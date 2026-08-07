@@ -219,7 +219,7 @@ input,select,textarea,button{font-family:var(--font-body);}
             <div>
               <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Pengajuan tanda tangan gabungan</div>
               <div style="font-family:var(--font-heading);font-size:28px;font-weight:700;letter-spacing:0.03em">{{ bundleView.id }}</div>
-              <div class="text-muted" style="font-size:13px">Diajukan {{ bundleView.oleh }} &middot; {{ bundleView.dibuat }} &middot; urutan berkas PO &rarr; SBK &rarr; Permintaan &rarr; Nota</div>
+              <div class="text-muted" style="font-size:13px">Diajukan {{ bundleView.oleh }} &middot; {{ bundleView.dibuat }} &middot; berkas dikelompokkan per proyek dan per permintaan (PO &rarr; SBK &rarr; Nota)</div>
             </div>
             <span class="tag tag-accent" style="font-size:12.5px">{{ bundleView.status }}</span>
           </div>
@@ -248,87 +248,104 @@ input,select,textarea,button{font-family:var(--font-body);}
           </div>
         </div>
 
-        <sc-for list="{{ bundleView.docs }}" as="bd" hint-placeholder-count="3">
-          <div class="card blueprint bundle-doc" style="padding:var(--space-6);gap:var(--space-4);border-color:{{ bd.border }}">
-            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-            <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;flex-wrap:wrap">
-              <div>
-                <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Dokumen {{ bd.no }} &middot; {{ bd.jenis }}</div>
-                <div style="font-family:var(--font-heading);font-size:22px;font-weight:700;letter-spacing:0.03em">{{ bd.id }}</div>
-                <div class="text-muted" style="font-size:12.5px">{{ bd.proyek }} &middot; pemohon {{ bd.pemohon }} &middot; asal {{ bd.asal }}</div>
-              </div>
-              <div style="text-align:right">
-                <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">{{ bd.nilaiLabel }}</div>
-                <div style="font-family:var(--font-heading);font-size:22px;font-weight:700">{{ bd.nilai }}</div>
-                <div style="font-size:12.5px;font-weight:600;color:{{ bd.dispoFg }}">{{ bd.dispoLabel }}</div>
-              </div>
+        <sc-for list="{{ bundleView.sections }}" as="sec" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:var(--space-5)">
+            <div style="border-bottom:2px solid var(--color-accent-900);padding-bottom:var(--space-2);display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);flex-wrap:wrap">
+              <div style="font-family:var(--font-heading);font-size:22px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase">Proyek — {{ sec.proyekLabel }}</div>
+              <span class="text-muted" style="font-size:12px;letter-spacing:0.1em;text-transform:uppercase">{{ sec.proyekKota }}</span>
             </div>
 
-            <sc-if value="{{ bd.isPo }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;flex-direction:column;gap:var(--space-3)">
-                <sc-for list="{{ bd.poBlocks }}" as="pb" hint-placeholder-count="2">
-                  <div style="border:1px solid var(--color-divider);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)">
-                    <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
-                      <span style="display:flex;gap:var(--space-3);align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-heading);font-size:18px;font-weight:700">{{ pb.toko }}</span><span class="tag tag-outline">{{ pb.termin }}</span></span>
-                      <span class="text-muted" style="font-size:12px">{{ pb.nItem }}</span>
-                    </div>
-                    <sc-for list="{{ pb.lines }}" as="pl" hint-placeholder-count="2">
-                      <div style="display:grid;grid-template-columns:1.6fr 100px 120px 120px;gap:var(--space-4);align-items:center;font-size:13px;border-top:1px solid var(--color-divider);padding-top:6px">
-                        <span style="font-weight:600">{{ pl.nama }}</span><span>{{ pl.qty }}</span><span class="text-muted" style="text-align:right">{{ pl.harga }}</span><span style="text-align:right;font-weight:600">{{ pl.subtotal }}</span>
-                      </div>
-                    </sc-for>
-                    <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline"><span class="text-muted" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase">Subtotal {{ pb.toko }}</span><span style="font-family:var(--font-heading);font-size:18px;font-weight:700">{{ pb.subtotal }}</span></div>
-                  </div>
-                </sc-for>
-              </div>
-            </sc-if>
-
-            <sc-if value="{{ bd.notPo }}" hint-placeholder-val="{{ false }}">
-              <div>
-                <div style="display:grid;grid-template-columns:26px 1.6fr 1.2fr 120px 120px;gap:var(--space-4);padding-bottom:6px;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
-                  <span>#</span><span>Material</span><span>Spesifikasi</span><span style="text-align:right">Qty</span><span style="text-align:right">Estimasi BoQ</span>
+            <sc-for list="{{ sec.reqGroups }}" as="rg" hint-placeholder-count="2">
+              <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+                <div style="background:var(--color-surface);border-left:3px solid var(--color-accent);padding:var(--space-3) var(--space-4)">
+                  <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">{{ rg.reqLabel }}</div>
+                  <div style="font-size:13px;color:var(--color-neutral-700)">{{ rg.reqSub }}</div>
                 </div>
-                <sc-for list="{{ bd.lines }}" as="ln" hint-placeholder-count="3">
-                  <div style="display:grid;grid-template-columns:26px 1.6fr 1.2fr 120px 120px;gap:var(--space-4);align-items:center;padding:8px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
-                    <span class="text-muted">{{ ln.no }}</span><span style="font-weight:600">{{ ln.nama }}</span><span class="text-muted" style="font-size:12.5px">{{ ln.spek }}</span><span style="text-align:right;font-weight:600">{{ ln.qty }}</span><span style="text-align:right">{{ ln.subtotal }}</span>
+
+                <sc-for list="{{ rg.docs }}" as="bd" hint-placeholder-count="2">
+                  <div class="card blueprint bundle-doc" style="padding:var(--space-6);gap:var(--space-4);border-color:{{ bd.border }}">
+                    <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                    <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;flex-wrap:wrap">
+                      <div>
+                        <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Dokumen {{ bd.no }} &middot; {{ bd.jenis }}</div>
+                        <div style="font-family:var(--font-heading);font-size:22px;font-weight:700;letter-spacing:0.03em">{{ bd.id }}</div>
+                        <div class="text-muted" style="font-size:12.5px">{{ bd.proyek }} &middot; pemohon {{ bd.pemohon }}<sc-if value="{{ bd.hasAsal }}" hint-placeholder-val="{{ true }}"> &middot; asal {{ bd.asal }}</sc-if></div>
+                      </div>
+                      <div style="text-align:right">
+                        <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">{{ bd.nilaiLabel }}</div>
+                        <div style="font-family:var(--font-heading);font-size:22px;font-weight:700">{{ bd.nilai }}</div>
+                        <div style="font-size:12.5px;font-weight:600;color:{{ bd.dispoFg }}">{{ bd.dispoLabel }}</div>
+                      </div>
+                    </div>
+
+                    <sc-if value="{{ bd.isPo }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+                        <sc-for list="{{ bd.poBlocks }}" as="pb" hint-placeholder-count="2">
+                          <div style="border:1px solid var(--color-divider);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)">
+                            <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+                              <span style="display:flex;gap:var(--space-3);align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-heading);font-size:18px;font-weight:700">{{ pb.toko }}</span><span class="tag tag-outline">{{ pb.termin }}</span></span>
+                              <span class="text-muted" style="font-size:12px">{{ pb.nItem }}</span>
+                            </div>
+                            <sc-for list="{{ pb.lines }}" as="pl" hint-placeholder-count="2">
+                              <div style="display:grid;grid-template-columns:1.6fr 100px 120px 120px;gap:var(--space-4);align-items:center;font-size:13px;border-top:1px solid var(--color-divider);padding-top:6px">
+                                <span style="font-weight:600">{{ pl.nama }}</span><span>{{ pl.qty }}</span><span class="text-muted" style="text-align:right">{{ pl.harga }}</span><span style="text-align:right;font-weight:600">{{ pl.subtotal }}</span>
+                              </div>
+                            </sc-for>
+                            <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline"><span class="text-muted" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase">Subtotal {{ pb.toko }}</span><span style="font-family:var(--font-heading);font-size:18px;font-weight:700">{{ pb.subtotal }}</span></div>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+
+                    <sc-if value="{{ bd.notPo }}" hint-placeholder-val="{{ false }}">
+                      <div>
+                        <div style="display:grid;grid-template-columns:26px 1.6fr 1.2fr 120px 120px;gap:var(--space-4);padding-bottom:6px;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+                          <span>#</span><span>Material</span><span>Spesifikasi</span><span style="text-align:right">Qty</span><span style="text-align:right">Estimasi BoQ</span>
+                        </div>
+                        <sc-for list="{{ bd.lines }}" as="ln" hint-placeholder-count="3">
+                          <div style="display:grid;grid-template-columns:26px 1.6fr 1.2fr 120px 120px;gap:var(--space-4);align-items:center;padding:8px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+                            <span class="text-muted">{{ ln.no }}</span><span style="font-weight:600">{{ ln.nama }}</span><span class="text-muted" style="font-size:12.5px">{{ ln.spek }}</span><span style="text-align:right;font-weight:600">{{ ln.qty }}</span><span style="text-align:right">{{ ln.subtotal }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+
+                    <sc-if value="{{ bd.isReq }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">
+                        <sc-for list="{{ bd.jobs }}" as="jb" hint-placeholder-count="2">
+                          <span class="tag tag-neutral" style="font-size:12px">{{ jb.huruf }}. {{ jb.nama }} &middot; {{ jb.volTxt }}</span>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+
+                    <sc-if value="{{ bd.hasNotas }}" hint-placeholder-val="{{ false }}">
+                      <div style="border-top:1px solid var(--color-divider);padding-top:var(--space-3);display:flex;flex-direction:column;gap:var(--space-3)">
+                        <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Nota terlampir</div>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-3)">
+                          <sc-for list="{{ bd.notas }}" as="nt" hint-placeholder-count="2">
+                            <div>
+                              <div class="text-muted" style="font-size:12px;margin-bottom:4px">{{ nt.label }}</div>
+                              <div style="height:180px;border:1px solid var(--color-divider)">
+                                <image-slot id="{{ nt.slotId }}" shape="rect" placeholder="Foto nota"></image-slot>
+                              </div>
+                            </div>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-if>
+
+                    <sc-if value="{{ bd.canAct }}" hint-placeholder-val="{{ true }}">
+                      <div class="no-print" style="display:flex;gap:var(--space-2);flex-wrap:wrap;border-top:1px solid var(--color-divider);padding-top:var(--space-3)">
+                        <button onClick="{{ bd.onApprove }}" class="btn btn-primary" style="min-height:42px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Setujui dokumen ini</button>
+                        <button onClick="{{ bd.onReject }}" class="btn btn-secondary" style="min-height:42px">Tolak</button>
+                      </div>
+                    </sc-if>
                   </div>
                 </sc-for>
               </div>
-            </sc-if>
-
-            <sc-if value="{{ bd.isReq }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">
-                <sc-for list="{{ bd.jobs }}" as="jb" hint-placeholder-count="2">
-                  <span class="tag tag-neutral" style="font-size:12px">{{ jb.huruf }}. {{ jb.nama }} &middot; {{ jb.volTxt }}</span>
-                </sc-for>
-              </div>
-            </sc-if>
-
-            <sc-if value="{{ bd.canAct }}" hint-placeholder-val="{{ true }}">
-              <div class="no-print" style="display:flex;gap:var(--space-2);flex-wrap:wrap;border-top:1px solid var(--color-divider);padding-top:var(--space-3)">
-                <button onClick="{{ bd.onApprove }}" class="btn btn-primary" style="min-height:42px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Setujui dokumen ini</button>
-                <button onClick="{{ bd.onReject }}" class="btn btn-secondary" style="min-height:42px">Tolak</button>
-              </div>
-            </sc-if>
+            </sc-for>
           </div>
         </sc-for>
-
-        <sc-if value="{{ bundleView.hasNotas }}" hint-placeholder-val="{{ false }}">
-          <div class="card blueprint bundle-notas" style="padding:var(--space-6);gap:var(--space-4)">
-            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-            <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Lampiran nota &mdash; per PO dan toko</div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-4)">
-              <sc-for list="{{ bundleView.notas }}" as="nt" hint-placeholder-count="3">
-                <div>
-                  <div class="text-muted" style="font-size:12px;margin-bottom:4px">{{ nt.label }}</div>
-                  <div style="height:200px;border:1px solid var(--color-divider)">
-                    <image-slot id="{{ nt.slotId }}" shape="rect" placeholder="Foto nota"></image-slot>
-                  </div>
-                </div>
-              </sc-for>
-            </div>
-          </div>
-        </sc-if>
       </div>
     </sc-if>
 
@@ -861,6 +878,80 @@ input,select,textarea,button{font-family:var(--font-body);}
               <button onClick="{{ onPoSubmit }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Ajukan PO ke Direktur</button>
               <span class="text-muted" style="font-size:13px">Total PO {{ poTotal }} · selisih terhadap BoQ {{ poSelisih }}</span>
             </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ hasFinSource }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+              <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Berkas asal — PO, SBK, dan permintaan yang menaunginya</span>
+              <span class="text-muted" style="font-size:12.5px">Kelompokkan per permintaan; buka masing-masing dokumen untuk verifikasi.</span>
+            </div>
+            <sc-for list="{{ finSourceGroups }}" as="sg" hint-placeholder-count="2">
+              <div style="border:1px solid var(--color-divider);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3)">
+                <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap;border-bottom:1px solid var(--color-divider);padding-bottom:var(--space-2)">
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">{{ sg.reqLabel }}</div>
+                    <div class="text-muted" style="font-size:12.5px">{{ sg.reqSub }}</div>
+                  </div>
+                  <sc-if value="{{ sg.hasReq }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ sg.reqOnOpen }}" class="btn btn-ghost" style="font-size:12.5px">Buka permintaan &rarr;</button>
+                  </sc-if>
+                </div>
+
+                <sc-for list="{{ sg.pos }}" as="po" hint-placeholder-count="1">
+                  <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+                    <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+                      <span style="display:flex;gap:var(--space-3);align-items:baseline;flex-wrap:wrap"><span class="tag tag-accent" style="font-size:11px">Purchase Order</span><span style="font-family:var(--font-heading);font-size:17px;font-weight:700">{{ po.id }}</span></span>
+                      <span style="display:flex;gap:var(--space-3);align-items:baseline">
+                        <span style="font-family:var(--font-heading);font-size:16px;font-weight:700">{{ po.total }}</span>
+                        <button onClick="{{ po.poOnOpen }}" class="btn btn-ghost" style="font-size:12.5px">Buka PO &rarr;</button>
+                      </span>
+                    </div>
+                    <sc-for list="{{ po.blocks }}" as="pb" hint-placeholder-count="1">
+                      <div style="border:1px dashed var(--color-divider);padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2)">
+                        <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+                          <span style="display:flex;gap:var(--space-2);align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-heading);font-size:15px;font-weight:700">{{ pb.toko }}</span><span class="tag tag-outline" style="font-size:11px">{{ pb.termin }}</span></span>
+                          <span style="font-family:var(--font-heading);font-size:15px;font-weight:700">{{ pb.subtotal }}</span>
+                        </div>
+                        <sc-for list="{{ pb.lines }}" as="pl" hint-placeholder-count="1">
+                          <div style="display:grid;grid-template-columns:1.6fr 100px 120px;gap:var(--space-3);align-items:center;font-size:13px;border-top:1px solid var(--color-divider);padding-top:5px">
+                            <span style="font-weight:600">{{ pl.nama }}</span><span>{{ pl.qty }}</span><span style="text-align:right;font-weight:600">{{ pl.subtotal }}</span>
+                          </div>
+                        </sc-for>
+                        <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline">
+                          <span class="text-muted" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase">Nota &mdash; {{ pb.toko }}</span>
+                        </div>
+                        <div style="height:160px;border:1px solid var(--color-divider)">
+                          <image-slot id="{{ pb.notaSlotId }}" shape="rect" placeholder="Foto nota"></image-slot>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+
+                <sc-if value="{{ sg.hasSbks }}" hint-placeholder-val="{{ false }}">
+                  <sc-for list="{{ sg.sbks }}" as="sb" hint-placeholder-count="1">
+                    <div style="border:1px dashed var(--color-divider);padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2)">
+                      <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+                        <span style="display:flex;gap:var(--space-3);align-items:baseline;flex-wrap:wrap"><span class="tag tag-accent-2" style="font-size:11px">Surat Barang Keluar</span><span style="font-family:var(--font-heading);font-size:16px;font-weight:700">{{ sb.id }}</span></span>
+                        <span style="display:flex;gap:var(--space-3);align-items:baseline">
+                          <span style="font-family:var(--font-heading);font-size:15px;font-weight:700">{{ sb.total }}</span>
+                          <button onClick="{{ sb.sbkOnOpen }}" class="btn btn-ghost" style="font-size:12.5px">Buka SBK &rarr;</button>
+                        </span>
+                      </div>
+                      <div class="text-muted" style="font-size:12px">Diambil oleh {{ sb.pemohon }}</div>
+                      <sc-for list="{{ sb.lines }}" as="ln" hint-placeholder-count="1">
+                        <div style="display:grid;grid-template-columns:26px 1.6fr 1.2fr 120px 120px;gap:var(--space-3);align-items:center;font-size:13px;border-top:1px solid var(--color-divider);padding-top:5px">
+                          <span class="text-muted">{{ ln.no }}</span><span style="font-weight:600">{{ ln.nama }}</span><span class="text-muted" style="font-size:12px">{{ ln.spek }}</span><span style="text-align:right;font-weight:600">{{ ln.qty }}</span><span style="text-align:right">{{ ln.subtotal }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-for>
+                </sc-if>
+              </div>
+            </sc-for>
           </div>
         </sc-if>
 
@@ -1851,7 +1942,7 @@ class Component extends DCLogic {
     });
     let bundleView = null;
     if (openB) {
-      const bDocs = this.bundleDocs(openB).slice().sort((a, b) => ORD[a.t] - ORD[b.t]);
+      const bDocs = this.bundleDocs(openB).slice();
       const dk = openB.dispo || {};
       const finalize = b => { if (this.bundleDocs(b).every(y => (b.dispo || {})[y.t + '|' + y.d.id])) { b.status = 'Selesai'; b.trail.push({ ts: this.now(1), actor: me, peran, aksi: 'Pengajuan selesai diproses', note: 'Seluruh dokumen telah ditandatangani atau ditolak' }); } };
       const decide = (x, kind) => {
@@ -1864,10 +1955,50 @@ class Component extends DCLogic {
       };
       const nPo = bDocs.filter(x => x.t === 'po').length, nSbk = bDocs.filter(x => x.t === 'sbk').length, nReq = bDocs.filter(x => x.t === 'req').length;
       const parts = []; if (nPo) parts.push(nPo + ' PO'); if (nSbk) parts.push(nSbk + ' SBK'); if (nReq) parts.push(nReq + ' Permintaan');
-      const notas = [];
-      bDocs.filter(x => x.t === 'po').forEach(x => this.tokosOf(x.d).forEach(tk => notas.push({ label: x.d.id + ' \u2014 ' + tk, slotId: 'nota-' + x.d.id + '-' + tk.replace(/\s+/g, '') })));
+      // F4: kelompokkan bDocs per proyek \u2192 per permintaan (reqId, atau id sendiri untuk doc req);
+      //     dalam satu permintaan, PO dulu lalu SBK. Nota tampil inline di kartu PO.
+      const REQ_TYPE_ORDER = { po: 0, sbk: 1, req: 2 };
+      const groupKey = x => x.d.reqId || x.d.id;
+      const proyekOrder = [];
+      bDocs.forEach(x => { const p = x.d.proyek || 'pakuwon'; if (proyekOrder.indexOf(p) < 0) proyekOrder.push(p); });
+      let seqNo = 0;
+      const buildDocView = x => {
+        const dd = x.d, key = x.t + '|' + dd.id, dispo = dk[key] || '';
+        seqNo += 1;
+        return { key, no: seqNo, jenis: this.JENIS[x.t], id: dd.id, proyek: this.proyekNama(dd.proyek),
+          pemohon: dd.pemohon || dd.oleh, asal: dd.reqId || '-',
+          hasAsal: !!dd.reqId,
+          nilaiLabel: x.t === 'po' ? 'Total PO' : x.t === 'sbk' ? 'Nilai stok keluar' : 'Estimasi BoQ',
+          nilai: rp(this.nilaiOf(x.t, dd)), dispo, decided: !!dispo,
+          dispoLabel: dispo === 'setuju' ? '\u2713 Disetujui' : dispo === 'tolak' ? '\u2715 Ditolak' : 'Menunggu keputusan',
+          dispoFg: dispo === 'setuju' ? 'var(--color-accent-700)' : dispo === 'tolak' ? this.RED : 'var(--color-neutral-600)',
+          border: dispo === 'setuju' ? 'var(--color-accent)' : dispo === 'tolak' ? this.RED : 'var(--color-divider)',
+          canAct: openB.status === 'Menunggu TTD' && !dispo,
+          isPo: x.t === 'po', isSbk: x.t === 'sbk', isReq: x.t === 'req', notPo: x.t !== 'po',
+          poBlocks: x.t === 'po' ? poBlocksOf(dd) : [], lines: x.t !== 'po' ? docLinesOf(x.t, dd) : [], jobs: x.t === 'req' ? docJobsOf(dd) : [],
+          notas: x.t === 'po' ? this.tokosOf(dd).map(tk => ({ label: dd.id + ' \u2014 ' + tk, slotId: 'nota-' + dd.id + '-' + tk.replace(/\s+/g, '') })) : [],
+          hasNotas: x.t === 'po' && this.tokosOf(dd).length > 0,
+          onApprove: () => decide(x, 'setuju'), onReject: () => decide(x, 'tolak') };
+      };
+      const sections = proyekOrder.map(pj => {
+        const pjDocs = bDocs.filter(x => (x.d.proyek || 'pakuwon') === pj);
+        const reqOrder = [];
+        pjDocs.forEach(x => { const k = groupKey(x); if (reqOrder.indexOf(k) < 0) reqOrder.push(k); });
+        const reqGroups = reqOrder.map(rk => {
+          const gDocs = pjDocs.filter(x => groupKey(x) === rk)
+            .sort((a, b) => REQ_TYPE_ORDER[a.t] - REQ_TYPE_ORDER[b.t]);
+          const first = gDocs[0].d;
+          return {
+            reqId: rk,
+            reqLabel: 'Permintaan ' + rk,
+            reqSub: 'Pemohon ' + (first.pemohon || first.oleh),
+            docs: gDocs.map(buildDocView)
+          };
+        });
+        return { proyekLabel: this.proyekNama(pj), proyekKota: this.proyekKota(pj), reqGroups };
+      });
       bundleView = {
-        id: openB.id, oleh: openB.oleh, dibuat: openB.dibuat, status: openB.status, selesai: openB.status !== 'Menunggu TTD', pending: openB.status === 'Menunggu TTD', hasNotas: notas.length > 0,
+        id: openB.id, oleh: openB.oleh, dibuat: openB.dibuat, status: openB.status, selesai: openB.status !== 'Menunggu TTD', pending: openB.status === 'Menunggu TTD',
         count: bDocs.length + ' dokumen', breakdown: parts.join(' \u00b7 '), nilai: rp(this.bundleNilai(openB)),
         proyekChips: this.bundleProyeks(openB).map(p => this.proyekNama(p)),
         nDecided: bDocs.filter(x => dk[x.t + '|' + x.d.id]).length + ' dari ' + bDocs.length + ' dokumen sudah diputuskan',
@@ -1880,22 +2011,55 @@ class Component extends DCLogic {
           this.touch({ screen: 'meja', openBundle: null });
           this.flash(openB.id + ' \u2014 ' + bDocs.length + ' dokumen ditandatangani sekaligus.');
         },
-        docs: bDocs.map((x, idx) => {
-          const dd = x.d, key = x.t + '|' + dd.id, dispo = dk[key] || '';
-          return { key, no: idx + 1, jenis: this.JENIS[x.t], id: dd.id, proyek: this.proyekNama(dd.proyek),
-            pemohon: dd.pemohon || dd.oleh, asal: dd.reqId || '\u2014', nilaiLabel: x.t === 'po' ? 'Total PO' : x.t === 'sbk' ? 'Nilai stok keluar' : 'Estimasi BoQ',
-            nilai: rp(this.nilaiOf(x.t, dd)), dispo, decided: !!dispo,
-            dispoLabel: dispo === 'setuju' ? '\u2713 Disetujui' : dispo === 'tolak' ? '\u2715 Ditolak' : 'Menunggu keputusan',
-            dispoFg: dispo === 'setuju' ? 'var(--color-accent-700)' : dispo === 'tolak' ? this.RED : 'var(--color-neutral-600)',
-            border: dispo === 'setuju' ? 'var(--color-accent)' : dispo === 'tolak' ? this.RED : 'var(--color-divider)',
-            canAct: openB.status === 'Menunggu TTD' && !dispo,
-            isPo: x.t === 'po', isSbk: x.t === 'sbk', isReq: x.t === 'req', notPo: x.t !== 'po',
-            poBlocks: x.t === 'po' ? poBlocksOf(dd) : [], lines: x.t !== 'po' ? docLinesOf(x.t, dd) : [], jobs: x.t === 'req' ? docJobsOf(dd) : [],
-            onApprove: () => decide(x, 'setuju'), onReject: () => decide(x, 'tolak') };
-        }),
-        notas
+        sections
       };
     }
+
+    // ---------- finance: berkas asal (F4 mirror) ----------
+    // Kelompokkan tagihan per permintaan asal → tampilkan PO, SBK, dan nota
+    // yang menaunginya, bukan hanya total per vendor.
+    const finSourceGroups = showFinance ? (() => {
+      const seen = [], groups = [];
+      (d.items || []).forEach(i => {
+        const po = s.pos.find(p => p.id === i.poId); if (!po) return;
+        const rid = po.reqId || po.id;
+        if (seen.indexOf(rid) < 0) { seen.push(rid); groups.push(rid); }
+      });
+      return groups.map(rid => {
+        const req = s.reqs.find(r => r.id === rid);
+        const poIds = Array.from(new Set((d.items || []).map(i => i.poId)
+          .filter(pid => { const po = s.pos.find(p => p.id === pid); return po && (po.reqId || po.id) === rid; })));
+        const relPos = poIds.map(pid => s.pos.find(p => p.id === pid)).filter(Boolean);
+        const relSbks = s.sbks.filter(sb => sb.reqId === rid);
+        return {
+          reqId: rid, reqLabel: 'Permintaan ' + rid,
+          reqSub: req ? this.proyekNama(req.proyek) + ' · pemohon ' + (req.oleh || '-') : '(permintaan tidak ditemukan)',
+          hasReq: !!req,
+          reqOnOpen: req ? () => this.open('req', rid) : () => this.flash('Permintaan ' + rid + ' tidak tersedia di data demo.'),
+          pos: relPos.map(po => ({
+            id: po.id, total: rp(this.nilaiPo(po)),
+            poOnOpen: () => this.open('po', po.id),
+            blocks: Object.values(po.lines.reduce((acc, l) => {
+              const tk = l.toko || 'Belum ditentukan';
+              if (!acc[tk]) acc[tk] = { toko: tk, lines: [], v: 0 };
+              const it = this.item(l.itemId), sub = Number(l.vol) * Number(l.harga || 0);
+              acc[tk].lines.push({ nama: it.nama, qty: this.num(l.vol) + ' ' + it.satuan, subtotal: rp(sub) });
+              acc[tk].v += sub; return acc;
+            }, {})).map(g => ({ toko: g.toko, termin: this.terminLabel(this.terminOf(po, g.toko)),
+              lines: g.lines, subtotal: rp(g.v),
+              notaSlotId: 'nota-' + po.id + '-' + g.toko.replace(/\s+/g, '') }))
+          })),
+          sbks: relSbks.map(sb => ({
+            id: sb.id, total: rp(this.nilaiSbk(sb)),
+            sbkOnOpen: () => this.open('sbk', sb.id),
+            pemohon: sb.pemohon || sb.oleh,
+            lines: sb.lines.map((l, i) => { const it = this.item(l.itemId);
+              return { no: i + 1, nama: it.nama, spek: it.spek, qty: this.num(l.vol) + ' ' + it.satuan, subtotal: rp(Number(l.vol) * it.harga) }; })
+          })),
+          hasSbks: relSbks.length > 0
+        };
+      });
+    })() : [];
 
     // ---------- finance multi-bukti per vendor ----------
     const finVendorRows = showFinance ? finGroups.map(g => {
@@ -2022,7 +2186,7 @@ class Component extends DCLogic {
         d.status = 'TTD Direktur'; d.sejak = 'baru saja';
         this.touch(); this.flash(d.id + ' diajukan ke Direktur — nota terlampir.');
       },
-      showFinance, finRows: finVendorRows,
+      showFinance, finRows: finVendorRows, finSourceGroups, hasFinSource: finSourceGroups.length > 0,
       payTotal: rp(nilai),
       finNotas: showFinance ? Object.values((d.items || []).reduce((acc, i) => {
         const k = i.poId + '|' + i.toko;
