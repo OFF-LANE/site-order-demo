@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/industry-ab829479-a357-4af7-9a6c-9318c723d454/styles.css">
+<script src="_ds/industry-ab829479-a357-4af7-9a6c-9318c723d454/_ds_bundle.js"></script>
+<script src="./image-slot.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);}
+a{color:var(--color-accent-700);} a:hover{color:var(--color-accent-800);}
+input,select,textarea,button{font-family:var(--font-body);}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@media print{.no-print{display:none !important} body{background:#fff} main{padding:0 !important;max-width:none !important} .bundle-doc{break-inside:avoid;page-break-inside:avoid} .bundle-notas{break-before:page;page-break-before:always}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+  <header class="no-print" style="background:var(--color-accent-900);color:var(--color-bg);padding:0 var(--space-6);position:relative">
+    <div style="max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:var(--space-6);flex-wrap:wrap;padding:var(--space-4) 0">
+      <div style="margin-right:auto">
+        <div style="font-family:var(--font-heading);font-weight:700;font-size:22px;letter-spacing:0.06em;text-transform:uppercase">SiteOrder</div>
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-300)">DITIRU — PT. Dimensi Tiga Ruang</div>
+      </div>
+      <button onClick="{{ onBell }}" title="Notifikasi" style="position:relative;border:1px solid var(--color-accent-600);background:transparent;color:var(--color-bg);width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+        <sc-if value="{{ notifCount }}" hint-placeholder-val="{{ false }}">
+          <span style="position:absolute;top:-7px;right:-7px;background:#b23b32;color:#fff;font-size:11px;font-weight:700;min-width:19px;height:19px;display:flex;align-items:center;justify-content:center;padding:0 4px">{{ notifCount }}</span>
+        </sc-if>
+      </button>
+      <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap">
+        <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-300)">Peran</span>
+        <sc-for list="{{ roleChips }}" as="rc" hint-placeholder-count="7">
+          <button onClick="{{ rc.onPick }}" style="border:1px solid {{ rc.border }};background:{{ rc.bg }};color:{{ rc.fg }};font-family:var(--font-heading);font-size:14px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:6px 12px;cursor:pointer">{{ rc.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <sc-if value="{{ showNotif }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;right:var(--space-6);top:72px;width:370px;max-width:calc(100vw - 32px);background:var(--color-bg);color:var(--color-text);border:1px solid var(--color-accent-900);box-shadow:var(--shadow-lg);z-index:40;max-height:70vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);padding:var(--space-4);border-bottom:1px solid var(--color-divider)">
+          <span style="font-family:var(--font-heading);font-size:17px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase">Notifikasi</span>
+          <span class="tag tag-outline">{{ roleLabel }}</span>
+        </div>
+        <sc-if value="{{ notifEmpty }}" hint-placeholder-val="{{ false }}">
+          <div class="text-muted" style="padding:var(--space-6);font-size:13px">Tidak ada notifikasi untuk peran ini.</div>
+        </sc-if>
+        <sc-for list="{{ notifs }}" as="n" hint-placeholder-count="3">
+          <div onClick="{{ n.onOpen }}" style="padding:var(--space-4);border-bottom:1px solid var(--color-divider);cursor:pointer;display:flex;gap:var(--space-3);align-items:flex-start">
+            <span style="width:8px;height:8px;background:{{ n.dot }};margin-top:6px;flex-shrink:0"></span>
+            <span>
+              <span style="display:block;font-size:13.5px;font-weight:600">{{ n.judul }}</span>
+              <span class="text-muted" style="display:block;font-size:12.5px">{{ n.sub }}</span>
+              <span class="text-muted" style="display:block;font-size:11.5px;margin-top:2px">{{ n.ts }}</span>
+            </span>
+          </div>
+        </sc-for>
+        <div style="padding:var(--space-4);display:flex;justify-content:space-between;align-items:center;gap:var(--space-3)">
+          <span class="text-muted" style="font-size:12px">Kanal WhatsApp — menyusul</span>
+          <button onClick="{{ onWa }}" class="btn btn-secondary" style="font-size:12.5px">Aktifkan nanti</button>
+        </div>
+      </div>
+    </sc-if>
+  </header>
+  <div class="no-print" style="background:var(--color-accent-800);color:var(--color-accent-200);font-size:12.5px;padding:var(--space-2) var(--space-6)">
+    <div style="max-width:1180px;margin:0 auto;display:flex;gap:var(--space-6);flex-wrap:wrap">
+      <span>Proyek — <strong style="color:var(--color-bg)">{{ proyekNama }}</strong></span>
+      <span>Opening — <strong style="color:var(--color-bg)">{{ proyekOpening }}</strong></span>
+      <span>{{ userName }} — {{ roleLabel }}</span>
+    </div>
+  </div>
+  <nav class="no-print" style="background:var(--color-surface);border-bottom:1px solid var(--color-divider);padding:0 var(--space-6)">
+    <div style="max-width:1180px;margin:0 auto;display:flex;gap:2px;overflow-x:auto">
+      <sc-for list="{{ navTabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.onPick }}" style="border:none;background:{{ t.bg }};cursor:pointer;padding:12px 16px;font-family:var(--font-heading);font-size:15px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;color:{{ t.fg }};border-bottom:3px solid {{ t.line }}">{{ t.label }}</button>
+      </sc-for>
+    </div>
+  </nav>
+  <main style="max-width:{{ mainW }};margin:0 auto;width:100%;box-sizing:border-box;padding:var(--space-8) var(--space-6) 80px;flex:1">
+
+    <sc-if value="{{ showMeja }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-6)">
+        <div>
+          <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Meja Direktur</div>
+          <h1 style="font-size:30px;margin:var(--space-2) 0 0">Dokumen menunggu tanda tangan Anda</h1>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-6)">
+          <div class="card blueprint" style="padding:var(--space-6);background:var(--color-accent-900);color:var(--color-bg);border-color:var(--color-accent-900)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-300)">Menunggu tanda tangan Anda</div>
+            <div style="font-family:var(--font-heading);font-size:38px;font-weight:700;line-height:1;margin-top:var(--space-2)">{{ mejaCount }} dokumen</div>
+            <div style="font-size:14px;color:var(--color-accent-200)">Nilai terkait {{ mejaNilai }}</div>
+          </div>
+          <div class="card blueprint" style="padding:var(--space-6)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Nilai PO berjalan</div>
+            <div style="font-family:var(--font-heading);font-size:38px;font-weight:700;line-height:1;margin-top:var(--space-2)">{{ belanjaMinggu }}</div>
+            <div class="text-muted" style="font-size:14px">PO menunggu tanda tangan dan di vendor</div>
+          </div>
+          <div class="card blueprint" style="padding:var(--space-6);border-color:{{ boqBorder }}">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:{{ boqFg }}">Item pekerjaan melebihi BoQ</div>
+            <div style="font-family:var(--font-heading);font-size:38px;font-weight:700;line-height:1;margin-top:var(--space-2);color:{{ boqFg }}">{{ boqOverCount }}</div>
+            <div class="text-muted" style="font-size:14px">{{ boqOverKet }}</div>
+          </div>
+        </div>
+
+        <sc-if value="{{ hasBundles }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <div style="display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;border-bottom:1px solid var(--color-divider);padding-bottom:var(--space-2)">
+              <h2 style="font-size:21px;margin:0">Pengajuan tanda tangan gabungan</h2>
+              <span class="text-muted" style="font-size:13px">Dari Purchasing — beberapa dokumen lintas proyek dalam satu berkas</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:var(--space-4)">
+              <sc-for list="{{ bundleCards }}" as="bc" hint-placeholder-count="1">
+                <div onClick="{{ bc.onOpen }}" class="card blueprint" style="padding:var(--space-6);gap:var(--space-3);cursor:pointer;border-color:var(--color-accent)">
+                  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                  <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;flex-wrap:wrap">
+                    <div>
+                      <div style="font-family:var(--font-heading);font-size:22px;font-weight:700;letter-spacing:0.03em">{{ bc.id }}</div>
+                      <div class="text-muted" style="font-size:12.5px">Diajukan {{ bc.oleh }} · {{ bc.dibuat }}</div>
+                    </div>
+                    <span class="tag tag-accent">{{ bc.nProyek }}</span>
+                  </div>
+                  <div style="display:flex;gap:var(--space-2);flex-wrap:wrap">
+                    <span class="tag tag-outline">{{ bc.count }}</span>
+                    <span class="tag tag-outline">{{ bc.breakdown }}</span>
+                  </div>
+                  <div class="text-muted" style="font-size:13px">Proyek — {{ bc.proyekTxt }}</div>
+                  <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;border-top:1px solid var(--color-divider);padding-top:var(--space-3)">
+                    <span class="text-muted" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase">Total nilai</span>
+                    <span style="font-family:var(--font-heading);font-size:24px;font-weight:700">{{ bc.nilai }}</span>
+                  </div>
+                  <button onClick="{{ bc.onOpen }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Buka &amp; tanda tangani</button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ mejaEmpty }}" hint-placeholder-val="{{ false }}">
+          <div class="card" style="padding:var(--space-8);text-align:center">
+            <div style="font-family:var(--font-heading);font-size:22px">Meja Anda bersih</div>
+            <div class="text-muted" style="font-size:14px">Tidak ada dokumen yang menunggu tanda tangan.</div>
+          </div>
+        </sc-if>
+
+        <sc-for list="{{ mejaGroups }}" as="g" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;border-bottom:1px solid var(--color-divider);padding-bottom:var(--space-2)">
+              <div style="display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap">
+                <h2 style="font-size:21px;margin:0">{{ g.judul }}</h2>
+                <span class="tag tag-accent">{{ g.countLabel }}</span>
+                <span class="text-muted" style="font-size:13px">{{ g.nilai }}</span>
+              </div>
+              <button onClick="{{ g.onAll }}" class="btn btn-secondary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Setujui semua</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--space-4)">
+              <sc-for list="{{ g.docs }}" as="d" hint-placeholder-count="2">
+                <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-3);border-color:{{ d.border }}">
+                  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                  <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;flex-wrap:wrap">
+                    <div>
+                      <div style="font-family:var(--font-heading);font-size:20px;font-weight:700;letter-spacing:0.03em">{{ d.id }}</div>
+                      <div class="text-muted" style="font-size:12.5px">{{ d.sub }}</div>
+                    </div>
+                    <span class="tag tag-outline">{{ d.tunggu }}</span>
+                  </div>
+                  <sc-if value="{{ d.flag }}" hint-placeholder-val="{{ false }}">
+                    <div style="background:{{ d.flagBg }};color:#fff;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;align-self:flex-start">{{ d.flag }}</div>
+                  </sc-if>
+                  <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:var(--space-3) 0">
+                    <span class="text-muted" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase">{{ d.nilaiLabel }}</span>
+                    <span style="font-family:var(--font-heading);font-size:24px;font-weight:700">{{ d.nilai }}</span>
+                  </div>
+                  <sc-if value="{{ d.notaSlot }}" hint-placeholder-val="{{ false }}">
+                    <div>
+                      <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:4px">Nota dari toko — nominal harus sama</div>
+                      <div style="height:150px;border:1px solid var(--color-divider)">
+                        <image-slot id="{{ d.notaSlot }}" shape="rect" placeholder="Foto nota penawaran"></image-slot>
+                      </div>
+                    </div>
+                  </sc-if>
+                  <div class="text-muted" style="font-size:12.5px">{{ d.ket }}</div>
+                  <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-1)">
+                    <button onClick="{{ d.onApprove }}" class="btn btn-primary" style="flex:1;min-width:130px;min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Setujui</button>
+                    <button onClick="{{ d.onRevisi }}" class="btn btn-secondary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Minta revisi</button>
+                    <button onClick="{{ d.onOpen }}" class="btn btn-ghost" style="min-height:44px">Rincian</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showBundle }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-5)">
+        <div class="no-print" style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center">
+          <button onClick="{{ bundleView.onBack }}" class="btn btn-ghost" style="margin-right:auto">&larr; Kembali ke meja</button>
+          <button onClick="{{ bundleView.onPrint }}" class="btn btn-secondary" style="min-height:44px">Cetak / unduh PDF</button>
+          <sc-if value="{{ bundleView.selesai }}" hint-placeholder-val="{{ false }}">
+            <span class="tag tag-accent" style="font-size:13px">Sudah diproses</span>
+          </sc-if>
+          <sc-if value="{{ bundleView.pending }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ bundleView.onSetujuiSemua }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Setujui semua</button>
+          </sc-if>
+        </div>
+
+        <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;flex-wrap:wrap">
+            <div>
+              <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Pengajuan tanda tangan gabungan</div>
+              <div style="font-family:var(--font-heading);font-size:28px;font-weight:700;letter-spacing:0.03em">{{ bundleView.id }}</div>
+              <div class="text-muted" style="font-size:13px">Diajukan {{ bundleView.oleh }} &middot; {{ bundleView.dibuat }} &middot; urutan berkas PO &rarr; SBK &rarr; Permintaan &rarr; Nota</div>
+            </div>
+            <span class="tag tag-accent" style="font-size:12.5px">{{ bundleView.status }}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--space-4);border-top:1px solid var(--color-divider);padding-top:var(--space-4)">
+            <div>
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Total nilai</div>
+              <div style="font-family:var(--font-heading);font-size:26px;font-weight:700;line-height:1.1">{{ bundleView.nilai }}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Jumlah dokumen</div>
+              <div style="font-family:var(--font-heading);font-size:26px;font-weight:700;line-height:1.1">{{ bundleView.count }}</div>
+              <div class="text-muted" style="font-size:12.5px">{{ bundleView.breakdown }}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Proyek</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+                <sc-for list="{{ bundleView.proyekChips }}" as="pc" hint-placeholder-count="2">
+                  <span class="tag tag-outline" style="font-size:12px">{{ pc }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Keputusan</div>
+              <div style="font-size:14px;font-weight:600;margin-top:4px">{{ bundleView.nDecided }}</div>
+            </div>
+          </div>
+        </div>
+
+        <sc-for list="{{ bundleView.docs }}" as="bd" hint-placeholder-count="3">
+          <div class="card blueprint bundle-doc" style="padding:var(--space-6);gap:var(--space-4);border-color:{{ bd.border }}">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;flex-wrap:wrap">
+              <div>
+                <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Dokumen {{ bd.no }} &middot; {{ bd.jenis }}</div>
+                <div style="font-family:var(--font-heading);font-size:22px;font-weight:700;letter-spacing:0.03em">{{ bd.id }}</div>
+                <div class="text-muted" style="font-size:12.5px">{{ bd.proyek }} &middot; pemohon {{ bd.pemohon }} &middot; asal {{ bd.asal }}</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">{{ bd.nilaiLabel }}</div>
+                <div style="font-family:var(--font-heading);font-size:22px;font-weight:700">{{ bd.nilai }}</div>
+                <div style="font-size:12.5px;font-weight:600;color:{{ bd.dispoFg }}">{{ bd.dispoLabel }}</div>
+              </div>
+            </div>
+
+            <sc-if value="{{ bd.isPo }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+                <sc-for list="{{ bd.poBlocks }}" as="pb" hint-placeholder-count="2">
+                  <div style="border:1px solid var(--color-divider);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)">
+                    <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+                      <span style="display:flex;gap:var(--space-3);align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-heading);font-size:18px;font-weight:700">{{ pb.toko }}</span><span class="tag tag-outline">{{ pb.termin }}</span></span>
+                      <span class="text-muted" style="font-size:12px">{{ pb.nItem }}</span>
+                    </div>
+                    <sc-for list="{{ pb.lines }}" as="pl" hint-placeholder-count="2">
+                      <div style="display:grid;grid-template-columns:1.6fr 100px 120px 120px;gap:var(--space-4);align-items:center;font-size:13px;border-top:1px solid var(--color-divider);padding-top:6px">
+                        <span style="font-weight:600">{{ pl.nama }}</span><span>{{ pl.qty }}</span><span class="text-muted" style="text-align:right">{{ pl.harga }}</span><span style="text-align:right;font-weight:600">{{ pl.subtotal }}</span>
+                      </div>
+                    </sc-for>
+                    <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline"><span class="text-muted" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase">Subtotal {{ pb.toko }}</span><span style="font-family:var(--font-heading);font-size:18px;font-weight:700">{{ pb.subtotal }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ bd.notPo }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="display:grid;grid-template-columns:26px 1.6fr 1.2fr 120px 120px;gap:var(--space-4);padding-bottom:6px;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+                  <span>#</span><span>Material</span><span>Spesifikasi</span><span style="text-align:right">Qty</span><span style="text-align:right">Estimasi BoQ</span>
+                </div>
+                <sc-for list="{{ bd.lines }}" as="ln" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:26px 1.6fr 1.2fr 120px 120px;gap:var(--space-4);align-items:center;padding:8px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+                    <span class="text-muted">{{ ln.no }}</span><span style="font-weight:600">{{ ln.nama }}</span><span class="text-muted" style="font-size:12.5px">{{ ln.spek }}</span><span style="text-align:right;font-weight:600">{{ ln.qty }}</span><span style="text-align:right">{{ ln.subtotal }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ bd.isReq }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">
+                <sc-for list="{{ bd.jobs }}" as="jb" hint-placeholder-count="2">
+                  <span class="tag tag-neutral" style="font-size:12px">{{ jb.huruf }}. {{ jb.nama }} &middot; {{ jb.volTxt }}</span>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ bd.canAct }}" hint-placeholder-val="{{ true }}">
+              <div class="no-print" style="display:flex;gap:var(--space-2);flex-wrap:wrap;border-top:1px solid var(--color-divider);padding-top:var(--space-3)">
+                <button onClick="{{ bd.onApprove }}" class="btn btn-primary" style="min-height:42px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Setujui dokumen ini</button>
+                <button onClick="{{ bd.onReject }}" class="btn btn-secondary" style="min-height:42px">Tolak</button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+
+        <sc-if value="{{ bundleView.hasNotas }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint bundle-notas" style="padding:var(--space-6);gap:var(--space-4)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Lampiran nota &mdash; per PO dan toko</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-4)">
+              <sc-for list="{{ bundleView.notas }}" as="nt" hint-placeholder-count="3">
+                <div>
+                  <div class="text-muted" style="font-size:12px;margin-bottom:4px">{{ nt.label }}</div>
+                  <div style="height:200px;border:1px solid var(--color-divider)">
+                    <image-slot id="{{ nt.slotId }}" shape="rect" placeholder="Foto nota"></image-slot>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showBudget }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-6)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:var(--space-4);flex-wrap:wrap">
+          <div>
+            <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Dashboard Budget</div>
+            <h1 style="font-size:30px;margin:var(--space-2) 0 0">Estimasi BoQ dibanding realisasi PO</h1>
+          </div>
+          <div style="display:flex;gap:var(--space-3);align-items:flex-end;flex-wrap:wrap">
+            <div>
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Proyek</div>
+              {{ proyekSelectEl }}
+            </div>
+            <button onClick="{{ onExport }}" class="btn btn-secondary">Ekspor ke Excel</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--space-4)">
+          <div class="card blueprint" style="padding:var(--space-6)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Budget BoQ</div>
+            <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;line-height:1.1">{{ bTotal }}</div>
+            <div class="text-muted" style="font-size:12.5px">6 kategori material</div>
+          </div>
+          <div class="card blueprint" style="padding:var(--space-6)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Estimasi disetujui</div>
+            <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;line-height:1.1">{{ bEstimasi }}</div>
+            <div class="text-muted" style="font-size:12.5px">harga BoQ saat permintaan lolos QS</div>
+          </div>
+          <div class="card blueprint" style="padding:var(--space-6)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Aktual (PO + stok)</div>
+            <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;line-height:1.1">{{ bAktual }}</div>
+            <div class="text-muted" style="font-size:12.5px">harga nota toko pada PO terbit</div>
+          </div>
+          <div class="card blueprint" style="padding:var(--space-6);border-color:{{ bSelisihBorder }}">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:{{ bSelisihFg }}">Selisih aktual vs estimasi</div>
+            <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;line-height:1.1;color:{{ bSelisihFg }}">{{ bSelisih }}</div>
+            <div style="font-size:12.5px;color:{{ bSelisihFg }}">{{ bSelisihLabel }}</div>
+          </div>
+          <div class="card blueprint" style="padding:var(--space-6)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Sisa budget</div>
+            <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;line-height:1.1">{{ bSisa }}</div>
+            <div class="text-muted" style="font-size:12.5px">{{ bSerap }}% terserap</div>
+          </div>
+        </div>
+
+        <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4);overflow-x:auto">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Volume pekerjaan terhadap BoQ proyek</div>
+          <div style="min-width:640px">
+            <div style="display:grid;grid-template-columns:1.6fr 90px 110px 110px 110px 1fr;gap:var(--space-4);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+              <span>Item pekerjaan</span><span style="text-align:right">BoQ</span><span style="text-align:right">Terpakai</span><span style="text-align:right">Diminta</span><span style="text-align:right">Sisa</span><span>Status</span>
+            </div>
+            <sc-for list="{{ boqRows }}" as="br" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:1.6fr 90px 110px 110px 110px 1fr;gap:var(--space-4);align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+                <span style="font-weight:600">{{ br.nama }}</span>
+                <span class="text-muted" style="text-align:right">{{ br.boq }}</span>
+                <span style="text-align:right">{{ br.terpakai }}</span>
+                <span style="text-align:right">{{ br.diminta }}</span>
+                <span style="text-align:right;font-weight:600;color:{{ br.fg }}">{{ br.sisa }}</span>
+                <span style="font-size:12.5px;font-weight:600;color:{{ br.fg }}">{{ br.status }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:var(--space-6)">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Realisasi per minggu</div>
+            <div style="display:flex;align-items:flex-end;gap:var(--space-4);height:160px">
+              <sc-for list="{{ weekBars }}" as="wb" hint-placeholder-count="6">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end">
+                  <span style="font-size:11px;font-weight:600;color:{{ wb.fg }}">{{ wb.nilai }}</span>
+                  <div style="width:100%;height:{{ wb.h }};background:{{ wb.color }};min-height:2px"></div>
+                  <span class="text-muted" style="font-size:11px;font-weight:600">M{{ wb.minggu }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div class="text-muted" style="font-size:12px">Batang penuh = sudah ada PO/SBK terbit. Batang muda = masih estimasi BoQ.</div>
+          </div>
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-3)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);flex-wrap:wrap">
+              <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Dokumen berjalan</span>
+              <span style="display:flex;gap:var(--space-3);flex-wrap:wrap;font-size:11px">
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;background:#b23b32"></span>Revisi</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;background:#c1741f"></span>Genting</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;background:#8a8d8f"></span>Ditahan</span>
+              </span>
+            </div>
+            <sc-if value="{{ pipelineEmpty }}" hint-placeholder-val="{{ false }}">
+              <div class="text-muted" style="font-size:13.5px">Tidak ada dokumen yang tertahan.</div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <sc-for list="{{ pipeline }}" as="p" hint-placeholder-count="5">
+                <div onClick="{{ p.onOpen }}" style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:center;flex-wrap:wrap;border:1px solid var(--color-divider);border-left:4px solid {{ p.warna }};padding:var(--space-3);cursor:pointer">
+                  <div>
+                    <div style="font-family:var(--font-heading);font-size:16px;font-weight:600;text-decoration:{{ p.coret }}">{{ p.id }}</div>
+                    <div class="text-muted" style="font-size:12px">{{ p.jenis }} · M{{ p.minggu }} · {{ p.nilai }}</div>
+                  </div>
+                  <div style="display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap">
+                    <sc-if value="{{ p.sisaTxt }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-size:11.5px;font-weight:700;color:{{ p.warna }}">{{ p.sisaTxt }}</span>
+                    </sc-if>
+                    <span class="tag tag-accent">{{ p.status }}</span>
+                    <span class="text-muted" style="font-size:12px">{{ p.pemilik }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4);overflow-x:auto">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Estimasi vs aktual per kategori</div>
+          <div style="min-width:700px">
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 90px;gap:var(--space-4);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+              <span>Kategori</span><span style="text-align:right">Budget</span><span style="text-align:right">Estimasi</span><span style="text-align:right">Aktual</span><span style="text-align:right">Selisih</span><span style="text-align:right">Serap</span>
+            </div>
+            <sc-for list="{{ katRows }}" as="kr" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 90px;gap:var(--space-4);align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+                <span style="font-weight:600">{{ kr.nama }}</span>
+                <span class="text-muted" style="text-align:right">{{ kr.budget }}</span>
+                <span style="text-align:right">{{ kr.estimasi }}</span>
+                <span style="text-align:right;font-weight:600">{{ kr.aktual }}</span>
+                <span style="text-align:right;font-weight:600;color:{{ kr.selisihFg }}">{{ kr.selisih }}</span>
+                <span style="text-align:right;font-weight:600;color:{{ kr.serapFg }}">{{ kr.serap }}%</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showForm }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:var(--space-4)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:var(--space-4);flex-wrap:wrap">
+          <div>
+            <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Supervisi Site</div>
+            <h1 style="font-size:28px;margin:var(--space-2) 0 0">{{ formTitle }}</h1>
+            <div class="text-muted" style="font-size:13px;margin-top:2px">{{ formSub }}</div>
+          </div>
+          <button onClick="{{ onDup }}" class="btn btn-secondary">Duplikat minggu lalu</button>
+        </div>
+        <div class="card blueprint" style="padding:var(--space-6);display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--space-4)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div>
+            <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Proyek</div>
+            <div style="font-size:15px;font-weight:600;margin-top:2px">Pakuwon Mall Surabaya</div>
+          </div>
+          <div>
+            <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Pemohon</div>
+            <div style="font-size:15px;font-weight:600;margin-top:2px">Jefta — Supervisi Site</div>
+          </div>
+          <div>
+            <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Tanggal kebutuhan</div>
+            <input class="input" type="date" value="{{ butuhDraft }}" onChange="{{ onButuhDraft }}" style="margin-top:2px">
+            <div style="font-size:12px;font-weight:600;color:{{ butuhDraftFg }};margin-top:4px">{{ butuhDraftTxt }}</div>
+          </div>
+        </div>
+        <div class="card" style="padding:var(--space-4);flex-direction:row;gap:var(--space-3);align-items:flex-start">
+          <span style="width:8px;height:8px;background:var(--color-accent);margin-top:6px;flex-shrink:0"></span>
+          <span class="text-muted" style="font-size:12.5px">Satu permintaan berlaku untuk satu tanggal kirim. Isi per item pekerjaan; material menempel pada pekerjaannya, lalu direkap otomatis menjadi dasar PO.</span>
+        </div>
+
+        <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Rencana kerja — {{ jobCount }}</div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+          <sc-for list="{{ jobs }}" as="j" hint-placeholder-count="3">
+            <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4);border-color:{{ j.border }}">
+              <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div style="display:flex;gap:var(--space-3);align-items:flex-start">
+                <span style="font-family:var(--font-heading);font-size:22px;font-weight:700;color:var(--color-accent-700);min-width:22px">{{ j.huruf }}</span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--space-3)">
+                  <div style="display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap">
+                    <div style="flex:1;min-width:200px;display:flex">{{ j.jobSelectEl }}</div>
+                    <input class="input" type="number" step="0.1" min="0" placeholder="Volume" value="{{ j.vol }}" onChange="{{ j.onVol }}" style="width:110px">
+                    <div style="display:flex;align-items:center;justify-content:center;border:1px solid var(--color-divider);font-size:13px;font-weight:600;padding:0 12px;height:38px">{{ j.satuan }}</div>
+                    <button onClick="{{ j.onRemove }}" class="btn btn-secondary btn-icon" title="Hapus item pekerjaan">×</button>
+                  </div>
+                  <div style="border:1px solid {{ j.boqBorder }};background:{{ j.boqBg }};padding:var(--space-3) var(--space-4)">
+                    <div style="font-size:13px;font-weight:600;color:{{ j.boqFg }}">{{ j.boqLine }}</div>
+                    <sc-if value="{{ j.boqWarn }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:13px;font-weight:700;color:#fff;background:#b23b32;padding:6px 10px;margin-top:var(--space-2)">{{ j.boqWarn }}</div>
+                    </sc-if>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Material yang dibutuhkan</div>
+                    <sc-for list="{{ j.mats }}" as="m" hint-placeholder-count="2">
+                      <div style="display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap">
+                        <div style="flex:1;min-width:180px;display:flex">{{ m.selectEl }}</div>
+                        <input class="input" type="number" min="0" placeholder="Qty" value="{{ m.vol }}" onChange="{{ m.onVol }}" style="width:96px">
+                        <div style="display:flex;align-items:center;justify-content:center;border:1px solid var(--color-divider);font-size:12.5px;font-weight:600;padding:0 10px;height:38px;min-width:60px">{{ m.satuan }}</div>
+                        <button onClick="{{ m.onRemove }}" class="btn btn-ghost btn-icon" title="Hapus material">×</button>
+                      </div>
+                    </sc-for>
+                    <button onClick="{{ j.onAddMat }}" class="btn btn-ghost" style="align-self:flex-start;font-size:13px">+ Tambah material</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+          <button onClick="{{ onAddJob }}" class="btn btn-secondary" style="border-style:dashed;min-height:44px">+ Tambah item pekerjaan</button>
+        </div>
+
+        <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-3)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);flex-wrap:wrap">
+            <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Rekap order material</span>
+            <span class="text-muted" style="font-size:12.5px">agregasi otomatis lintas item pekerjaan — dasar PO</span>
+          </div>
+          <sc-if value="{{ rekapEmpty }}" hint-placeholder-val="{{ false }}">
+            <div class="text-muted" style="font-size:13px">Belum ada material yang diisi.</div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ rekapRows }}" as="rr" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:1.6fr 110px 1fr 120px;gap:var(--space-4);align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+                <span style="font-weight:600">{{ rr.nama }}</span>
+                <span style="font-weight:600">{{ rr.qty }}</span>
+                <span class="text-muted" style="font-size:12px">{{ rr.dari }}</span>
+                <span style="text-align:right">{{ rr.subtotal }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:baseline;border-top:2px solid var(--color-divider);padding-top:var(--space-3)">
+            <span class="text-muted" style="font-size:12.5px">Estimasi BoQ seluruh material</span>
+            <span style="font-family:var(--font-heading);font-size:22px;font-weight:700">{{ draftNilai }}</span>
+          </div>
+        </div>
+
+        <button onClick="{{ onSubmit }}" class="btn btn-primary" style="min-height:50px;font-family:var(--font-heading);font-size:16px;letter-spacing:0.06em;text-transform:uppercase">{{ submitLabel }}</button>
+        <div class="text-muted" style="font-size:12.5px;text-align:center">Alur: Cek PM → Cek QS → TTD Direktur → Purchasing → cek gudang → SBK &amp; PO → Finance → bukti transfer.</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showWork }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:var(--space-4)">
+        <div>
+          <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">{{ roleLabel }}</div>
+          <h1 style="font-size:28px;margin:var(--space-2) 0 0">{{ workTitle }}</h1>
+          <div class="text-muted" style="font-size:13.5px;margin-top:2px">{{ workSub }}</div>
+        </div>
+
+        <sc-if value="{{ showBundleBuilder }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4);border-color:var(--color-accent)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div>
+              <div style="font-family:var(--font-heading);font-size:20px">Ajukan tanda tangan gabungan ke Direktur</div>
+              <div class="text-muted" style="font-size:13px">Pilih PO, SBK, dan permintaan yang menunggu tanda tangan &mdash; lintas proyek dan lintas permintaan &mdash; lalu kirim sebagai satu berkas. Urutan berkas: PO &rarr; SBK &rarr; Permintaan &rarr; Nota.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <sc-for list="{{ bundlePickRows }}" as="bp" hint-placeholder-count="3">
+                <label style="display:flex;gap:var(--space-3);align-items:center;border:1px solid {{ bp.border }};padding:var(--space-3) var(--space-4);cursor:pointer">
+                  <input type="checkbox" checked="{{ bp.checked }}" onChange="{{ bp.onToggle }}" style="width:18px;height:18px;accent-color:var(--color-accent);flex-shrink:0">
+                  <span style="display:flex;flex-direction:column;flex:1">
+                    <span style="font-family:var(--font-heading);font-size:16px;font-weight:600">{{ bp.id }}</span>
+                    <span class="text-muted" style="font-size:12.5px">{{ bp.jenis }} &middot; {{ bp.proyek }} &middot; {{ bp.sub }}</span>
+                  </span>
+                  <span style="font-family:var(--font-heading);font-size:17px;font-weight:700">{{ bp.nilai }}</span>
+                </label>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap">
+              <button onClick="{{ onKirimBundle }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Kirim sebagai satu pengajuan</button>
+              <span class="text-muted" style="font-size:13px">{{ bundleBuildInfo }}</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showGabung }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div>
+              <div style="font-family:var(--font-heading);font-size:20px">Gabungkan tagihan untuk Finance</div>
+              <div class="text-muted" style="font-size:13px">Tagihan muncul sesuai termin tiap toko: lunas di muka dan DP begitu PO ditandatangani; pelunasan dan tempo setelah barang datang di site.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <sc-for list="{{ gabungRows }}" as="gr" hint-placeholder-count="3">
+                <label style="display:flex;gap:var(--space-3);align-items:center;border:1px solid {{ gr.border }};padding:var(--space-3) var(--space-4);cursor:pointer">
+                  <input type="checkbox" checked="{{ gr.checked }}" onChange="{{ gr.onToggle }}" style="width:18px;height:18px;accent-color:var(--color-accent)">
+                  <span style="flex:1;min-width:0">
+                    <span style="display:block;font-family:var(--font-heading);font-size:17px;font-weight:600">{{ gr.id }}</span>
+                    <span class="text-muted" style="display:block;font-size:12.5px">{{ gr.sub }}</span>
+                  </span>
+                  <span style="font-family:var(--font-heading);font-size:19px;font-weight:700">{{ gr.nilai }}</span>
+                </label>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap">
+              <button onClick="{{ onGabung }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Gabungkan &amp; kirim ke Finance</button>
+              <span class="text-muted" style="font-size:13px">{{ gabungInfo }}</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ workEmpty }}" hint-placeholder-val="{{ false }}">
+          <div class="card" style="padding:var(--space-8);text-align:center">
+            <div style="font-family:var(--font-heading);font-size:20px">Tidak ada tugas</div>
+            <div class="text-muted" style="font-size:13.5px">Belum ada dokumen yang menunggu tindakan Anda.</div>
+          </div>
+        </sc-if>
+        <sc-for list="{{ workRows }}" as="wr" hint-placeholder-count="3">
+          <button onClick="{{ wr.onOpen }}" class="card blueprint" style="text-align:left;padding:var(--space-6);gap:var(--space-3);cursor:pointer;border-left:4px solid {{ wr.warna }}">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;flex-wrap:wrap">
+              <div>
+                <div style="font-family:var(--font-heading);font-size:20px;font-weight:700;letter-spacing:0.03em">{{ wr.id }}</div>
+                <div class="text-muted" style="font-size:12.5px">{{ wr.sub }}</div>
+              </div>
+              <span class="tag tag-accent">{{ wr.status }}</span>
+            </div>
+            <sc-if value="{{ wr.flag }}" hint-placeholder-val="{{ false }}">
+              <div style="background:{{ wr.flagBg }};color:#fff;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;align-self:flex-start">{{ wr.flag }}</div>
+            </sc-if>
+            <div class="text-muted" style="font-size:13px">{{ wr.ket }}</div>
+            <div style="display:flex;gap:var(--space-6);flex-wrap:wrap;font-size:12.5px;border-top:1px solid var(--color-divider);padding-top:var(--space-3)">
+              <span>{{ wr.nilaiLabel }} <strong>{{ wr.nilai }}</strong></span>
+              <span class="text-muted">{{ wr.meta }}</span>
+            </div>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showDetail }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+        <button onClick="{{ onBack }}" class="btn btn-ghost no-print" style="align-self:flex-start">← Kembali</button>
+        <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;flex-wrap:wrap">
+            <div>
+              <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">{{ sel.jenis }}</div>
+              <div style="font-family:var(--font-heading);font-size:28px;font-weight:700;letter-spacing:0.03em">{{ sel.id }}</div>
+              <div class="text-muted" style="font-size:13px">{{ sel.sub }}</div>
+            </div>
+            <div style="display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap">
+              <span class="tag tag-accent" style="font-size:12.5px">{{ sel.status }}</span>
+              <sc-if value="{{ canPrint }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ onPrintDoc }}" class="btn btn-secondary no-print" style="min-height:40px">Cetak / unduh PDF</button>
+              </sc-if>
+            </div>
+          </div>
+          <sc-if value="{{ sel.flag }}" hint-placeholder-val="{{ false }}">
+            <div style="background:{{ sel.flagBg }};color:#fff;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:8px 12px;align-self:flex-start">{{ sel.flag }}</div>
+          </sc-if>
+          <div style="display:flex;gap:var(--space-8);flex-wrap:wrap;font-size:13px;border-top:1px solid var(--color-divider);padding-top:var(--space-4)">
+            <span class="text-muted">Dibuat<br><strong style="color:var(--color-text);font-size:14px">{{ sel.dibuat }}</strong></span>
+            <span class="text-muted">Pemohon<br><strong style="color:var(--color-text);font-size:14px">{{ sel.pemohon }}</strong></span>
+            <sc-if value="{{ sel.asal }}" hint-placeholder-val="{{ false }}">
+              <span class="text-muted">Kode permintaan asal<br><strong style="color:var(--color-text);font-size:14px">{{ sel.asal }}</strong></span>
+            </sc-if>
+            <span class="text-muted">{{ sel.nilaiLabel }}<br><strong style="color:var(--color-text);font-size:14px">{{ sel.nilai }}</strong></span>
+            <sc-if value="{{ sel.butuhTxt }}" hint-placeholder-val="{{ false }}">
+              <span class="text-muted">Tanggal kebutuhan<br><strong style="color:{{ sel.butuhFg }};font-size:14px">{{ sel.butuhTxt }}</strong></span>
+            </sc-if>
+          </div>
+          <sc-if value="{{ sel.ttdList }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;border-top:1px solid var(--color-divider);padding-top:var(--space-4)">
+              <sc-for list="{{ sel.ttdList }}" as="tt" hint-placeholder-count="3">
+                <div style="border:1px solid var(--color-divider);padding:var(--space-3) var(--space-4);min-width:170px">
+                  <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">{{ tt.peran }}</div>
+                  <div style="font-size:14px;font-weight:600;margin-top:2px">{{ tt.nama }}</div>
+                  <div style="font-size:12px;color:{{ tt.fg }}">{{ tt.status }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ showJobs }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-4);flex-wrap:wrap">
+              <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Rencana kerja &amp; validasi BoQ</span>
+              <span class="text-muted" style="font-size:12.5px">{{ boqSummary }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+              <sc-for list="{{ selJobs }}" as="sj" hint-placeholder-count="3">
+                <div style="border:1px solid {{ sj.border }};background:{{ sj.bg }};padding:var(--space-4)">
+                  <div style="display:flex;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;align-items:baseline">
+                    <span style="font-size:15px;font-weight:600">{{ sj.huruf }}. {{ sj.nama }}</span>
+                    <span style="font-family:var(--font-heading);font-size:18px;font-weight:700">{{ sj.volTxt }}</span>
+                  </div>
+                  <div style="font-size:13px;color:{{ sj.fg }};margin-top:4px">{{ sj.boqLine }}</div>
+                  <sc-if value="{{ sj.warn }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:13px;font-weight:700;color:#fff;background:#b23b32;padding:6px 10px;margin-top:var(--space-2)">{{ sj.warn }}</div>
+                  </sc-if>
+                  <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-divider)">
+                    <sc-for list="{{ sj.mats }}" as="sm" hint-placeholder-count="2">
+                      <span style="font-size:13px"><strong>{{ sm.qty }}</strong> <span class="text-muted">{{ sm.nama }}</span></span>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showLineTable }}" hint-placeholder-val="{{ true }}">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-3);overflow-x:auto">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">{{ lineTableTitle }}</div>
+            <div style="min-width:{{ tableMinW }}">
+              <div style="display:grid;grid-template-columns:{{ tableCols }};gap:var(--space-4);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+                <span>#</span><span>Material</span><span>Spesifikasi</span><span style="text-align:right">Qty</span><span>Satuan</span><span style="text-align:right">{{ hargaLabel }}</span>
+                <sc-if value="{{ sumberCol }}" hint-placeholder-val="{{ false }}"><span>Sumber</span></sc-if>
+              </div>
+              <sc-for list="{{ selLines }}" as="ln" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:{{ tableCols }};gap:var(--space-4);align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+                  <span class="text-muted">{{ ln.no }}</span>
+                  <span style="font-weight:600">{{ ln.nama }}</span>
+                  <span class="text-muted" style="font-size:12.5px">{{ ln.spek }}</span>
+                  <span style="text-align:right;font-weight:600">{{ ln.vol }}</span>
+                  <span class="text-muted">{{ ln.satuan }}</span>
+                  <span style="text-align:right">{{ ln.subtotal }}</span>
+                  <sc-if value="{{ sumberCol }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:12px;font-weight:600;color:{{ ln.sumberFg }}">{{ ln.sumberLabel }}</span>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showPoBlocks }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-4);flex-wrap:wrap">
+              <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Rincian per toko material</span>
+              <span class="text-muted" style="font-size:12.5px">Harga dari nota penawaran toko — sudah final</span>
+            </div>
+            <sc-for list="{{ poBlocks }}" as="pb" hint-placeholder-count="2">
+              <div style="border:1px solid var(--color-divider);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3)">
+                <div style="display:flex;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;align-items:baseline">
+                  <div style="display:flex;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+                    <span style="font-family:var(--font-heading);font-size:19px;font-weight:700">{{ pb.toko }}</span>
+                    <span class="tag tag-outline">{{ pb.termin }}</span>
+                  </div>
+                  <span class="text-muted" style="font-size:12.5px">{{ pb.nItem }}</span>
+                </div>
+                <div style="display:flex;flex-direction:column">
+                  <sc-for list="{{ pb.lines }}" as="pl" hint-placeholder-count="3">
+                    <div style="display:grid;grid-template-columns:1.6fr 110px 130px 130px;gap:var(--space-4);align-items:center;padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+                      <span style="font-weight:600">{{ pl.nama }}</span>
+                      <span>{{ pl.qty }}</span>
+                      <span class="text-muted" style="text-align:right">{{ pl.harga }}</span>
+                      <span style="text-align:right;font-weight:600">{{ pl.subtotal }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:baseline">
+                  <span class="text-muted" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase">Subtotal {{ pb.toko }}</span>
+                  <span style="font-family:var(--font-heading);font-size:20px;font-weight:700">{{ pb.subtotal }}</span>
+                </div>
+                <sc-if value="{{ pb.payStatus }}" hint-placeholder-val="{{ false }}">
+                  <div style="border-left:3px solid var(--color-accent);background:var(--color-accent-100);padding:var(--space-2) var(--space-3);font-size:13px">Status pembayaran — {{ pb.payStatus }}</div>
+                </sc-if>
+                <div>
+                  <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:4px">Nota penawaran — nominal {{ pb.subtotal }}</div>
+                  <div style="height:190px;border:1px solid var(--color-divider)">
+                    <image-slot id="{{ pb.slotId }}" shape="rect" placeholder="Foto nota dari toko"></image-slot>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+            <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:baseline;border-top:2px solid var(--color-accent-900);padding-top:var(--space-3)">
+              <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Total PO</span>
+              <span style="font-family:var(--font-heading);font-size:30px;font-weight:700">{{ poTotal }}</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showPoEdit }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4);border-color:var(--color-accent)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div>
+              <div style="font-family:var(--font-heading);font-size:21px">Isi toko dan harga nota</div>
+              <div class="text-muted" style="font-size:13px">Satu PO boleh memuat beberapa toko. Harga diambil dari nota penawaran yang diminta ke toko.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+              <sc-for list="{{ poEditLines }}" as="pe" hint-placeholder-count="3">
+                <div style="border:1px solid var(--color-divider);padding:var(--space-4);display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--space-4);align-items:center">
+                  <div>
+                    <div style="font-size:14px;font-weight:600">{{ pe.nama }}</div>
+                    <div class="text-muted" style="font-size:12px">{{ pe.vol }} {{ pe.satuan }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Toko</div>
+                    {{ pe.tokoSelectEl }}
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Harga nota</div>
+                    <input class="input" type="number" min="0" value="{{ pe.harga }}" onChange="{{ pe.onHarga }}" style="margin-top:2px">
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Subtotal</div>
+                    <div style="font-size:15px;font-weight:600">{{ pe.subtotal }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Selisih BoQ</div>
+                    <div style="font-size:14px;font-weight:600;color:{{ pe.selisihFg }}">{{ pe.selisih }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+              <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Termin pembayaran per toko</div>
+              <sc-for list="{{ poTerminRows }}" as="pt" hint-placeholder-count="2">
+                <div style="border:1px solid var(--color-divider);padding:var(--space-4);display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-4);align-items:center">
+                  <div>
+                    <div style="font-family:var(--font-heading);font-size:18px;font-weight:600">{{ pt.toko }}</div>
+                    <div class="text-muted" style="font-size:12.5px">Subtotal {{ pt.subtotal }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Termin</div>
+                    {{ pt.selectEl }}
+                  </div>
+                  <div class="text-muted" style="font-size:12.5px">{{ pt.ket }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center">
+              <button onClick="{{ onPoSubmit }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Ajukan PO ke Direktur</button>
+              <span class="text-muted" style="font-size:13px">Total PO {{ poTotal }} · selisih terhadap BoQ {{ poSelisih }}</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showFinance }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+              <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Pembayaran per vendor — satu bukti transfer tiap vendor</span>
+              <span class="text-muted" style="font-size:12.5px">{{ buktiKet }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+              <sc-for list="{{ finRows }}" as="fr" hint-placeholder-count="2">
+                <div style="border:1px solid {{ fr.border }};padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3)">
+                  <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:baseline;flex-wrap:wrap">
+                    <span style="font-family:var(--font-heading);font-size:19px;font-weight:700">{{ fr.toko }}</span>
+                    <span style="font-family:var(--font-heading);font-size:20px;font-weight:700">{{ fr.nilai }}</span>
+                  </div>
+                  <sc-for list="{{ fr.items }}" as="fi" hint-placeholder-count="2">
+                    <div style="display:grid;grid-template-columns:120px 1fr 150px;gap:var(--space-4);align-items:center;font-size:13px;border-top:1px solid var(--color-divider);padding-top:var(--space-2)">
+                      <span class="tag tag-outline">{{ fi.jenis }}</span>
+                      <span style="color:{{ fi.fg }}">{{ fi.label }}</span>
+                      <span style="text-align:right;font-weight:600">{{ fi.nilai }} <span class="text-muted">· {{ fi.poId }}</span></span>
+                    </div>
+                  </sc-for>
+                  <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:center;flex-wrap:wrap;border-top:1px solid var(--color-divider);padding-top:var(--space-2)">
+                    <span style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Bukti transfer — {{ fr.toko }}</span>
+                    <span style="font-size:12.5px;font-weight:600;color:{{ fr.doneFg }}">{{ fr.doneLabel }}</span>
+                  </div>
+                  <div style="height:220px;border:1px solid {{ fr.border }}">
+                    <image-slot id="{{ fr.buktiSlotId }}" shape="rect" placeholder="Unggah bukti transfer ke vendor ini"></image-slot>
+                  </div>
+                  <sc-if value="{{ fr.canMark }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ fr.onMark }}" class="btn btn-secondary" style="align-self:flex-start;min-height:42px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Tandai bukti {{ fr.toko }} terunggah</button>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:baseline;border-top:2px solid var(--color-accent-900);padding-top:var(--space-3)">
+              <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Total pembayaran</span>
+              <span style="font-family:var(--font-heading);font-size:30px;font-weight:700">{{ payTotal }}</span>
+            </div>
+            <sc-if value="{{ canLunas }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ onLunas }}" class="btn btn-primary" style="min-height:46px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Semua bukti terunggah — tandai LUNAS</button>
+            </sc-if>
+            <sc-if value="{{ isLunas }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="border:2px solid var(--color-accent-700);color:var(--color-accent-800);font-family:var(--font-heading);font-size:26px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:6px 16px;display:inline-block">Lunas</div>
+                <div class="text-muted" style="font-size:12.5px;margin-top:var(--space-2)">{{ lunasKet }}</div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showSplit }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4);border-color:var(--color-accent)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div>
+              <div style="font-family:var(--font-heading);font-size:21px">Form cek gudang — atas permintaan Purchasing</div>
+              <div class="text-muted" style="font-size:13px">Isi stok tersedia per item. Yang keluar stok masuk SBK, sisanya masuk PO dan kembali ke Purchasing.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+              <sc-for list="{{ splitLines }}" as="sl" hint-placeholder-count="4">
+                <div style="border:1px solid var(--color-divider);padding:var(--space-4);display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--space-4);align-items:center">
+                  <div>
+                    <div style="font-size:14px;font-weight:600">{{ sl.nama }}</div>
+                    <div class="text-muted" style="font-size:12px">{{ sl.dari }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Diminta</div>
+                    <div style="font-size:15px;font-weight:600">{{ sl.diminta }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Stok gudang</div>
+                    <div style="font-size:15px;font-weight:600;color:{{ sl.stokFg }}">{{ sl.stok }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Keluar dari stok</div>
+                    <input class="input" type="number" min="0" value="{{ sl.ambil }}" onChange="{{ sl.onAmbil }}" style="margin-top:2px">
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Masuk PO</div>
+                    <div style="font-size:15px;font-weight:600">{{ sl.beli }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center">
+              <button onClick="{{ onSplitSubmit }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Kirim hasil cek gudang</button>
+              <span class="text-muted" style="font-size:13px">{{ splitInfo }}</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showTerima }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4);border-color:var(--color-accent)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div>
+              <div style="font-family:var(--font-heading);font-size:21px">Terima barang di site</div>
+              <div class="text-muted" style="font-size:13px">Catat jumlah yang benar-benar diterima. Bila ada selisih, penyebabnya wajib dipilih.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+              <sc-for list="{{ terimaLines }}" as="tl" hint-placeholder-count="4">
+                <div style="border:1px solid {{ tl.border }};padding:var(--space-4);display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:var(--space-4);align-items:center">
+                  <div>
+                    <div style="font-size:14px;font-weight:600">{{ tl.nama }}</div>
+                    <div class="text-muted" style="font-size:12px">{{ tl.dari }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Diminta</div>
+                    <div style="font-size:15px;font-weight:600">{{ tl.diminta }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Diterima</div>
+                    <input class="input" type="number" min="0" value="{{ tl.diterima }}" onChange="{{ tl.onChange }}" style="margin-top:2px">
+                  </div>
+                  <div style="font-size:13px;font-weight:600;color:{{ tl.statusFg }}">{{ tl.statusTxt }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <textarea class="input" rows="2" placeholder="Catatan kondisi barang" value="{{ terimaNote }}" onChange="{{ onTerimaNote }}"></textarea>
+            <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center">
+              <button onClick="{{ onSesuai }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Sesuai — tutup permintaan</button>
+              <button onClick="{{ onSelisih }}" class="btn btn-secondary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Ada selisih</button>
+              <span class="text-muted" style="font-size:13px">{{ selisihInfo }}</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ actionBar }}" hint-placeholder-val="{{ false }}">
+          <div class="card no-print" style="padding:var(--space-4) var(--space-6);flex-direction:row;gap:var(--space-3);flex-wrap:wrap;align-items:center">
+            <sc-if value="{{ canApprove }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ onApprove }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">{{ approveLabel }}</button>
+              <button onClick="{{ onOpenRevisi }}" class="btn btn-secondary" style="min-height:44px">Minta revisi</button>
+              <span class="text-muted" style="font-size:13px">{{ approveHint }}</span>
+            </sc-if>
+            <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ onEdit }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Edit rencana kerja</button>
+              <span class="text-muted" style="font-size:13px">Perbaiki isi permintaan, lalu ajukan ulang.</span>
+            </sc-if>
+            <sc-if value="{{ canMintaGudang }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ onMintaGudang }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Minta cek gudang</button>
+              <span class="text-muted" style="font-size:13px">Barang hanya keluar gudang atas permintaan Purchasing.</span>
+            </sc-if>
+            <sc-if value="{{ canDatang }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ onDatang }}" class="btn btn-primary" style="min-height:44px">Tandai barang datang di site</button>
+            </sc-if>
+            <sc-if value="{{ canRevisiPo }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ onRevisiPo }}" class="btn btn-primary" style="min-height:44px">Kirim ulang kekurangan</button>
+              <span class="text-muted" style="font-size:13px">Selisih dari toko — tanggung jawab Purchasing.</span>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-4);flex-wrap:wrap">
+            <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Jejak audit — siapa, kapan, apa, catatan</span>
+            <span class="text-muted" style="font-size:12.5px">{{ trailCount }} kejadian</span>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ selTrail }}" as="ev" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:18px 1fr;gap:var(--space-4)">
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div style="width:9px;height:9px;background:{{ ev.dot }};margin-top:5px;flex-shrink:0"></div>
+                  <sc-if value="{{ ev.hasLine }}" hint-placeholder-val="{{ true }}"><div style="width:1px;flex:1;background:var(--color-divider);min-height:20px"></div></sc-if>
+                </div>
+                <div style="padding-bottom:var(--space-6)">
+                  <div style="display:flex;justify-content:space-between;gap:var(--space-3);flex-wrap:wrap;align-items:baseline">
+                    <span style="font-family:var(--font-heading);font-size:17px;font-weight:600;color:{{ ev.titleColor }}">{{ ev.aksi }}</span>
+                    <span class="text-muted" style="font-size:12.5px">{{ ev.ts }}</span>
+                  </div>
+                  <div class="text-muted" style="font-size:12.5px">{{ ev.actor }} — {{ ev.peran }}</div>
+                  <sc-if value="{{ ev.note }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:13px;border-left:2px solid var(--color-accent);padding:var(--space-2) var(--space-3);margin-top:var(--space-2);background:var(--color-accent-100)">{{ ev.note }}</div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showRiwayat }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+        <div>
+          <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Riwayat</div>
+          <h1 style="font-size:28px;margin:var(--space-2) 0 0">Seluruh dokumen proyek</h1>
+        </div>
+        <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
+          <input class="input" placeholder="Cari nomor dokumen, material, toko, atau pekerjaan" value="{{ search }}" onChange="{{ onSearch }}" style="flex:1;min-width:220px">
+          {{ proyekFilterEl }}
+          {{ jenisFilterEl }}
+        </div>
+        <div class="card blueprint" style="padding:var(--space-6);overflow-x:auto">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="min-width:860px">
+            <div style="display:grid;grid-template-columns:150px 150px 70px 130px 1fr 130px;gap:var(--space-4);padding:var(--space-2) 0;padding-left:var(--space-3);border-left:4px solid transparent;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+              <span>Nomor</span><span>Jenis</span><span>Minggu</span><span style="text-align:right">Nilai</span><span>Status</span><span>Dibuat</span>
+            </div>
+            <sc-if value="{{ riwayatEmpty }}" hint-placeholder-val="{{ false }}">
+              <div class="text-muted" style="padding:var(--space-8);text-align:center;font-size:13.5px">Tidak ada hasil yang cocok.</div>
+            </sc-if>
+            <sc-for list="{{ riwayatRows }}" as="rw" hint-placeholder-count="6">
+              <div onClick="{{ rw.onOpen }}" style="display:grid;grid-template-columns:150px 150px 70px 130px 1fr 130px;gap:var(--space-4);align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);border-left:4px solid {{ rw.warna }};padding-left:var(--space-3);font-size:13.5px;cursor:pointer">
+                <span style="display:flex;flex-direction:column"><span style="font-family:var(--font-heading);font-weight:600;text-decoration:{{ rw.coret }}">{{ rw.id }}</span><span class="text-muted" style="font-size:11px">{{ rw.proyek }}</span></span>
+                <span class="text-muted">{{ rw.jenis }}</span>
+                <span>M{{ rw.minggu }}</span>
+                <span style="text-align:right;font-weight:600">{{ rw.nilai }}</span>
+                <span style="display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap"><span class="tag tag-accent">{{ rw.status }}</span><span style="font-size:11.5px;font-weight:700;color:{{ rw.warna }}">{{ rw.sisaTxt }}</span></span>
+                <span class="text-muted" style="font-size:12.5px">{{ rw.dibuat }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ modalRevisi }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop">
+      <div class="dialog blueprint">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="dialog-title">Minta revisi — {{ modalId }}</div>
+        <div class="dialog-body">Alasan wajib diisi agar tercatat pada jejak audit.</div>
+        <textarea class="input" rows="4" placeholder="Tulis alasan revisi" value="{{ modalNote }}" onChange="{{ onModalNote }}"></textarea>
+        <div class="dialog-actions">
+          <button onClick="{{ onModalClose }}" class="btn btn-secondary">Batal</button>
+          <button onClick="{{ onModalSend }}" class="btn btn-primary">Kirim revisi</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ modalSelisih }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop">
+      <div class="dialog blueprint">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="dialog-title">Penyebab selisih — {{ modalId }}</div>
+        <div class="dialog-body">Jalur revisi mengikuti penyebab yang dipilih.</div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <label class="radio" style="align-items:flex-start;border:1px solid {{ sebabVendorBorder }};padding:var(--space-3)">
+            <input type="radio" name="sebab" checked="{{ sebabVendor }}" onChange="{{ onSebabVendor }}"><span class="dot" style="margin-top:3px"></span>
+            <span>
+              <span style="display:block;font-weight:600;font-size:14px">Salah kirim / kurang dari toko</span>
+              <span class="text-muted" style="display:block;font-size:12.5px">Menjadi tanggung jawab Purchasing — memicu revisi PO.</span>
+            </span>
+          </label>
+          <label class="radio" style="align-items:flex-start;border:1px solid {{ sebabReqBorder }};padding:var(--space-3)">
+            <input type="radio" name="sebab" checked="{{ sebabReq }}" onChange="{{ onSebabReq }}"><span class="dot" style="margin-top:3px"></span>
+            <span>
+              <span style="display:block;font-weight:600;font-size:14px">Salah request dari awal</span>
+              <span class="text-muted" style="display:block;font-size:12.5px">Supervisi mengedit permintaan lalu mengajukan ulang.</span>
+            </span>
+          </label>
+        </div>
+        <div class="dialog-actions">
+          <button onClick="{{ onModalClose }}" class="btn btn-secondary">Batal</button>
+          <button onClick="{{ onSelisihSend }}" class="btn btn-primary">Catat selisih</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div class="no-print" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--color-accent-900);color:var(--color-bg);font-size:13.5px;font-weight:600;padding:var(--space-3) var(--space-6);box-shadow:var(--shadow-lg);animation:toastIn 0.22s ease;z-index:60;max-width:90vw;text-align:center">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900},&quot;modeHp&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Tampilan&quot;}}">
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.RED = '#b23b32'; this.ORANGE = '#c1741f'; this.GREY = '#8a8d8f';
+    this.TODAY = new Date('2026-08-04T08:00:00');
+    this.CAT = [
+      { id: 'pasir', nama: 'Pasir pasang/halus', spek: 'Lumajang', satuan: 'kubik', harga: 320000, kat: 'sipil', toko: 'Toko Megabaja' },
+      { id: 'semen', nama: 'Semen Gresik 40 kg', spek: 'PCC', satuan: 'sak', harga: 62000, kat: 'sipil', toko: 'Toko Megabaja' },
+      { id: 'hebel', nama: 'Hebel 10 cm', spek: '60 × 20 cm', satuan: 'kubik', harga: 720000, kat: 'sipil', toko: 'Toko Megabaja' },
+      { id: 'tripfur', nama: 'Triplek 9 mm grade furniture', spek: '1220 × 2440 mm', satuan: 'lembar', harga: 195000, kat: 'panel', toko: 'Toko Nunut' },
+      { id: 'tripsemi', nama: 'Triplek 9 mm semi kriyung', spek: '1220 × 2440 mm', satuan: 'lembar', harga: 148000, kat: 'panel', toko: 'Toko Nunut' },
+      { id: 'hpl', nama: 'HPL TH007AA', spek: 'Taco · 1220 × 2440 mm', satuan: 'lembar', harga: 210000, kat: 'panel', toko: 'Toko Nunut' },
+      { id: 'gyp9', nama: 'Gypsum A+ 9 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 62000, kat: 'rangka', toko: 'Toko Megabaja' },
+      { id: 'gyp12', nama: 'Gypsum A+ 12 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 88000, kat: 'rangka', toko: 'Toko Megabaja' },
+      { id: 'hollow', nama: 'Hollow galvanis 20×40', spek: 'Tebal 0,3 mm · 4 m', satuan: 'batang', harga: 68000, kat: 'rangka', toko: 'Toko Megabaja' },
+      { id: 'skrup', nama: 'Skrup 2,5 cm', spek: 'Gypsum · isi 1000', satuan: 'dus', harga: 95000, kat: 'rangka', toko: 'Toko Asia' },
+      { id: 'kompon', nama: 'Kompon', spek: 'Jointing compound 25 kg', satuan: 'sak', harga: 135000, kat: 'finishing', toko: 'Toko Asia' },
+      { id: 'duco', nama: 'Cat duco', spek: 'Putih matte', satuan: 'liter', harga: 165000, kat: 'finishing', toko: 'Toko Asia' },
+      { id: 'sealant', nama: 'Sealant silikon', spek: 'Netral · 300 ml', satuan: 'tube', harga: 38000, kat: 'finishing', toko: 'Toko Asia' },
+      { id: 'keramik', nama: 'Keramik 60×60', spek: 'Granit polished', satuan: 'dus', harga: 148000, kat: 'lantai', toko: 'Toko Megabaja' },
+      { id: 'vinyl', nama: 'Vinyl flooring 3 mm', spek: 'Wood series', satuan: 'm²', harga: 145000, kat: 'lantai', toko: 'Toko Nunut' },
+      { id: 'nym', nama: 'Kabel NYM 3×2,5', spek: 'Roll 50 m', satuan: 'roll', harga: 780000, kat: 'mep', toko: 'Toko Asia' }
+    ];
+    this.KAT = [
+      { id: 'rangka', nama: 'Rangka & Plafon', budget: 145000000 }, { id: 'panel', nama: 'Kayu & Panel', budget: 130000000 },
+      { id: 'sipil', nama: 'Pekerjaan Sipil', budget: 55000000 }, { id: 'finishing', nama: 'Finishing & Cat', budget: 32000000 },
+      { id: 'lantai', nama: 'Lantai', budget: 62000000 }, { id: 'mep', nama: 'MEP', budget: 26000000 }
+    ];
+    this.JOBS = [
+      { id: 'keramik', nama: 'Pasang Keramik', satuan: 'm²', boq: 320, terpakai: 245 },
+      { id: 'skirting', nama: 'Pasang base skirting', satuan: 'm¹', boq: 180, terpakai: 96 },
+      { id: 'partisi', nama: 'Pasang rangka + gipsum partisi & plafon fitting room', satuan: 'm²', boq: 300, terpakai: 195 },
+      { id: 'plafon', nama: 'Pasang rangka + gipsum plafon area tenant', satuan: 'm²', boq: 460, terpakai: 318 },
+      { id: 'kabinet', nama: 'Pasang kabinet & backdrop HPL', satuan: 'm¹', boq: 120, terpakai: 64 },
+      { id: 'catduco', nama: 'Finishing cat duco kusen', satuan: 'm²', boq: 210, terpakai: 138 },
+      { id: 'mepinst', nama: 'Instalasi titik lampu & stop kontak', satuan: 'm¹', boq: 240, terpakai: 152 }
+    ];
+    this.TOKO = [{ nama: 'Toko Megabaja' }, { nama: 'Toko Asia' }, { nama: 'Toko Nunut' }, { nama: 'Toko Warna Prima' }];
+    this.PROJECTS = [
+      { id: 'pakuwon', nama: 'Fit-out Tenant Pakuwon Mall Surabaya', kota: 'Surabaya', opening: '25 Sep 2026', spv: 'Jefta', terpakai: {} },
+      { id: 'trans', nama: 'Fit-out Tenant Trans Studio Mall Bandung', kota: 'Bandung', opening: '12 Okt 2026', spv: 'Hendra Gunawan', terpakai: { keramik: 120, plafon: 180, partisi: 60, kabinet: 20, catduco: 30 } },
+      { id: 'plaza', nama: 'Fit-out Tenant Plaza Indonesia Jakarta', kota: 'Jakarta', opening: '30 Okt 2026', spv: 'Bagas Nugroho', terpakai: { plafon: 220, catduco: 40, kabinet: 35, keramik: 90 } }
+    ];
+    this.PROJ = id => this.PROJECTS.find(p => p.id === id) || this.PROJECTS[0];
+    this.TERMIN = [
+      { id: 'lunas', label: 'Lunas di muka', ket: 'Dibayar penuh lebih dulu, toko baru mengirim barang.' },
+      { id: 'dp', label: 'DP + Pelunasan', ket: 'DP 30% di muka, sisanya saat barang sampai di site.' },
+      { id: 'tempo', label: 'Tempo 14 hari', ket: 'Barang dikirim lebih dulu, dibayar dalam 14 hari.' }
+    ];
+    this.DP = 0.3;
+    this.STOK = { pasir: 2, semen: 40, hebel: 0, tripfur: 5, tripsemi: 0, hpl: 10, gyp9: 40, gyp12: 15, hollow: 60, skrup: 4, kompon: 0, duco: 25, sealant: 40, keramik: 0, vinyl: 0, nym: 2 };
+    this.PEOPLE = { supervisi: 'Jefta', pm: 'Andi Prasetyo', qs: 'Maya Kusuma', gudang: 'Sudirman', purchasing: 'Rina Astuti', finance: 'Dewi Lestari', direktur: 'Ir. Bambang Wijaya' };
+    this.RLBL = { supervisi: 'Supervisi Site', pm: 'Project Manager', qs: 'Quantity Surveyor', gudang: 'Kepala Gudang', purchasing: 'Purchasing', finance: 'Finance', direktur: 'Direktur' };
+    this.PERAN = { supervisi: 'Supervisi', pm: 'PM', qs: 'QS', gudang: 'Kepala Gudang', purchasing: 'Purchasing', finance: 'Finance', direktur: 'Direktur' };
+    this.JENIS = { req: 'Surat Permintaan Material', sbk: 'Surat Barang Keluar', po: 'Purchase Order', pay: 'Pengajuan Pembayaran' };
+    this.PEMILIK = {
+      'Cek PM': 'PM', 'Cek QS': 'QS', 'TTD Direktur': 'Direktur', 'Di Purchasing': 'Purchasing', 'Cek Gudang': 'Kepala Gudang',
+      'Menunggu Barang': 'Purchasing', 'Draft': 'Purchasing', 'Dikirim ke Toko': 'Purchasing', 'Barang Datang': 'Purchasing',
+      'Terima di Site': 'Supervisi', 'Revisi': 'Supervisi', 'Revisi Purchasing': 'Purchasing', 'Barang Keluar': 'Gudang',
+      'Di Finance': 'Finance', 'Lunas': '—', 'Ditahan': '—', 'Dibatalkan': '—', 'Selesai': '—'
+    };
+    const J = (jobId, vol, mats) => ({ jobId, vol, mats });
+    const M = (itemId, vol) => ({ itemId, vol });
+    const T = (ts, actor, peran, aksi, note) => ({ ts, actor, peran, aksi, note: note || '' });
+    this.state = {
+      role: 'supervisi', screen: 'form', sel: null, modal: null, toast: null, showNotif: false,
+      search: '', fJenis: 'Semua jenis', terimaNote: '', sebab: 'vendor', editId: null,
+      butuhDraft: '2026-08-11', gabungSel: {}, bundles: [], bundleSel: {}, openBundle: null, proyek: 'pakuwon',
+      draft: [J('keramik', 60, [M('pasir', 6), M('semen', 30)]), J('skirting', 52.2, [M('tripfur', 2)]), J('partisi', 118.9, [M('skrup', 10), M('kompon', 4)])],
+      reqs: [
+        { id: 'REQ-2026-028', minggu: 29, butuh: '2026-07-16', status: 'Selesai', dibuat: '13 Jul 2026, 07.55', oleh: 'Jefta',
+          jobs: [J('plafon', 140, [M('gyp9', 60), M('hollow', 120)])],
+          trail: [T('13 Jul 2026, 07.55', 'Jefta', 'Supervisi', 'Diajukan', 'Plafon area tenant 140 m²'), T('13 Jul 2026, 11.20', 'Andi Prasetyo', 'PM', 'Disetujui PM', ''), T('14 Jul 2026, 09.00', 'Maya Kusuma', 'QS', 'Disetujui QS', 'Volume dalam sisa BoQ plafon'), T('14 Jul 2026, 15.00', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('15 Jul 2026, 08.00', 'Rina Astuti', 'Purchasing', 'Minta cek gudang', ''), T('15 Jul 2026, 10.10', 'Sudirman', 'Kepala Gudang', 'Hasil cek gudang dikirim', '120 batang hollow dari stok, gypsum masuk PO'), T('17 Jul 2026, 08.20', 'Jefta', 'Supervisi', 'Diterima di Site — Sesuai', ''), T('17 Jul 2026, 08.21', 'Jefta', 'Supervisi', 'Selesai', '')] },
+        { id: 'REQ-2026-029', minggu: 30, butuh: '2026-07-24', status: 'Terima di Site', dibuat: '20 Jul 2026, 08.20', oleh: 'Jefta',
+          jobs: [J('kabinet', 42, [M('tripfur', 60), M('hpl', 45)]), J('catduco', 60, [M('duco', 20)])],
+          trail: [T('20 Jul 2026, 08.20', 'Jefta', 'Supervisi', 'Diajukan', ''), T('20 Jul 2026, 15.05', 'Andi Prasetyo', 'PM', 'Minta Revisi', 'Volume HPL melebihi kebutuhan area kasir'), T('21 Jul 2026, 07.50', 'Jefta', 'Supervisi', 'Diajukan Ulang', 'HPL dikurangi dari 60 menjadi 45 lembar'), T('21 Jul 2026, 10.30', 'Andi Prasetyo', 'PM', 'Disetujui PM', ''), T('22 Jul 2026, 09.40', 'Maya Kusuma', 'QS', 'Disetujui QS', 'Kabinet 42 m¹ masih dalam sisa BoQ'), T('22 Jul 2026, 15.10', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('23 Jul 2026, 08.00', 'Rina Astuti', 'Purchasing', 'Minta cek gudang', ''), T('23 Jul 2026, 09.30', 'Sudirman', 'Kepala Gudang', 'Hasil cek gudang dikirim', '20 liter duco dari stok, sisanya PO'), T('24 Jul 2026, 16.45', 'Rina Astuti', 'Purchasing', 'Barang datang di site', '')] },
+        { id: 'REQ-2026-030', minggu: 31, butuh: '2026-08-06', status: 'Di Purchasing', dibuat: '27 Jul 2026, 08.15', oleh: 'Jefta',
+          jobs: [J('plafon', 96, [M('gyp9', 90), M('hollow', 180)]), J('mepinst', 40, [M('nym', 5)])],
+          trail: [T('27 Jul 2026, 08.15', 'Jefta', 'Supervisi', 'Diajukan', 'Pekerjaan plafon Lt. 2'), T('28 Jul 2026, 09.30', 'Andi Prasetyo', 'PM', 'Disetujui PM', 'Sesuai kurva-S'), T('29 Jul 2026, 10.05', 'Maya Kusuma', 'QS', 'Disetujui QS', 'Plafon terpakai 318 dari 460 m² — sisa cukup'), T('30 Jul 2026, 09.20', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', 'Silakan diproses Purchasing')] },
+        { id: 'REQ-2026-031', minggu: 32, butuh: '2026-08-12', status: 'Cek PM', dibuat: '4 Agu 2026, 07.30', oleh: 'Jefta',
+          jobs: [J('keramik', 60, [M('pasir', 6), M('semen', 30)]), J('skirting', 52.2, [M('tripfur', 2)]), J('partisi', 118.9, [M('skrup', 10), M('kompon', 4)])],
+          trail: [T('4 Agu 2026, 07.30', 'Jefta', 'Supervisi', 'Diajukan', 'Rencana kerja 3 item · tanggal kebutuhan 12 Agu 2026. Partisi fitting room melebihi sisa BoQ — mohon dicek terhadap luasan aktual lapangan.')] },
+        { id: 'REQ-2026-032', minggu: 32, butuh: '2026-08-09', status: 'Revisi', dibuat: '3 Agu 2026, 08.05', oleh: 'Jefta',
+          jobs: [J('catduco', 85, [M('duco', 28), M('sealant', 30)])],
+          trail: [T('3 Agu 2026, 08.05', 'Jefta', 'Supervisi', 'Diajukan', ''), T('3 Agu 2026, 14.40', 'Maya Kusuma', 'QS', 'Minta Revisi', 'Volume cat duco 85 m² melebihi sisa BoQ 72 m². Kurangi atau ajukan tambah volume.')] },
+        { id: 'REQ-2026-027', minggu: 28, butuh: '2026-07-09', status: 'Dibatalkan', dibuat: '6 Jul 2026, 08.10', oleh: 'Jefta',
+          jobs: [J('mepinst', 30, [M('nym', 6)])],
+          trail: [T('6 Jul 2026, 08.10', 'Jefta', 'Supervisi', 'Diajukan', ''), T('6 Jul 2026, 15.30', 'Andi Prasetyo', 'PM', 'Dibatalkan', 'Titik instalasi berubah, menunggu gambar konsultan MEP')] }
+      ],
+      sbks: [
+        { id: 'SBK-2026-012', reqId: 'REQ-2026-029', pemohon: 'Jefta', minggu: 30, status: 'Barang Keluar', dibuat: '23 Jul 2026, 09.40', oleh: 'Rina Astuti',
+          lines: [{ itemId: 'duco', vol: 20 }],
+          trail: [T('23 Jul 2026, 09.40', 'Rina Astuti', 'Purchasing', 'SBK dibuat', 'Atas hasil cek gudang REQ-2026-029'), T('23 Jul 2026, 10.15', 'Sudirman', 'Kepala Gudang', 'Diverifikasi Kepala Gudang', 'Stok fisik tersedia'), T('23 Jul 2026, 15.40', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('24 Jul 2026, 08.20', 'Sudirman', 'Kepala Gudang', 'Barang keluar gudang', '')] }
+      ],
+      pos: [
+        { id: 'PO-2026-018', reqId: 'REQ-2026-028', pemohon: 'Jefta', minggu: 29, status: 'Barang Datang', dibuat: '15 Jul 2026, 11.30', oleh: 'Rina Astuti',
+          termins: { 'Toko Megabaja': 'tempo' }, datang: '2026-07-17',
+          lines: [{ itemId: 'gyp9', vol: 60, harga: 63500, toko: 'Toko Megabaja' }],
+          trail: [T('15 Jul 2026, 11.30', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Harga dari nota Toko Megabaja'), T('15 Jul 2026, 15.20', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('16 Jul 2026, 08.40', 'Rina Astuti', 'Purchasing', 'PO dikirim ke toko', ''), T('17 Jul 2026, 07.30', 'Rina Astuti', 'Purchasing', 'Barang datang di site', '')] },
+        { id: 'PO-2026-019', reqId: 'REQ-2026-029', pemohon: 'Jefta', minggu: 30, status: 'Barang Datang', dibuat: '23 Jul 2026, 11.00', oleh: 'Rina Astuti',
+          termins: { 'Toko Nunut': 'dp', 'Toko Asia': 'lunas' }, datang: '2026-07-24',
+          lines: [{ itemId: 'tripfur', vol: 60, harga: 201000, toko: 'Toko Nunut' }, { itemId: 'hpl', vol: 45, harga: 216000, toko: 'Toko Nunut' }, { itemId: 'sealant', vol: 24, harga: 39000, toko: 'Toko Asia' }],
+          trail: [T('23 Jul 2026, 11.00', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Dua toko dalam satu surat: Nunut dan Asia'), T('23 Jul 2026, 15.45', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', 'Nominal cocok dengan nota'), T('24 Jul 2026, 08.10', 'Rina Astuti', 'Purchasing', 'PO dikirim ke toko', ''), T('24 Jul 2026, 16.45', 'Rina Astuti', 'Purchasing', 'Barang datang di site', '')] },
+        { id: 'PO-2026-020', reqId: 'REQ-2026-030', pemohon: 'Jefta', minggu: 31, status: 'Barang Datang', dibuat: '31 Jul 2026, 10.20', oleh: 'Rina Astuti',
+          termins: { 'Toko Megabaja': 'dp', 'Toko Asia': 'tempo' }, datang: '2026-08-03',
+          lines: [{ itemId: 'gyp9', vol: 90, harga: 64500, toko: 'Toko Megabaja' }, { itemId: 'hollow', vol: 180, harga: 69000, toko: 'Toko Megabaja' }, { itemId: 'nym', vol: 5, harga: 795000, toko: 'Toko Asia' }],
+          trail: [T('31 Jul 2026, 10.20', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Nota Megabaja dan Asia terlampir'), T('31 Jul 2026, 16.00', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('1 Agu 2026, 09.00', 'Rina Astuti', 'Purchasing', 'PO dikirim ke toko', ''), T('3 Agu 2026, 15.20', 'Rina Astuti', 'Purchasing', 'Barang datang di site', '')] }
+      ],
+      pays: [
+        { id: 'PAY-2026-006', minggu: 29, status: 'Lunas', dibuat: '20 Jul 2026, 09.00', oleh: 'Rina Astuti', bukti: true,
+          items: [{ poId: 'PO-2026-018', toko: 'Toko Megabaja', jenis: 'Tempo', due: '2026-07-31' }],
+          trail: [T('20 Jul 2026, 09.00', 'Rina Astuti', 'Purchasing', 'Tagihan dikirim ke Finance', 'Tempo 14 hari · Toko Megabaja · jatuh tempo 31 Jul 2026'), T('21 Jul 2026, 10.15', 'Dewi Lestari', 'Finance', 'Pembayaran diproses', 'Transfer BCA ke Toko Megabaja'), T('21 Jul 2026, 10.30', 'Dewi Lestari', 'Finance', 'Bukti transfer diunggah — LUNAS', 'Bukti tampil otomatis di layar Purchasing')] }
+      ]
+    };
+    ['reqs', 'sbks', 'pos', 'pays'].forEach(k => this.state[k].forEach(d => { if (!d.proyek) d.proyek = 'pakuwon'; }));
+    const P = (proyek, o) => Object.assign({ proyek }, o);
+    // --- proyek lain + berkas siap tanda tangan untuk pengajuan gabungan ---
+    this.state.reqs = this.state.reqs.concat([
+      P('pakuwon', { id: 'REQ-2026-033', minggu: 32, butuh: '2026-08-13', status: 'Menunggu Barang', dibuat: '1 Agu 2026, 07.40', oleh: 'Jefta',
+        jobs: [J('keramik', 40, [M('pasir', 4), M('semen', 20)]), J('partisi', 60, [M('skrup', 10), M('kompon', 4)])],
+        trail: [T('1 Agu 2026, 07.40', 'Jefta', 'Supervisi', 'Diajukan', ''), T('1 Agu 2026, 11.00', 'Andi Prasetyo', 'PM', 'Disetujui PM', ''), T('2 Agu 2026, 09.10', 'Maya Kusuma', 'QS', 'Disetujui QS', ''), T('2 Agu 2026, 14.30', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('3 Agu 2026, 08.15', 'Rina Astuti', 'Purchasing', 'Minta cek gudang', ''), T('3 Agu 2026, 10.05', 'Sudirman', 'Kepala Gudang', 'Hasil cek gudang dikirim', 'Semen dari stok, sisanya PO')] }),
+      P('pakuwon', { id: 'REQ-2026-034', minggu: 33, butuh: '2026-08-15', status: 'Menunggu Barang', dibuat: '2 Agu 2026, 08.00', oleh: 'Jefta',
+        jobs: [J('catduco', 40, [M('duco', 14), M('sealant', 20)])],
+        trail: [T('2 Agu 2026, 08.00', 'Jefta', 'Supervisi', 'Diajukan', ''), T('2 Agu 2026, 13.20', 'Andi Prasetyo', 'PM', 'Disetujui PM', ''), T('3 Agu 2026, 09.30', 'Maya Kusuma', 'QS', 'Disetujui QS', ''), T('3 Agu 2026, 15.00', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('4 Agu 2026, 08.10', 'Rina Astuti', 'Purchasing', 'Minta cek gudang', ''), T('4 Agu 2026, 09.40', 'Sudirman', 'Kepala Gudang', 'Hasil cek gudang dikirim', 'Stok kosong — seluruhnya PO')] }),
+      P('trans', { id: 'REQ-BDG-035', minggu: 32, butuh: '2026-08-14', status: 'Menunggu Barang', dibuat: '1 Agu 2026, 09.00', oleh: 'Hendra Gunawan',
+        jobs: [J('plafon', 120, [M('gyp9', 70), M('hollow', 140)]), J('kabinet', 24, [M('hpl', 24)])],
+        trail: [T('1 Agu 2026, 09.00', 'Hendra Gunawan', 'Supervisi', 'Diajukan', 'Plafon & kabinet tenant Bandung'), T('1 Agu 2026, 13.10', 'Andi Prasetyo', 'PM', 'Disetujui PM', ''), T('2 Agu 2026, 10.00', 'Maya Kusuma', 'QS', 'Disetujui QS', ''), T('2 Agu 2026, 15.30', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('3 Agu 2026, 08.30', 'Rina Astuti', 'Purchasing', 'Minta cek gudang', ''), T('3 Agu 2026, 10.40', 'Sudirman', 'Kepala Gudang', 'Hasil cek gudang dikirim', 'Hollow dari stok, sisanya PO')] }),
+      P('trans', { id: 'REQ-BDG-031', minggu: 30, butuh: '2026-07-26', status: 'Selesai', dibuat: '19 Jul 2026, 08.00', oleh: 'Hendra Gunawan',
+        jobs: [J('keramik', 120, [M('pasir', 12), M('semen', 60)])],
+        trail: [T('19 Jul 2026, 08.00', 'Hendra Gunawan', 'Supervisi', 'Diajukan', ''), T('20 Jul 2026, 09.00', 'Andi Prasetyo', 'PM', 'Disetujui PM', ''), T('20 Jul 2026, 14.00', 'Maya Kusuma', 'QS', 'Disetujui QS', ''), T('21 Jul 2026, 10.00', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('25 Jul 2026, 16.00', 'Hendra Gunawan', 'Supervisi', 'Selesai', 'Diterima lengkap')] }),
+      P('plaza', { id: 'REQ-JKT-022', minggu: 32, butuh: '2026-08-12', status: 'Cek QS', dibuat: '3 Agu 2026, 07.50', oleh: 'Bagas Nugroho',
+        jobs: [J('plafon', 160, [M('gyp12', 40), M('hollow', 200)])],
+        trail: [T('3 Agu 2026, 07.50', 'Bagas Nugroho', 'Supervisi', 'Diajukan', 'Plafon lobby tenant Jakarta'), T('3 Agu 2026, 13.00', 'Andi Prasetyo', 'PM', 'Disetujui PM', 'Sesuai kurva-S')] }),
+      P('plaza', { id: 'REQ-JKT-020', minggu: 31, butuh: '2026-08-02', status: 'Selesai', dibuat: '26 Jul 2026, 08.10', oleh: 'Bagas Nugroho',
+        jobs: [J('plafon', 90, [M('gyp12', 40)]), J('mepinst', 30, [M('nym', 3)])],
+        trail: [T('26 Jul 2026, 08.10', 'Bagas Nugroho', 'Supervisi', 'Diajukan', ''), T('27 Jul 2026, 09.00', 'Andi Prasetyo', 'PM', 'Disetujui PM', ''), T('27 Jul 2026, 14.00', 'Maya Kusuma', 'QS', 'Disetujui QS', ''), T('28 Jul 2026, 10.00', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('2 Agu 2026, 16.00', 'Bagas Nugroho', 'Supervisi', 'Selesai', 'Diterima lengkap')] })
+    ]);
+    this.state.sbks = this.state.sbks.concat([
+      P('pakuwon', { id: 'SBK-2026-013', reqId: 'REQ-2026-033', pemohon: 'Jefta', minggu: 32, status: 'TTD Direktur', sejak: 'baru saja', bundleId: 'TTD-2026-004', dibuat: '3 Agu 2026, 10.20', oleh: 'Rina Astuti',
+        lines: [{ itemId: 'semen', vol: 20 }],
+        trail: [T('3 Agu 2026, 10.20', 'Rina Astuti', 'Purchasing', 'SBK dibuat', 'Atas hasil cek gudang REQ-2026-033'), T('3 Agu 2026, 11.00', 'Sudirman', 'Kepala Gudang', 'Diverifikasi Kepala Gudang', '20 sak semen tersedia di stok')] }),
+      P('trans', { id: 'SBK-2026-014', reqId: 'REQ-BDG-035', pemohon: 'Hendra Gunawan', minggu: 32, status: 'TTD Direktur', sejak: 'baru saja', bundleId: 'TTD-2026-004', dibuat: '3 Agu 2026, 11.10', oleh: 'Rina Astuti',
+        lines: [{ itemId: 'hollow', vol: 140 }],
+        trail: [T('3 Agu 2026, 11.10', 'Rina Astuti', 'Purchasing', 'SBK dibuat', 'Atas hasil cek gudang REQ-BDG-035'), T('3 Agu 2026, 11.40', 'Sudirman', 'Kepala Gudang', 'Diverifikasi Kepala Gudang', '140 batang hollow tersedia di stok')] })
+    ]);
+    this.state.pos = this.state.pos.concat([
+      P('pakuwon', { id: 'PO-2026-021', reqId: 'REQ-2026-033', pemohon: 'Jefta', minggu: 32, status: 'TTD Direktur', sejak: 'baru saja', bundleId: 'TTD-2026-004', dibuat: '3 Agu 2026, 14.10', oleh: 'Rina Astuti',
+        termins: { 'Toko Megabaja': 'lunas', 'Toko Asia': 'tempo' },
+        lines: [{ itemId: 'pasir', vol: 4, harga: 330000, toko: 'Toko Megabaja' }, { itemId: 'skrup', vol: 10, harga: 97000, toko: 'Toko Asia' }, { itemId: 'kompon', vol: 4, harga: 138000, toko: 'Toko Asia' }],
+        trail: [T('3 Agu 2026, 14.10', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Megabaja — Lunas di muka; Asia — Tempo 14 hari · sesuai nota')] }),
+      P('pakuwon', { id: 'PO-2026-022', reqId: 'REQ-2026-034', pemohon: 'Jefta', minggu: 33, status: 'TTD Direktur', sejak: 'baru saja', bundleId: 'TTD-2026-004', dibuat: '4 Agu 2026, 10.30', oleh: 'Rina Astuti',
+        termins: { 'Toko Asia': 'dp' },
+        lines: [{ itemId: 'duco', vol: 14, harga: 168000, toko: 'Toko Asia' }, { itemId: 'sealant', vol: 20, harga: 39000, toko: 'Toko Asia' }],
+        trail: [T('4 Agu 2026, 10.30', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Asia — DP + Pelunasan · sesuai nota')] }),
+      P('trans', { id: 'PO-2026-023', reqId: 'REQ-BDG-035', pemohon: 'Hendra Gunawan', minggu: 32, status: 'TTD Direktur', sejak: 'baru saja', bundleId: 'TTD-2026-004', dibuat: '3 Agu 2026, 15.20', oleh: 'Rina Astuti',
+        termins: { 'Toko Megabaja': 'tempo', 'Toko Nunut': 'lunas' },
+        lines: [{ itemId: 'gyp9', vol: 70, harga: 64000, toko: 'Toko Megabaja' }, { itemId: 'hpl', vol: 24, harga: 217000, toko: 'Toko Nunut' }],
+        trail: [T('3 Agu 2026, 15.20', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Megabaja — Tempo 14 hari; Nunut — Lunas di muka · sesuai nota')] }),
+      P('plaza', { id: 'PO-2026-024', reqId: 'REQ-JKT-020', pemohon: 'Bagas Nugroho', minggu: 31, status: 'Barang Datang', datang: '2026-08-02', dibuat: '28 Jul 2026, 11.00', oleh: 'Rina Astuti',
+        termins: { 'Toko Megabaja': 'tempo', 'Toko Asia': 'lunas' },
+        lines: [{ itemId: 'gyp12', vol: 40, harga: 90000, toko: 'Toko Megabaja' }, { itemId: 'nym', vol: 3, harga: 790000, toko: 'Toko Asia' }],
+        trail: [T('28 Jul 2026, 11.00', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Dua toko: Megabaja (tempo) dan Asia (lunas)'), T('28 Jul 2026, 15.30', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('29 Jul 2026, 09.00', 'Rina Astuti', 'Purchasing', 'PO dikirim ke toko', ''), T('2 Agu 2026, 15.00', 'Rina Astuti', 'Purchasing', 'Barang datang di site', 'Tagihan Megabaja (tempo, jatuh tempo 16 Agu 2026) terbuka')] })
+    ]);
+    this.state.pays = this.state.pays.concat([
+      P('plaza', { id: 'PAY-2026-007', minggu: 31, status: 'Di Finance', dibuat: '3 Agu 2026, 09.30', oleh: 'Rina Astuti', bukti: false, buktiToko: {},
+        items: [{ poId: 'PO-2026-024', toko: 'Toko Megabaja', jenis: 'Tempo', due: '2026-08-16' }, { poId: 'PO-2026-024', toko: 'Toko Asia', jenis: 'Lunas', due: '' }],
+        trail: [T('3 Agu 2026, 09.30', 'Rina Astuti', 'Purchasing', 'Tagihan digabung dan dikirim ke Finance', 'PO-2026-024 · dua vendor: Toko Megabaja (tempo) dan Toko Asia (lunas)')] })
+    ]);
+    this.state.reqs = this.state.reqs.concat([
+      P('plaza', { id: 'REQ-JKT-023', minggu: 32, butuh: '2026-08-14', status: 'Menunggu Barang', dibuat: '3 Agu 2026, 08.20', oleh: 'Bagas Nugroho',
+        jobs: [J('kabinet', 30, [M('hpl', 20)]), J('keramik', 20, [M('semen', 10)])],
+        trail: [T('3 Agu 2026, 08.20', 'Bagas Nugroho', 'Supervisi', 'Diajukan', ''), T('3 Agu 2026, 13.30', 'Andi Prasetyo', 'PM', 'Disetujui PM', ''), T('4 Agu 2026, 09.00', 'Maya Kusuma', 'QS', 'Disetujui QS', ''), T('4 Agu 2026, 14.00', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('5 Agu 2026, 08.10', 'Rina Astuti', 'Purchasing', 'Minta cek gudang', ''), T('5 Agu 2026, 10.00', 'Sudirman', 'Kepala Gudang', 'Hasil cek gudang dikirim', 'Semen dari stok, HPL masuk PO')] })
+    ]);
+    this.state.sbks = this.state.sbks.concat([
+      P('plaza', { id: 'SBK-2026-015', reqId: 'REQ-JKT-023', pemohon: 'Bagas Nugroho', minggu: 32, status: 'TTD Direktur', sejak: 'baru saja', dibuat: '5 Agu 2026, 10.15', oleh: 'Rina Astuti',
+        lines: [{ itemId: 'semen', vol: 10 }],
+        trail: [T('5 Agu 2026, 10.15', 'Rina Astuti', 'Purchasing', 'SBK dibuat', 'Atas hasil cek gudang REQ-JKT-023'), T('5 Agu 2026, 10.40', 'Sudirman', 'Kepala Gudang', 'Diverifikasi Kepala Gudang', '10 sak semen tersedia di stok')] })
+    ]);
+    this.state.pos = this.state.pos.concat([
+      P('plaza', { id: 'PO-2026-025', reqId: 'REQ-JKT-023', pemohon: 'Bagas Nugroho', minggu: 32, status: 'TTD Direktur', sejak: 'baru saja', dibuat: '5 Agu 2026, 11.20', oleh: 'Rina Astuti',
+        termins: { 'Toko Nunut': 'tempo' },
+        lines: [{ itemId: 'hpl', vol: 20, harga: 217000, toko: 'Toko Nunut' }],
+        trail: [T('5 Agu 2026, 11.20', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Nunut \u2014 Tempo 14 hari \u00b7 sesuai nota')] })
+    ]);
+    this.state.pays.forEach(p => { if (p.bukti && !p.buktiToko) { p.buktiToko = {}; Array.from(new Set((p.items || []).map(i => i.toko))).forEach(tk => p.buktiToko[tk] = true); } if (!p.buktiToko) p.buktiToko = {}; });
+    this.state.bundles = [
+      { id: 'TTD-2026-004', oleh: 'Rina Astuti', dibuat: '4 Agu 2026, 16.20', status: 'Menunggu TTD', dispo: {},
+        keys: ['po|PO-2026-021', 'po|PO-2026-022', 'po|PO-2026-023', 'sbk|SBK-2026-013', 'sbk|SBK-2026-014'],
+        trail: [T('4 Agu 2026, 16.20', 'Rina Astuti', 'Purchasing', 'Pengajuan tanda tangan gabungan dibuat', '3 PO + 2 SBK dari 2 proyek (Pakuwon, Bandung) digabung menjadi satu pengajuan tanda tangan')] }
+    ];
+  }
+  item(id) { return this.CAT.find(c => c.id === id) || { nama: '', spek: '', satuan: '', harga: 0, kat: '', toko: '' }; }
+  job(id) { return this.JOBS.find(j => j.id === id) || { nama: '', satuan: '', boq: 0, terpakai: 0 }; }
+  terminOf(po, toko) { return (po.termins || {})[toko] || 'tempo'; }
+  terminLabel(id) { return (this.TERMIN.find(t => t.id === id) || this.TERMIN[2]).label; }
+  iso(d) { const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+  isoAdd(is, n) { const d = new Date(is + 'T00:00:00'); d.setDate(d.getDate() + n); return this.iso(d); }
+  isoToday() { return this.iso(this.TODAY); }
+  tokosOf(po) { return Array.from(new Set(po.lines.map(l => l.toko || 'Belum ditentukan'))); }
+  tokoTotal(po, toko) { return po.lines.filter(l => (l.toko || 'Belum ditentukan') === toko).reduce((a, l) => a + Number(l.vol || 0) * Number(l.harga || 0), 0); }
+  unitNilai(po, toko, jenis) {
+    const t = this.tokoTotal(po, toko), dp = Math.round(t * this.DP / 1000) * 1000;
+    return jenis === 'DP' ? dp : jenis === 'Pelunasan' ? t - dp : t;
+  }
+  unitsOf(po) {
+    const signed = ['Dikirim ke Toko', 'Barang Datang'].includes(po.status), datang = po.status === 'Barang Datang', out = [];
+    this.tokosOf(po).forEach(toko => {
+      const tm = this.terminOf(po, toko);
+      const mk = (jenis, ready, due) => out.push({ poId: po.id, toko: toko, termin: tm, jenis: jenis, ready: ready,
+        due: due || '', nilai: this.unitNilai(po, toko, jenis), key: po.id + '|' + toko + '|' + jenis });
+      if (tm === 'lunas') mk('Lunas', signed);
+      else if (tm === 'dp') { mk('DP', signed); mk('Pelunasan', datang); }
+      else mk('Tempo', datang, po.datang ? this.isoAdd(po.datang, 14) : '');
+    });
+    return out;
+  }
+  payUnits() { return this.state.pos.reduce((a, p) => a.concat(this.unitsOf(p)), []); }
+  paidBy(key) { return this.state.pays.find(p => (p.items || []).some(i => i.poId + '|' + i.toko + '|' + i.jenis === key)); }
+  jenisLabel(jenis, due) {
+    return jenis === 'Tempo' ? 'Tempo — jatuh tempo ' + this.tgl(due) + ' (' + this.sisaTxt(due) + ')'
+      : jenis === 'DP' ? 'DP 30% di muka' : jenis === 'Pelunasan' ? 'Pelunasan 70% setelah barang sampai' : 'Lunas di muka — barang dikirim setelah dibayar';
+  }
+  payItemNilai(i) { const po = this.state.pos.find(x => x.id === i.poId); return po ? this.unitNilai(po, i.toko, i.jenis) : 0; }
+  payPoIds(p) { return Array.from(new Set((p.items || []).map(i => i.poId))); }
+  rp(n) {
+    const neg = n < 0, a = Math.abs(n); let s;
+    if (a >= 1000000000) s = 'Rp ' + (a / 1000000000).toFixed(2).replace('.', ',') + ' M';
+    else if (a >= 1000000) s = 'Rp ' + (a / 1000000).toFixed(1).replace('.', ',') + ' jt';
+    else if (a >= 1000) s = 'Rp ' + Math.round(a / 1000) + ' rb';
+    else s = 'Rp ' + a;
+    return (neg ? '− ' : '') + s;
+  }
+  num(n) { return String(Math.round(Number(n) * 10) / 10).replace('.', ','); }
+  now(off) {
+    const d = new Date(this.TODAY.getTime() + (off || 0) * 60000), b = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    return d.getDate() + ' ' + b[d.getMonth()] + ' ' + d.getFullYear() + ', ' + String(d.getHours()).padStart(2, '0') + '.' + String(d.getMinutes()).padStart(2, '0');
+  }
+  tgl(iso) {
+    if (!iso) return '';
+    const b = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'], d = new Date(iso + 'T00:00:00');
+    return d.getDate() + ' ' + b[d.getMonth()] + ' ' + d.getFullYear();
+  }
+  sisaHari(iso) { return iso ? Math.round((new Date(iso + 'T00:00:00') - this.TODAY) / 86400000) : null; }
+  sisaTxt(iso) {
+    const n = this.sisaHari(iso);
+    if (n === null) return '';
+    return n < 0 ? 'terlewat ' + Math.abs(n) + ' hari' : n === 0 ? 'hari ini' : n + ' hari lagi';
+  }
+  // agregasi material lintas item pekerjaan
+  lines(req) {
+    const m = {};
+    (req.jobs || []).forEach(j => (j.mats || []).forEach(mt => {
+      if (!mt.itemId || !Number(mt.vol)) return;
+      if (!m[mt.itemId]) m[mt.itemId] = { itemId: mt.itemId, vol: 0, dari: [], sumber: null, terima: null };
+      m[mt.itemId].vol += Number(mt.vol);
+      const nm = this.job(j.jobId).nama; if (m[mt.itemId].dari.indexOf(nm) < 0) m[mt.itemId].dari.push(nm);
+    }));
+    const arr = Object.keys(m).map(k => m[k]);
+    if (req._lines) arr.forEach(l => { const prev = req._lines.find(x => x.itemId === l.itemId); if (prev) { l.sumber = prev.sumber; l.terima = prev.terima; l.ambil = prev.ambil; } });
+    req._lines = arr;
+    return arr;
+  }
+  // volume pekerjaan yang sudah dipesan lewat permintaan berjalan (selain req ini)
+  terpakaiBase(jobId, proyek) { const p = this.PROJ(proyek || 'pakuwon'); return p.id === 'pakuwon' ? this.job(jobId).terpakai : (p.terpakai[jobId] || 0); }
+  terpakaiJob(jobId, exceptId, proyek) {
+    proyek = proyek || 'pakuwon';
+    const base = this.terpakaiBase(jobId, proyek);
+    const extra = this.state.reqs.filter(r => (r.proyek || 'pakuwon') === proyek && r.id !== exceptId && !['Dibatalkan', 'Revisi', 'Ditahan', 'Cek PM', 'Cek QS'].includes(r.status))
+      .reduce((a, r) => a + (r.jobs || []).filter(j => j.jobId === jobId).reduce((b, j) => b + Number(j.vol || 0), 0), 0);
+    return base + extra;
+  }
+  boqCheck(jobId, vol, exceptId, proyek) {
+    const j = this.job(jobId), terpakai = this.terpakaiJob(jobId, exceptId, proyek), sisa = j.boq - terpakai, over = Number(vol || 0) - sisa;
+    return { j, terpakai, sisa, over, lebih: over > 0 };
+  }
+  proyekNama(id) { return this.PROJ(id).nama; }
+  proyekKota(id) { return this.PROJ(id).kota; }
+  bundleDocs(b) { return (b.keys || []).map(k => this.docOf(k)).filter(Boolean); }
+  bundleNilai(b) { return this.bundleDocs(b).reduce((a, x) => a + this.nilaiOf(x.t, x.d), 0); }
+  bundleProyeks(b) { return Array.from(new Set(this.bundleDocs(b).map(x => x.d.proyek || 'pakuwon'))); }
+  flash(m) { clearTimeout(this._tt); this.setState({ toast: m }); this._tt = setTimeout(() => this.setState({ toast: null }), 3600); }
+  touch(extra) { this.setState(Object.assign({ reqs: this.state.reqs.slice(), sbks: this.state.sbks.slice(), pos: this.state.pos.slice(), pays: this.state.pays.slice(), bundles: this.state.bundles.slice() }, extra || {})); }
+  nilaiReq(r) { return this.lines(r).reduce((a, l) => a + Number(l.vol || 0) * this.item(l.itemId).harga, 0); }
+  nilaiSbk(s) { return s.lines.reduce((a, l) => a + Number(l.vol || 0) * this.item(l.itemId).harga, 0); }
+  nilaiPo(p) { return p.lines.reduce((a, l) => a + Number(l.vol || 0) * Number(l.harga || 0), 0); }
+  nilaiPay(p) { return (p.items || []).reduce((a, i) => a + this.payItemNilai(i), 0); }
+  nilaiOf(t, d) { return t === 'req' ? this.nilaiReq(d) : t === 'sbk' ? this.nilaiSbk(d) : t === 'po' ? this.nilaiPo(d) : this.nilaiPay(d); }
+  docOf(key) {
+    if (!key) return null;
+    const [t, id] = key.split('|');
+    const arr = { req: this.state.reqs, sbk: this.state.sbks, po: this.state.pos, pay: this.state.pays }[t];
+    const d = arr ? arr.find(x => x.id === id) : null;
+    return d ? { t, d } : null;
+  }
+  allDocs() {
+    const s = this.state;
+    return [].concat(s.reqs.map(d => ({ t: 'req', d })), s.sbks.map(d => ({ t: 'sbk', d })), s.pos.map(d => ({ t: 'po', d })), s.pays.map(d => ({ t: 'pay', d })));
+  }
+  open(t, id) { this.setState({ screen: 'detail', sel: t + '|' + id, terimaNote: '', showNotif: false }); }
+  warnaOf(t, doc) {
+    const st = doc.status;
+    if (st === 'Dibatalkan') return { c: this.GREY, coret: 'line-through' };
+    if (st === 'Ditahan') return { c: this.GREY, coret: 'none' };
+    if (st === 'Revisi' || st === 'Revisi Purchasing') return { c: this.RED, coret: 'none' };
+    if (t === 'req' && !['Selesai', 'Dibatalkan', 'Ditahan'].includes(st)) {
+      const n = this.sisaHari(doc.butuh);
+      if (n !== null && n <= 5) return { c: this.ORANGE, coret: 'none' };
+    }
+    return { c: 'var(--color-divider)', coret: 'none' };
+  }
+  waitFor(role) {
+    return {
+      pm: [['req', 'Cek PM']], qs: [['req', 'Cek QS']], gudang: [['req', 'Cek Gudang'], ['sbk', 'Barang Keluar']],
+      purchasing: [['req', 'Di Purchasing'], ['po', 'Draft'], ['po', 'Dikirim ke Toko'], ['req', 'Revisi Purchasing'], ['pay', 'Lunas']],
+      supervisi: [['req', 'Terima di Site'], ['req', 'Revisi']],
+      finance: [['pay', 'Di Finance']],
+      direktur: [['req', 'TTD Direktur'], ['sbk', 'TTD Direktur'], ['po', 'TTD Direktur']]
+    }[role] || [];
+  }
+  approveDoc(t, d, role) {
+    const me = this.PEOPLE[role], peran = this.PERAN[role];
+    const ev = (aksi, note) => d.trail.push({ ts: this.now(), actor: me, peran, aksi, note: note || '' });
+    if (t === 'req') {
+      const over = (d.jobs || []).filter(j => this.boqCheck(j.jobId, j.vol, d.id, d.proyek).lebih);
+      const catatan = over.length ? 'Volume ' + over.map(j => this.job(j.jobId).nama).join(', ') + ' melebihi sisa BoQ — disetujui setelah cek luasan aktual lapangan.' : '';
+      if (d.status === 'Cek PM') { ev('Disetujui PM', catatan || 'Tahapan sesuai, tanggal kebutuhan ' + this.tgl(d.butuh) + ' dapat dikejar'); d.status = 'Cek QS'; }
+      else if (d.status === 'Cek QS') { ev('Disetujui QS', catatan || 'Volume seluruh item pekerjaan dalam sisa BoQ'); d.status = 'TTD Direktur'; d.sejak = 'baru saja'; }
+      else if (d.status === 'TTD Direktur') { ev('TTD Direktur', ''); d.status = 'Di Purchasing'; }
+    } else if (t === 'sbk') { ev('TTD Direktur', ''); d.status = 'Barang Keluar'; }
+    else if (t === 'po') { ev('TTD Direktur', 'Nominal cocok dengan nota terlampir'); d.status = 'Dikirim ke Toko'; }
+  }
+  renderVals() {
+    const s = this.state, role = s.role, me = this.PEOPLE[role], peran = this.PERAN[role];
+    const rp = n => this.rp(n);
+    const roleChips = ['supervisi', 'pm', 'qs', 'gudang', 'purchasing', 'finance', 'direktur'].map(k => ({
+      label: { supervisi: 'Supervisi', pm: 'PM', qs: 'QS', gudang: 'Gudang', purchasing: 'Purchasing', finance: 'Finance', direktur: 'Direktur' }[k],
+      bg: k === role ? 'var(--color-bg)' : 'transparent', fg: k === role ? 'var(--color-accent-900)' : 'var(--color-accent-200)',
+      border: k === role ? 'var(--color-bg)' : 'var(--color-accent-600)',
+      onPick: () => this.setState({ role: k, screen: k === 'direktur' ? 'meja' : k === 'supervisi' ? 'form' : 'work', sel: null, showNotif: false, editId: null })
+    }));
+    const queue = [];
+    this.waitFor(role).forEach(([t, st]) => this.allDocs().filter(x => x.t === t && x.d.status === st).forEach(x => queue.push(x)));
+    const workName = { supervisi: 'Terima Barang', pm: 'Kotak Masuk', qs: 'Kotak Masuk', gudang: 'Cek Gudang', purchasing: 'Pengadaan', finance: 'Pembayaran', direktur: 'Meja Direktur' }[role];
+    const tabs = [];
+    if (role === 'direktur') tabs.push(['meja', 'Meja Direktur']);
+    if (role === 'supervisi') tabs.push(['form', s.editId ? 'Edit Permintaan' : 'Buat Permintaan']);
+    tabs.push(['budget', 'Dashboard Budget']);
+    if (role !== 'direktur') tabs.push(['work', workName + (queue.length ? ' (' + queue.length + ')' : '')]);
+    tabs.push(['riwayat', 'Riwayat']);
+    const navTabs = tabs.map(([k, label]) => ({
+      label, fg: s.screen === k ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
+      bg: s.screen === k ? 'var(--color-bg)' : 'transparent', line: s.screen === k ? 'var(--color-accent)' : 'transparent',
+      onPick: () => this.setState({ screen: k, sel: null, showNotif: false })
+    }));
+
+    // ---------- notifikasi ----------
+    const notifs = [];
+    queue.filter(x => !(x.t === 'pay' && x.d.status === 'Lunas')).forEach(x => notifs.push({
+      judul: 'Giliran Anda — ' + x.d.id, sub: this.JENIS[x.t] + ' · ' + x.d.status, ts: 'Dibuat ' + x.d.dibuat,
+      dot: 'var(--color-accent)', onOpen: () => this.open(x.t, x.d.id)
+    }));
+    s.reqs.filter(r => ['Revisi', 'Revisi Purchasing'].includes(r.status)).forEach(r => notifs.push({
+      judul: 'Diminta revisi — ' + r.id, sub: (r.trail.slice(-1)[0] || {}).note || 'Perlu perbaikan', ts: (r.trail.slice(-1)[0] || {}).ts || '',
+      dot: this.RED, onOpen: () => this.open('req', r.id)
+    }));
+    if (role === 'purchasing') {
+      s.pays.filter(p => p.status === 'Lunas' && p.bukti).forEach(p => notifs.push({
+        judul: 'Bukti transfer diterima — ' + p.id, sub: 'LUNAS · ' + this.payPoIds(p).join(', ') + ' · ' + this.rp(this.nilaiPay(p)),
+        ts: (p.trail.slice(-1)[0] || {}).ts || '', dot: 'var(--color-accent)', onOpen: () => this.open('pay', p.id)
+      }));
+    }
+    if (['pm', 'qs', 'direktur'].includes(role)) {
+      s.reqs.filter(r => !['Selesai', 'Dibatalkan', 'Ditahan'].includes(r.status) && (r.jobs || []).some(j => this.boqCheck(j.jobId, j.vol, r.id, r.proyek).lebih)).forEach(r => notifs.push({
+        judul: 'Volume melebihi BoQ — ' + r.id, sub: (r.jobs || []).filter(j => this.boqCheck(j.jobId, j.vol, r.id, r.proyek).lebih).map(j => this.job(j.jobId).nama).join(', '),
+        ts: 'Perlu cek luasan aktual lapangan', dot: this.RED, onOpen: () => this.open('req', r.id)
+      }));
+    }
+
+    // ---------- budget ----------
+    const PJ = s.proyek;
+    const reqsPJ = s.reqs.filter(r => (r.proyek || 'pakuwon') === PJ);
+    const posPJ = s.pos.filter(p => (p.proyek || 'pakuwon') === PJ);
+    const sbksPJ = s.sbks.filter(b => (b.proyek || 'pakuwon') === PJ);
+    const committedReq = ['Di Purchasing', 'Cek Gudang', 'Menunggu Barang', 'Terima di Site', 'Selesai', 'Revisi Purchasing'];
+    const estKat = {}, aktKat = {};
+    reqsPJ.forEach(r => { if (committedReq.includes(r.status)) this.lines(r).forEach(l => { const it = this.item(l.itemId); estKat[it.kat] = (estKat[it.kat] || 0) + Number(l.vol || 0) * it.harga; }); });
+    sbksPJ.forEach(b => b.lines.forEach(l => { const it = this.item(l.itemId); aktKat[it.kat] = (aktKat[it.kat] || 0) + Number(l.vol || 0) * it.harga; }));
+    posPJ.forEach(p => p.lines.forEach(l => { const it = this.item(l.itemId); aktKat[it.kat] = (aktKat[it.kat] || 0) + Number(l.vol || 0) * Number(l.harga || 0); }));
+    const budgetTotal = this.KAT.reduce((a, k) => a + k.budget, 0);
+    const estTotal = Object.keys(estKat).reduce((a, k) => a + estKat[k], 0);
+    const aktTotal = Object.keys(aktKat).reduce((a, k) => a + aktKat[k], 0);
+    const selisihTotal = aktTotal - estTotal;
+    const katRows = this.KAT.map(k => {
+      const e = estKat[k.id] || 0, a = aktKat[k.id] || 0, dd = a - e, serap = Math.round((a || e) / k.budget * 100);
+      return { nama: k.nama, budget: rp(k.budget), estimasi: rp(e), aktual: rp(a), selisih: dd === 0 ? '—' : (dd > 0 ? '+ ' : '') + rp(dd),
+        selisihFg: dd > 0 ? this.RED : dd < 0 ? 'var(--color-accent-700)' : 'var(--color-neutral-600)',
+        serap, serapFg: serap > 85 ? this.RED : 'var(--color-accent-700)' };
+    });
+    const aktifReqs = reqsPJ.filter(r => !['Dibatalkan', 'Ditahan', 'Selesai'].includes(r.status));
+    const boqRows = this.JOBS.filter(j => aktifReqs.some(r => (r.jobs || []).some(x => x.jobId === j.id))).map(j => {
+      const diminta = aktifReqs.reduce((a, r) => a + (r.jobs || []).filter(x => x.jobId === j.id).reduce((b, x) => b + Number(x.vol || 0), 0), 0);
+      const sisa = j.boq - this.terpakaiBase(j.id, PJ) - diminta;
+      return { nama: j.nama, boq: this.num(j.boq) + ' ' + j.satuan, terpakai: this.num(this.terpakaiBase(j.id, PJ)) + ' ' + j.satuan,
+        diminta: this.num(diminta) + ' ' + j.satuan, sisa: this.num(sisa) + ' ' + j.satuan,
+        status: sisa < 0 ? 'Melebihi BoQ — perlu persetujuan QS & PM' : 'Dalam sisa BoQ',
+        fg: sisa < 0 ? this.RED : 'var(--color-accent-700)' };
+    });
+    const boqOverJobs = aktifReqs.reduce((a, r) => a + (r.jobs || []).filter(j => this.boqCheck(j.jobId, j.vol, r.id, PJ).lebih).length, 0);
+    const weeks = [28, 29, 30, 31, 32, 33];
+    const weekVals = weeks.map(w => {
+      const akt = posPJ.filter(p => p.minggu === w).reduce((a, p) => a + this.nilaiPo(p), 0) + sbksPJ.filter(b => b.minggu === w).reduce((a, b) => a + this.nilaiSbk(b), 0);
+      const est = reqsPJ.filter(r => r.minggu === w).reduce((a, r) => a + this.nilaiReq(r), 0);
+      return { w, v: akt || est, real: akt > 0 };
+    });
+    const maxW = Math.max.apply(null, weekVals.map(x => x.v).concat([1]));
+    const weekBars = weekVals.map(x => ({
+      minggu: x.w, nilai: x.v ? rp(x.v) : '—', h: Math.round(Math.max(x.v / maxW, 0.02) * 112) + 'px',
+      color: x.v === 0 ? 'var(--color-neutral-300)' : x.real ? 'var(--color-accent)' : 'var(--color-accent-300)',
+      fg: x.real ? 'var(--color-accent-800)' : 'var(--color-neutral-700)'
+    }));
+    const pipeStatus = ['Cek PM', 'Cek QS', 'TTD Direktur', 'Di Purchasing', 'Cek Gudang', 'Menunggu Barang', 'Draft', 'Dikirim ke Toko', 'Terima di Site', 'Revisi', 'Revisi Purchasing', 'Di Finance', 'Ditahan', 'Dibatalkan'];
+    const pipeline = this.allDocs().filter(x => pipeStatus.includes(x.d.status) && (x.d.proyek || 'pakuwon') === PJ).map(x => {
+      const w = this.warnaOf(x.t, x.d);
+      return { id: x.d.id, jenis: this.JENIS[x.t], minggu: x.d.minggu, nilai: rp(this.nilaiOf(x.t, x.d)), status: x.d.status,
+        pemilik: this.PEMILIK[x.d.status] || '—', warna: w.c, coret: w.coret,
+        sisaTxt: x.t === 'req' && !['Selesai', 'Dibatalkan', 'Ditahan'].includes(x.d.status) ? this.sisaTxt(x.d.butuh) : '',
+        onOpen: () => this.open(x.t, x.d.id) };
+    });
+
+    // ---------- meja direktur ----------
+    const mejaDefs = [['req', 'Surat Permintaan Material'], ['sbk', 'Surat Barang Keluar'], ['po', 'Purchase Order']];
+    const mejaGroups = mejaDefs.map(([t, judul]) => {
+      const docs = this.allDocs().filter(x => x.t === t && x.d.status === 'TTD Direktur' && !x.d.bundleId);
+      return {
+        judul, count: docs.length, countLabel: docs.length + ' dokumen', nilai: rp(docs.reduce((a, x) => a + this.nilaiOf(x.t, x.d), 0)),
+        onAll: () => { docs.forEach(x => this.approveDoc(x.t, x.d, 'direktur')); this.touch(); this.flash(docs.length + ' dokumen — ' + judul + ' — ditandatangani.'); },
+        docs: docs.map(x => {
+          const dd = x.d, w = this.warnaOf(x.t, dd), sisa = x.t === 'req' ? this.sisaHari(dd.butuh) : null;
+          const over = x.t === 'req' ? (dd.jobs || []).filter(j => this.boqCheck(j.jobId, j.vol, dd.id, dd.proyek).lebih).length : 0;
+          return {
+            id: dd.id,
+            sub: x.t === 'req' ? this.proyekKota(dd.proyek) + ' · pemohon ' + dd.oleh + ' · butuh ' + this.tgl(dd.butuh) + ' · ' + (dd.jobs || []).length + ' item pekerjaan'
+              : x.t === 'sbk' ? this.proyekKota(dd.proyek) + ' · dari ' + dd.reqId + ' · pemohon ' + dd.pemohon
+              : this.proyekKota(dd.proyek) + ' · dari ' + dd.reqId + ' · ' + new Set(dd.lines.map(l => l.toko)).size + ' toko',
+            ket: x.t === 'req' ? 'Lolos Cek PM dan Cek QS. Berikutnya diproses Purchasing.'
+              : x.t === 'sbk' ? 'Diverifikasi Kepala Gudang atas permintaan Purchasing.'
+              : 'Verifikasi nominal terhadap nota, lalu PO dikirim ke toko.',
+            nilai: rp(this.nilaiOf(x.t, dd)), nilaiLabel: x.t === 'req' ? 'Estimasi BoQ' : x.t === 'sbk' ? 'Nilai stok keluar' : 'Total PO',
+            tunggu: 'Menunggu ' + (dd.sejak || 'baru saja'), border: w.c,
+            flag: over ? over + ' item melebihi BoQ' : (sisa !== null && sisa <= 5 ? 'Genting — butuh ' + this.sisaTxt(dd.butuh) : ''),
+            flagBg: over ? this.RED : this.ORANGE,
+            notaSlot: x.t === 'po' ? 'nota-meja-' + dd.id : '',
+            onApprove: () => { this.approveDoc(x.t, dd, 'direktur'); this.touch(); this.flash(dd.id + ' ditandatangani — ' + dd.status); },
+            onRevisi: () => this.setState({ modal: { kind: 'revisi', t: x.t, id: dd.id, note: '' } }),
+            onOpen: () => this.open(x.t, dd.id)
+          };
+        })
+      };
+    }).filter(g => g.count > 0);
+    const mejaAll = this.allDocs().filter(x => x.d.status === 'TTD Direktur');
+    const pendingBundles = s.bundles.filter(b => b.status === 'Menunggu TTD');
+    const bundleCards = pendingBundles.map(b => {
+      const docs = this.bundleDocs(b);
+      const nPo = docs.filter(x => x.t === 'po').length, nSbk = docs.filter(x => x.t === 'sbk').length, nReq = docs.filter(x => x.t === 'req').length;
+      const proyeks = this.bundleProyeks(b), parts = [];
+      if (nPo) parts.push(nPo + ' PO'); if (nSbk) parts.push(nSbk + ' SBK'); if (nReq) parts.push(nReq + ' Permintaan');
+      return { id: b.id, oleh: b.oleh, dibuat: b.dibuat, count: docs.length + ' dokumen', breakdown: parts.join(' · '),
+        nilai: rp(this.bundleNilai(b)), proyekTxt: proyeks.map(p => this.proyekKota(p)).join(' + '), nProyek: proyeks.length + ' proyek',
+        onOpen: () => this.setState({ screen: 'bundle', openBundle: b.id, showNotif: false }) };
+    });
+
+    // ---------- form rencana kerja ----------
+    const editing = s.editId ? s.reqs.find(r => r.id === s.editId) : null;
+    const setDraft = arr => this.setState({ draft: arr });
+    const jobs = s.draft.map((j, i) => {
+      const info = this.boqCheck(j.jobId, j.vol, s.editId, (editing && editing.proyek) || 'pakuwon');
+      const upd = patch => { const a = s.draft.slice(); a[i] = Object.assign({}, a[i], patch); setDraft(a); };
+      return {
+        huruf: String.fromCharCode(65 + i), vol: j.vol, satuan: info.j.satuan || '—',
+        border: info.lebih ? this.RED : 'var(--color-border, var(--color-divider))',
+        boqBorder: info.lebih ? this.RED : 'var(--color-divider)', boqBg: info.lebih ? 'var(--color-neutral-100)' : 'transparent',
+        boqFg: info.lebih ? this.RED : 'var(--color-accent-800)',
+        boqLine: j.jobId ? info.j.nama + ': ' + this.num(j.vol || 0) + ' ' + info.j.satuan + ' diminta · BoQ ' + this.num(info.j.boq) + ' ' + info.j.satuan + ' · terpakai ' + this.num(info.terpakai) + ' ' + info.j.satuan + ' · sisa ' + this.num(info.sisa) + ' ' + info.j.satuan + (info.lebih ? '' : ' ✓') : 'Pilih item pekerjaan untuk melihat validasi BoQ.',
+        boqWarn: info.lebih ? '⚠ MELEBIHI SISA VOLUME BoQ — selisih ' + this.num(info.over) + ' ' + info.j.satuan + '. Perlu persetujuan QS & PM.' : '',
+        onVol: e => upd({ vol: e.target.value }),
+        onRemove: () => setDraft(s.draft.filter((_, k) => k !== i)),
+        onAddMat: () => upd({ mats: (j.mats || []).concat([{ itemId: '', vol: '' }]) }),
+        jobSelectEl: React.createElement('select', { className: 'input', value: j.jobId, onChange: e => upd({ jobId: e.target.value }) },
+          [React.createElement('option', { key: '_', value: '' }, '— Pilih item pekerjaan —')].concat(this.JOBS.map(x => React.createElement('option', { key: x.id, value: x.id }, x.nama)))),
+        mats: (j.mats || []).map((mt, k) => {
+          const it = this.item(mt.itemId);
+          const updM = patch => { const a = s.draft.slice(); const ms = (a[i].mats || []).slice(); ms[k] = Object.assign({}, ms[k], patch); a[i] = Object.assign({}, a[i], { mats: ms }); setDraft(a); };
+          return {
+            vol: mt.vol, satuan: it.satuan || '—', onVol: e => updM({ vol: e.target.value }),
+            onRemove: () => { const a = s.draft.slice(); a[i] = Object.assign({}, a[i], { mats: (a[i].mats || []).filter((_, z) => z !== k) }); setDraft(a); },
+            selectEl: React.createElement('select', { className: 'input', value: mt.itemId, onChange: e => updM({ itemId: e.target.value }) },
+              [React.createElement('option', { key: '_', value: '' }, '— Pilih material —')].concat(this.CAT.map(c => React.createElement('option', { key: c.id, value: c.id }, c.nama))))
+          };
+        })
+      };
+    });
+    const rekapMap = {};
+    s.draft.forEach(j => (j.mats || []).forEach(mt => {
+      if (!mt.itemId || !Number(mt.vol)) return;
+      if (!rekapMap[mt.itemId]) rekapMap[mt.itemId] = { vol: 0, dari: [] };
+      rekapMap[mt.itemId].vol += Number(mt.vol);
+      const nm = this.job(j.jobId).nama || 'item pekerjaan'; if (rekapMap[mt.itemId].dari.indexOf(nm) < 0) rekapMap[mt.itemId].dari.push(nm);
+    }));
+    const rekapRows = Object.keys(rekapMap).map(k => {
+      const it = this.item(k), r = rekapMap[k];
+      return { nama: it.nama, qty: this.num(r.vol) + ' ' + it.satuan, dari: 'dari ' + r.dari.join(', '), subtotal: rp(r.vol * it.harga) };
+    });
+    const draftTotal = Object.keys(rekapMap).reduce((a, k) => a + rekapMap[k].vol * this.item(k).harga, 0);
+    const sisaDraft = this.sisaHari(s.butuhDraft);
+
+    // ---------- worklist ----------
+    const workRows = queue.map(x => {
+      const dd = x.d, t = x.t, w = this.warnaOf(t, dd), sisa = t === 'req' ? this.sisaHari(dd.butuh) : null;
+      const over = t === 'req' ? (dd.jobs || []).filter(j => this.boqCheck(j.jobId, j.vol, dd.id, dd.proyek).lebih).length : 0;
+      return {
+        id: dd.id,
+        sub: t === 'req' ? 'Permintaan · butuh ' + this.tgl(dd.butuh) + ' · ' + (dd.jobs || []).length + ' item pekerjaan'
+          : t === 'sbk' ? 'Surat Barang Keluar · dari ' + dd.reqId
+          : t === 'po' ? 'Purchase Order · dari ' + dd.reqId
+          : 'Pengajuan Pembayaran · ' + (dd.items || []).length + ' tagihan',
+        ket: t === 'req' && dd.status === 'Di Purchasing' ? 'Tekan "Minta cek gudang" untuk meminta gudang mengisi stok tersedia.'
+          : t === 'req' && dd.status === 'Cek Gudang' ? 'Isi stok tersedia per item; sisanya masuk PO.'
+          : t === 'req' && dd.status === 'Terima di Site' ? 'Barang sudah dikirim — catat jumlah diterima.'
+          : t === 'req' && dd.status === 'Revisi' ? 'Dikembalikan — edit rencana kerja lalu ajukan ulang.'
+          : t === 'req' && dd.status === 'Revisi Purchasing' ? 'Selisih dari toko — lengkapi kekurangan.'
+          : t === 'po' && dd.status === 'Draft' ? 'Tentukan toko dan harga nota per baris.'
+          : t === 'po' ? 'PO sudah di toko — tandai bila barang datang.'
+          : dd.status === 'Lunas' ? 'Sudah dibayar Finance — bukti transfer terlampir. Buka untuk melihat buktinya.'
+          : 'Rekap per toko, nota terlampir, lalu unggah bukti transfer.',
+        status: dd.status, nilai: rp(this.nilaiOf(t, dd)), nilaiLabel: t === 'req' ? 'Estimasi BoQ' : 'Nilai',
+        warna: t === 'pay' && dd.status === 'Lunas' ? 'var(--color-accent)' : w.c,
+        flag: t === 'pay' && dd.status === 'Lunas' ? 'Bukti transfer diterima — LUNAS' : (over ? over + ' item melebihi BoQ' : (sisa !== null && sisa <= 5 ? 'Genting — ' + this.sisaTxt(dd.butuh) : '')),
+        flagBg: t === 'pay' && dd.status === 'Lunas' ? 'var(--color-accent-700)' : (over ? this.RED : this.ORANGE),
+        meta: 'Dibuat ' + dd.dibuat + ' oleh ' + dd.oleh, onOpen: () => this.open(t, dd.id)
+      };
+    });
+    const unpaidUnits = this.payUnits().filter(u => !this.paidBy(u.key));
+    const readyUnits = unpaidUnits.filter(u => u.ready);
+    const gabungRows = readyUnits.map(u => ({
+      id: u.poId + ' — ' + u.toko, checked: !!s.gabungSel[u.key], nilai: rp(u.nilai),
+      sub: this.jenisLabel(u.jenis, u.due),
+      border: s.gabungSel[u.key] ? 'var(--color-accent)' : 'var(--color-divider)',
+      onToggle: () => this.setState({ gabungSel: Object.assign({}, s.gabungSel, { [u.key]: !s.gabungSel[u.key] }) })
+    }));
+    const gabungPicked = readyUnits.filter(u => s.gabungSel[u.key]);
+
+    // ---------- detail ----------
+    const cur = this.docOf(s.sel);
+    const t = cur ? cur.t : null, d = cur ? cur.d : null;
+    const nilai = cur ? this.nilaiOf(t, d) : 0;
+    const isReq = t === 'req';
+    const reqLines = isReq ? this.lines(d) : [];
+    const sumberCol = isReq && reqLines.some(l => l.sumber);
+    let tableCols = '26px 1.6fr 1.2fr 70px 70px 120px', tableMinW = '660px';
+    if (sumberCol) { tableCols += ' 140px'; tableMinW = '810px'; }
+    const selLines = (isReq ? reqLines : t === 'sbk' ? d.lines : []).map((l, i) => {
+      const it = this.item(l.itemId);
+      return { no: i + 1, nama: it.nama, spek: it.spek, vol: this.num(l.vol), satuan: it.satuan, subtotal: rp(Number(l.vol) * it.harga),
+        sumberLabel: l.sumber === 'stok' ? 'Stok gudang' : l.sumber === 'beli' ? 'Beli (PO)' : l.sumber === 'campur' ? 'Stok + PO' : '—',
+        sumberFg: l.sumber ? 'var(--color-accent-700)' : 'var(--color-neutral-600)' };
+    });
+    const selJobs = isReq ? (d.jobs || []).map((j, i) => {
+      const info = this.boqCheck(j.jobId, j.vol, d.id, d.proyek);
+      return {
+        huruf: String.fromCharCode(65 + i), nama: info.j.nama, volTxt: '±' + this.num(j.vol) + ' ' + info.j.satuan,
+        border: info.lebih ? this.RED : 'var(--color-divider)', bg: info.lebih ? 'var(--color-neutral-100)' : 'transparent',
+        fg: info.lebih ? this.RED : 'var(--color-accent-800)',
+        boqLine: this.num(j.vol) + ' ' + info.j.satuan + ' diminta · BoQ ' + this.num(info.j.boq) + ' ' + info.j.satuan + ' · terpakai ' + this.num(info.terpakai) + ' ' + info.j.satuan + ' · sisa ' + this.num(info.sisa) + ' ' + info.j.satuan + (info.lebih ? '' : ' ✓'),
+        warn: info.lebih ? '⚠ MELEBIHI SISA VOLUME BoQ — selisih ' + this.num(info.over) + ' ' + info.j.satuan + '. Perlu persetujuan QS & PM.' : '',
+        mats: (j.mats || []).map(mt => ({ qty: this.num(mt.vol) + ' ' + this.item(mt.itemId).satuan, nama: this.item(mt.itemId).nama }))
+      };
+    }) : [];
+    const nOver = selJobs.filter(x => x.warn).length;
+    const trail = cur ? d.trail : [];
+    const selTrail = trail.map((e, i) => ({
+      ts: e.ts, actor: e.actor, peran: e.peran, aksi: e.aksi, note: e.note, hasLine: i < trail.length - 1,
+      dot: /Revisi|Selisih|Dibatalkan|Ditahan/.test(e.aksi) ? this.RED : /Disetujui|TTD|Selesai|LUNAS|Lunas|keluar/.test(e.aksi) ? 'var(--color-accent)' : 'var(--color-neutral-500)',
+      titleColor: /Revisi|Selisih|Dibatalkan/.test(e.aksi) ? this.RED : 'var(--color-text)'
+    }));
+    const ttdList = cur && t === 'sbk' ? [
+      { peran: 'Pembuat surat', nama: d.oleh, status: 'Ditandatangani', fg: 'var(--color-accent-700)' },
+      { peran: 'Kepala gudang', nama: 'Sudirman', status: d.trail.some(e => e.aksi.indexOf('Diverifikasi') === 0) ? 'Ditandatangani' : 'Menunggu', fg: 'var(--color-accent-700)' },
+      { peran: 'Direktur', nama: 'Ir. Bambang Wijaya', status: d.status === 'TTD Direktur' ? 'Menunggu' : 'Ditandatangani', fg: d.status === 'TTD Direktur' ? 'var(--color-neutral-700)' : 'var(--color-accent-700)' }
+    ] : null;
+    const showPoBlocks = !!cur && t === 'po' && d.status !== 'Draft';
+    const poBlocks = showPoBlocks || (cur && t === 'po') ? Object.values(d.lines.reduce((acc, l) => {
+      const tk = l.toko || 'Belum ditentukan';
+      if (!acc[tk]) acc[tk] = { toko: tk, lines: [], v: 0 };
+      const it = this.item(l.itemId), sub = Number(l.vol) * Number(l.harga || 0);
+      acc[tk].lines.push({ nama: it.nama, qty: this.num(l.vol) + ' ' + it.satuan, harga: rp(Number(l.harga || 0)), subtotal: rp(sub) });
+      acc[tk].v += sub; return acc;
+    }, {})).map(g => {
+      const tm = this.terminOf(d, g.toko);
+      const st = this.unitsOf(d).filter(u => u.toko === g.toko).map(u => {
+        const pay = this.paidBy(u.key);
+        const ket = pay ? (pay.status === 'Lunas' ? 'lunas — ' + pay.id : 'diajukan — ' + pay.id)
+          : u.ready ? 'siap diajukan ke Finance'
+          : u.jenis === 'Pelunasan' ? 'menunggu barang datang di site' : 'menunggu tanda tangan Direktur';
+        return u.jenis + ' ' + this.rp(u.nilai) + ' — ' + ket;
+      }).join(' · ');
+      return { toko: g.toko, termin: this.terminLabel(tm), nItem: g.lines.length + ' item', lines: g.lines,
+        subtotal: rp(g.v), slotId: 'nota-' + d.id + '-' + g.toko.replace(/\s+/g, ''),
+        payStatus: d.status === 'Draft' ? '' : g.toko + ' — ' + st };
+    }) : [];
+    const showPoEdit = !!cur && t === 'po' && role === 'purchasing' && d.status === 'Draft';
+    const poEditLines = showPoEdit ? d.lines.map(l => {
+      const it = this.item(l.itemId), h = Number(l.harga || 0), sl = (h - it.harga) * Number(l.vol);
+      return {
+        nama: it.nama, vol: this.num(l.vol), satuan: it.satuan, harga: h, subtotal: rp(h * Number(l.vol)),
+        selisih: sl === 0 ? '—' : (sl > 0 ? '+ ' : '') + rp(sl), selisihFg: sl > 0 ? this.RED : 'var(--color-accent-700)',
+        onHarga: e => { l.harga = Number(e.target.value || 0); this.touch(); },
+        tokoSelectEl: React.createElement('select', { className: 'input', value: l.toko || '', style: { marginTop: 2 }, onChange: e => { l.toko = e.target.value; this.touch(); } },
+          [React.createElement('option', { key: '_', value: '' }, '— Pilih toko —')].concat(this.TOKO.map(x => React.createElement('option', { key: x.nama, value: x.nama }, x.nama))))
+      };
+    }) : [];
+    const poTerminRows = showPoEdit ? this.tokosOf(d).filter(tk => tk !== 'Belum ditentukan').map(tk => {
+      const tm = this.terminOf(d, tk);
+      return {
+        toko: tk, subtotal: rp(this.tokoTotal(d, tk)), ket: (this.TERMIN.find(x => x.id === tm) || {}).ket,
+        selectEl: React.createElement('select', { className: 'input', value: tm, style: { marginTop: 2 },
+          onChange: e => { d.termins = Object.assign({}, d.termins || {}, { [tk]: e.target.value }); this.touch(); } },
+          this.TERMIN.map(x => React.createElement('option', { key: x.id, value: x.id }, x.label)))
+      };
+    }) : [];
+    const poBoqV = cur && t === 'po' ? d.lines.reduce((a, l) => a + Number(l.vol) * this.item(l.itemId).harga, 0) : 0;
+    const showFinance = !!cur && t === 'pay';
+    const finGroups = showFinance ? Object.values((d.items || []).reduce((acc, i) => {
+      if (!acc[i.toko]) acc[i.toko] = { toko: i.toko, pos: [], items: [], v: 0 };
+      const n = this.payItemNilai(i), dekat = i.jenis === 'Tempo' && this.sisaHari(i.due) !== null && this.sisaHari(i.due) <= 5;
+      acc[i.toko].items.push({ poId: i.poId, label: this.jenisLabel(i.jenis, i.due), jenis: i.jenis,
+        nilai: this.rp(n), fg: dekat ? this.ORANGE : 'var(--color-neutral-700)' });
+      if (acc[i.toko].pos.indexOf(i.poId) < 0) acc[i.toko].pos.push(i.poId);
+      acc[i.toko].v += n;
+      return acc;
+    }, {})) : [];
+    const showSplit = !!cur && isReq && role === 'gudang' && d.status === 'Cek Gudang';
+    const splitState = showSplit ? reqLines.map(l => ({ l, stok: this.STOK[l.itemId] || 0, ambil: l.ambil === undefined ? Math.min(this.STOK[l.itemId] || 0, Number(l.vol)) : l.ambil })) : [];
+    const splitLines = splitState.map(x => ({
+      nama: this.item(x.l.itemId).nama, dari: 'untuk ' + (x.l.dari || []).join(', '),
+      diminta: this.num(x.l.vol) + ' ' + this.item(x.l.itemId).satuan, stok: x.stok + ' ' + this.item(x.l.itemId).satuan,
+      stokFg: x.stok === 0 ? 'var(--color-neutral-600)' : 'var(--color-accent-700)',
+      ambil: x.ambil, beli: this.num(Number(x.l.vol) - Number(x.ambil)) + ' ' + this.item(x.l.itemId).satuan,
+      onAmbil: e => { const v = Math.max(0, Math.min(Number(e.target.value || 0), Number(x.l.vol), x.stok)); x.l.ambil = v; this.touch(); }
+    }));
+    const nStok = splitState.filter(x => Number(x.ambil) > 0).length, nBeli = splitState.filter(x => Number(x.l.vol) - Number(x.ambil) > 0).length;
+    const showTerima = !!cur && isReq && role === 'supervisi' && d.status === 'Terima di Site';
+    const terimaLines = showTerima ? reqLines.map(l => {
+      const it = this.item(l.itemId), got = l.terima === null ? l.vol : l.terima, diff = Number(got) - Number(l.vol);
+      return {
+        nama: it.nama, dari: 'untuk ' + (l.dari || []).join(', '), diminta: this.num(l.vol) + ' ' + it.satuan, diterima: got,
+        statusTxt: diff === 0 ? 'Sesuai' : diff < 0 ? 'Kurang ' + this.num(Math.abs(diff)) + ' ' + it.satuan : 'Lebih ' + this.num(diff) + ' ' + it.satuan,
+        statusFg: diff === 0 ? 'var(--color-accent-700)' : this.ORANGE, border: diff === 0 ? 'var(--color-divider)' : this.ORANGE,
+        onChange: e => { l.terima = e.target.value === '' ? 0 : Number(e.target.value); this.touch(); }
+      };
+    }) : [];
+    const nSelisih = showTerima ? reqLines.filter(l => l.terima !== null && Number(l.terima) !== Number(l.vol)).length : 0;
+    const canApprove = !!cur && ((role === 'direktur' && d.status === 'TTD Direktur') || (role === 'pm' && d.status === 'Cek PM') || (role === 'qs' && d.status === 'Cek QS'));
+    const canEdit = !!cur && isReq && role === 'supervisi' && d.status === 'Revisi';
+    const canMintaGudang = !!cur && isReq && role === 'purchasing' && d.status === 'Di Purchasing';
+    const canDatang = !!cur && t === 'po' && role === 'purchasing' && d.status === 'Dikirim ke Toko';
+    const canRevisiPo = !!cur && isReq && role === 'purchasing' && d.status === 'Revisi Purchasing';
+    const selW = cur ? this.warnaOf(t, d) : null;
+    const selSisa = isReq ? this.sisaHari(d.butuh) : null;
+    const modal = s.modal;
+
+    // ---------- riwayat ----------
+    const q = s.search.toLowerCase();
+    const jenisNama = { req: 'Permintaan Material', sbk: 'Barang Keluar', po: 'Purchase Order', pay: 'Pembayaran' };
+    const riwayatRows = this.allDocs().filter(x => {
+      if (s.fJenis !== 'Semua jenis' && jenisNama[x.t] !== s.fJenis) return false;
+      if ((s.fProyek || 'Semua proyek') !== 'Semua proyek' && this.proyekNama(x.d.proyek) !== s.fProyek) return false;
+      if (!q) return true;
+      const mat = x.t === 'req' ? this.lines(x.d).map(l => this.item(l.itemId).nama).join(' ') + ' ' + (x.d.jobs || []).map(j => this.job(j.jobId).nama).join(' ')
+        : (x.d.lines || []).map(l => this.item(l.itemId).nama + ' ' + (l.toko || '')).join(' ');
+      return [x.d.id, x.d.status, mat].join(' ').toLowerCase().includes(q);
+    }).sort((a, b) => b.d.minggu - a.d.minggu).map(x => {
+      const w = this.warnaOf(x.t, x.d);
+      return { id: x.d.id, jenis: jenisNama[x.t], minggu: x.d.minggu, nilai: rp(this.nilaiOf(x.t, x.d)), status: x.d.status, proyek: this.proyekKota(x.d.proyek),
+        dibuat: x.d.dibuat, warna: w.c, coret: w.coret,
+        sisaTxt: x.t === 'req' && !['Selesai', 'Dibatalkan', 'Ditahan'].includes(x.d.status) ? this.sisaTxt(x.d.butuh) : '',
+        onOpen: () => this.open(x.t, x.d.id) };
+    });
+
+    // ---------- pengajuan gabungan: purchasing menyusun ----------
+    const ORD = { po: 0, sbk: 1, req: 2 };
+    const ttdUnbundled = this.allDocs().filter(x => x.d.status === 'TTD Direktur' && !x.d.bundleId).sort((a, b) => ORD[a.t] - ORD[b.t]);
+    const bundlePickRows = ttdUnbundled.map(x => {
+      const key = x.t + '|' + x.d.id, on = !!s.bundleSel[key];
+      return { key, checked: on, jenis: this.JENIS[x.t], id: x.d.id, proyek: this.proyekKota(x.d.proyek),
+        nilai: rp(this.nilaiOf(x.t, x.d)), sub: x.d.reqId ? 'dari ' + x.d.reqId : (x.d.jobs || []).length + ' item pekerjaan',
+        border: on ? 'var(--color-accent)' : 'var(--color-divider)',
+        onToggle: () => this.setState({ bundleSel: Object.assign({}, s.bundleSel, { [key]: !s.bundleSel[key] }) }) };
+    });
+    const bundlePicked = ttdUnbundled.filter(x => s.bundleSel[x.t + '|' + x.d.id]);
+
+    // ---------- pengajuan gabungan: detail untuk Direktur ----------
+    const openB = s.bundles.find(b => b.id === s.openBundle) || null;
+    const poBlocksOf = dd => Object.values(dd.lines.reduce((acc, l) => {
+      const tk = l.toko || 'Belum ditentukan';
+      if (!acc[tk]) acc[tk] = { toko: tk, lines: [], v: 0 };
+      const it = this.item(l.itemId), sub = Number(l.vol) * Number(l.harga || 0);
+      acc[tk].lines.push({ nama: it.nama, qty: this.num(l.vol) + ' ' + it.satuan, harga: rp(Number(l.harga || 0)), subtotal: rp(sub) });
+      acc[tk].v += sub; return acc;
+    }, {})).map(g => ({ toko: g.toko, termin: this.terminLabel(this.terminOf(dd, g.toko)), nItem: g.lines.length + ' item', lines: g.lines, subtotal: rp(g.v) }));
+    const docLinesOf = (tt, dd) => (tt === 'req' ? this.lines(dd) : dd.lines).map((l, i) => {
+      const it = this.item(l.itemId);
+      return { no: i + 1, nama: it.nama, spek: it.spek, qty: this.num(l.vol) + ' ' + it.satuan, subtotal: rp(Number(l.vol) * it.harga) };
+    });
+    const docJobsOf = dd => (dd.jobs || []).map((j, i) => {
+      const info = this.boqCheck(j.jobId, j.vol, dd.id, dd.proyek);
+      return { huruf: String.fromCharCode(65 + i), nama: info.j.nama, volTxt: '\u00b1' + this.num(j.vol) + ' ' + info.j.satuan,
+        warn: info.lebih, mats: (j.mats || []).map(mt => ({ qty: this.num(mt.vol) + ' ' + this.item(mt.itemId).satuan, nama: this.item(mt.itemId).nama })) };
+    });
+    let bundleView = null;
+    if (openB) {
+      const bDocs = this.bundleDocs(openB).slice().sort((a, b) => ORD[a.t] - ORD[b.t]);
+      const dk = openB.dispo || {};
+      const finalize = b => { if (this.bundleDocs(b).every(y => (b.dispo || {})[y.t + '|' + y.d.id])) { b.status = 'Selesai'; b.trail.push({ ts: this.now(1), actor: me, peran, aksi: 'Pengajuan selesai diproses', note: 'Seluruh dokumen telah ditandatangani atau ditolak' }); } };
+      const decide = (x, kind) => {
+        const b = s.bundles.find(z => z.id === openB.id), key = x.t + '|' + x.d.id;
+        b.dispo = Object.assign({}, b.dispo || {}, { [key]: kind });
+        if (kind === 'setuju') this.approveDoc(x.t, x.d, 'direktur');
+        else { x.d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Ditolak Direktur', note: 'Dikembalikan untuk revisi dari pengajuan ' + b.id }); x.d.status = x.t === 'req' ? 'Revisi' : 'Draft'; x.d.bundleId = null; }
+        finalize(b); this.touch();
+        this.flash(x.d.id + (kind === 'setuju' ? ' ditandatangani.' : ' ditolak \u2014 dikembalikan ke Purchasing.'));
+      };
+      const nPo = bDocs.filter(x => x.t === 'po').length, nSbk = bDocs.filter(x => x.t === 'sbk').length, nReq = bDocs.filter(x => x.t === 'req').length;
+      const parts = []; if (nPo) parts.push(nPo + ' PO'); if (nSbk) parts.push(nSbk + ' SBK'); if (nReq) parts.push(nReq + ' Permintaan');
+      const notas = [];
+      bDocs.filter(x => x.t === 'po').forEach(x => this.tokosOf(x.d).forEach(tk => notas.push({ label: x.d.id + ' \u2014 ' + tk, slotId: 'nota-' + x.d.id + '-' + tk.replace(/\s+/g, '') })));
+      bundleView = {
+        id: openB.id, oleh: openB.oleh, dibuat: openB.dibuat, status: openB.status, selesai: openB.status !== 'Menunggu TTD', pending: openB.status === 'Menunggu TTD', hasNotas: notas.length > 0,
+        count: bDocs.length + ' dokumen', breakdown: parts.join(' \u00b7 '), nilai: rp(this.bundleNilai(openB)),
+        proyekChips: this.bundleProyeks(openB).map(p => this.proyekNama(p)),
+        nDecided: bDocs.filter(x => dk[x.t + '|' + x.d.id]).length + ' dari ' + bDocs.length + ' dokumen sudah diputuskan',
+        onBack: () => this.setState({ screen: 'meja', openBundle: null }),
+        onPrint: () => { this.flash('Menyiapkan ' + openB.id + ' untuk dicetak / disimpan PDF.'); setTimeout(() => window.print(), 400); },
+        onSetujuiSemua: () => {
+          const b = s.bundles.find(z => z.id === openB.id);
+          this.bundleDocs(b).forEach(x => { const k = x.t + '|' + x.d.id; if ((b.dispo || {})[k] !== 'tolak' && (b.dispo || {})[k] !== 'setuju') { b.dispo = Object.assign({}, b.dispo || {}, { [k]: 'setuju' }); this.approveDoc(x.t, x.d, 'direktur'); } });
+          b.status = 'Selesai'; b.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Ditandatangani Direktur \u2014 Setujui Semua', note: bDocs.length + ' dokumen dalam satu pengajuan ditandatangani sekaligus' });
+          this.touch({ screen: 'meja', openBundle: null });
+          this.flash(openB.id + ' \u2014 ' + bDocs.length + ' dokumen ditandatangani sekaligus.');
+        },
+        docs: bDocs.map((x, idx) => {
+          const dd = x.d, key = x.t + '|' + dd.id, dispo = dk[key] || '';
+          return { key, no: idx + 1, jenis: this.JENIS[x.t], id: dd.id, proyek: this.proyekNama(dd.proyek),
+            pemohon: dd.pemohon || dd.oleh, asal: dd.reqId || '\u2014', nilaiLabel: x.t === 'po' ? 'Total PO' : x.t === 'sbk' ? 'Nilai stok keluar' : 'Estimasi BoQ',
+            nilai: rp(this.nilaiOf(x.t, dd)), dispo, decided: !!dispo,
+            dispoLabel: dispo === 'setuju' ? '\u2713 Disetujui' : dispo === 'tolak' ? '\u2715 Ditolak' : 'Menunggu keputusan',
+            dispoFg: dispo === 'setuju' ? 'var(--color-accent-700)' : dispo === 'tolak' ? this.RED : 'var(--color-neutral-600)',
+            border: dispo === 'setuju' ? 'var(--color-accent)' : dispo === 'tolak' ? this.RED : 'var(--color-divider)',
+            canAct: openB.status === 'Menunggu TTD' && !dispo,
+            isPo: x.t === 'po', isSbk: x.t === 'sbk', isReq: x.t === 'req', notPo: x.t !== 'po',
+            poBlocks: x.t === 'po' ? poBlocksOf(dd) : [], lines: x.t !== 'po' ? docLinesOf(x.t, dd) : [], jobs: x.t === 'req' ? docJobsOf(dd) : [],
+            onApprove: () => decide(x, 'setuju'), onReject: () => decide(x, 'tolak') };
+        }),
+        notas
+      };
+    }
+
+    // ---------- finance multi-bukti per vendor ----------
+    const finVendorRows = showFinance ? finGroups.map(g => {
+      const done = !!(d.buktiToko || {})[g.toko];
+      return { toko: g.toko, poList: g.pos.join(', '), nilai: rp(g.v), items: g.items,
+        buktiSlotId: 'bukti-' + d.id + '-' + g.toko.replace(/\s+/g, ''),
+        done, doneLabel: done ? '\u2713 Bukti transfer terunggah' : 'Belum ada bukti transfer',
+        doneFg: done ? 'var(--color-accent-700)' : 'var(--color-neutral-600)',
+        border: done ? 'var(--color-accent)' : 'var(--color-divider)',
+        canMark: role === 'finance' && d.status !== 'Lunas' && !done,
+        onMark: () => { d.buktiToko = Object.assign({}, d.buktiToko || {}, { [g.toko]: true }); d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Bukti transfer diunggah \u2014 ' + g.toko, note: 'Transfer ' + rp(g.v) + ' ke ' + g.toko }); this.touch(); this.flash('Bukti transfer ' + g.toko + ' diunggah.'); } };
+    }) : [];
+    const allBuktiDone = showFinance && finGroups.length > 0 && finGroups.every(g => (d.buktiToko || {})[g.toko]);
+    const proyekSelectEl = React.createElement('select', { className: 'input', value: s.proyek, style: { width: 'auto' }, onChange: e => this.setState({ proyek: e.target.value }) },
+      this.PROJECTS.map(p => React.createElement('option', { key: p.id, value: p.id }, p.nama)));
+    const proyekFilterEl = React.createElement('select', { className: 'input', value: s.fProyek || 'Semua proyek', style: { width: 'auto' }, onChange: e => this.setState({ fProyek: e.target.value }) },
+      ['Semua proyek'].concat(this.PROJECTS.map(p => p.nama)).map(o => React.createElement('option', { key: o, value: o }, o)));
+
+    return {
+      roleChips, navTabs, userName: me, roleLabel: this.RLBL[role], mainW: (this.props.modeHp ?? false) ? '440px' : '1180px',
+      showNotif: s.showNotif, notifs, notifEmpty: !notifs.length, notifCount: notifs.length ? String(notifs.length) : '',
+      onBell: () => this.setState({ showNotif: !s.showNotif }),
+      onWa: () => this.flash('Kanal WhatsApp belum diaktifkan pada demo ini.'),
+      showMeja: s.screen === 'meja', showBudget: s.screen === 'budget', showForm: role === 'supervisi' && s.screen === 'form',
+      showWork: s.screen === 'work', showDetail: s.screen === 'detail' && !!cur, showRiwayat: s.screen === 'riwayat',
+      showBundle: s.screen === 'bundle' && !!bundleView, bundleView, bundleCards, bundleEmpty: !bundleCards.length,
+      proyekNama: this.proyekNama(s.proyek), proyekOpening: this.PROJ(s.proyek).opening, proyekSelectEl, proyekFilterEl,
+      showBundleBuilder: role === 'purchasing' && ttdUnbundled.length > 0, bundlePickRows,
+      bundleBuildInfo: bundlePicked.length ? bundlePicked.length + ' dokumen dipilih · ' + rp(bundlePicked.reduce((a, x) => a + this.nilaiOf(x.t, x.d), 0)) : 'Pilih dokumen lintas proyek untuk digabung.',
+      onKirimBundle: () => {
+        if (!bundlePicked.length) { this.flash('Pilih minimal satu dokumen.'); return; }
+        const id = 'TTD-2026-00' + (4 + s.bundles.length), keys = bundlePicked.map(x => x.t + '|' + x.d.id);
+        bundlePicked.forEach(x => { x.d.bundleId = id; x.d.sejak = 'baru saja'; });
+        const nPo = bundlePicked.filter(x => x.t === 'po').length, nSbk = bundlePicked.filter(x => x.t === 'sbk').length, nReq = bundlePicked.filter(x => x.t === 'req').length;
+        const parts = []; if (nPo) parts.push(nPo + ' PO'); if (nSbk) parts.push(nSbk + ' SBK'); if (nReq) parts.push(nReq + ' permintaan');
+        const proyeks = Array.from(new Set(bundlePicked.map(x => this.proyekKota(x.d.proyek))));
+        const bundle = { id, oleh: 'Rina Astuti', dibuat: this.now(), status: 'Menunggu TTD', dispo: {}, keys,
+          trail: [{ ts: this.now(), actor: 'Rina Astuti', peran: 'Purchasing', aksi: 'Pengajuan tanda tangan gabungan dibuat', note: parts.join(' + ') + ' dari ' + proyeks.length + ' proyek (' + proyeks.join(', ') + ') digabung menjadi satu pengajuan' }] };
+        this.setState({ bundles: s.bundles.concat([bundle]), reqs: s.reqs.slice(), sbks: s.sbks.slice(), pos: s.pos.slice(), bundleSel: {} });
+        this.flash(id + ' dikirim ke Direktur — ' + bundlePicked.length + ' dokumen, ' + rp(bundlePicked.reduce((a, x) => a + this.nilaiOf(x.t, x.d), 0)) + '.');
+      },
+      mejaGroups, mejaEmpty: !mejaGroups.length && !bundleCards.length, hasBundles: !!bundleCards.length, mejaCount: mejaAll.length,
+      mejaNilai: rp(mejaAll.reduce((a, x) => a + this.nilaiOf(x.t, x.d), 0)),
+      belanjaMinggu: rp(s.pos.filter(p => ['TTD Direktur', 'Dikirim ke Toko'].includes(p.status)).reduce((a, p) => a + this.nilaiPo(p), 0)),
+      boqOverCount: boqOverJobs, boqBorder: boqOverJobs ? this.RED : 'var(--color-divider)', boqFg: boqOverJobs ? this.RED : 'var(--color-accent-700)',
+      boqOverKet: boqOverJobs ? 'perlu persetujuan QS & PM' : 'semua dalam sisa BoQ',
+      bTotal: rp(budgetTotal), bEstimasi: rp(estTotal), bAktual: rp(aktTotal), bSisa: rp(budgetTotal - aktTotal),
+      bSerap: Math.round(aktTotal / budgetTotal * 100),
+      bSelisih: selisihTotal === 0 ? '—' : (selisihTotal > 0 ? '+ ' : '') + rp(selisihTotal),
+      bSelisihLabel: selisihTotal > 0 ? 'harga nota di atas estimasi BoQ' : selisihTotal < 0 ? 'harga nota di bawah estimasi BoQ' : 'belum ada selisih',
+      bSelisihFg: selisihTotal > 0 ? this.RED : 'var(--color-accent-700)',
+      bSelisihBorder: selisihTotal > 0 ? this.RED : 'var(--color-divider)',
+      katRows, boqRows, weekBars, pipeline, pipelineEmpty: !pipeline.length,
+      onExport: () => this.flash('Demo: rekap budget dan validasi BoQ diunduh sebagai berkas Excel.'),
+      formTitle: editing ? 'Edit Permintaan — ' + editing.id : 'Rencana Kerja & Permintaan Material',
+      formSub: editing ? 'Perbaiki sesuai catatan revisi, lalu ajukan ulang.' : 'Isi item pekerjaan lebih dulu; material menempel di bawahnya.',
+      submitLabel: editing ? 'Simpan & ajukan ulang' : 'Ajukan permintaan',
+      jobs, jobCount: s.draft.length + ' item pekerjaan', rekapRows, rekapEmpty: !rekapRows.length, draftNilai: rp(draftTotal),
+      butuhDraft: s.butuhDraft, onButuhDraft: e => this.setState({ butuhDraft: e.target.value }),
+      butuhDraftTxt: s.butuhDraft ? this.tgl(s.butuhDraft) + ' — ' + this.sisaTxt(s.butuhDraft) : 'belum diisi',
+      butuhDraftFg: sisaDraft !== null && sisaDraft <= 5 ? this.ORANGE : 'var(--color-accent-700)',
+      onAddJob: () => setDraft(s.draft.concat([{ jobId: '', vol: '', mats: [{ itemId: '', vol: '' }] }])),
+      onDup: () => { const last = s.reqs.find(r => r.id === 'REQ-2026-030'); setDraft((last.jobs || []).map(j => ({ jobId: j.jobId, vol: j.vol, mats: (j.mats || []).map(m => ({ itemId: m.itemId, vol: m.vol })) }))); this.flash('Rencana kerja ' + last.id + ' disalin ke formulir.'); },
+      onSubmit: () => {
+        const valid = s.draft.filter(j => j.jobId && Number(j.vol) > 0 && (j.mats || []).some(m => m.itemId && Number(m.vol) > 0));
+        if (!valid.length) { this.flash('Lengkapi minimal satu item pekerjaan beserta materialnya.'); return; }
+        if (!s.butuhDraft) { this.flash('Tanggal kebutuhan wajib diisi.'); return; }
+        const jobsData = valid.map(j => ({ jobId: j.jobId, vol: Number(j.vol), mats: (j.mats || []).filter(m => m.itemId && Number(m.vol) > 0).map(m => ({ itemId: m.itemId, vol: Number(m.vol) })) }));
+        if (editing) {
+          editing.jobs = jobsData; editing.butuh = s.butuhDraft; editing._lines = null;
+          editing.trail.push({ ts: this.now(), actor: 'Jefta', peran: 'Supervisi', aksi: 'Diajukan Ulang', note: 'Rencana kerja diperbaiki sesuai catatan revisi · tanggal kebutuhan ' + this.tgl(s.butuhDraft) });
+          editing.status = 'Cek PM';
+          this.touch({ editId: null, screen: 'riwayat', draft: [{ jobId: '', vol: '', mats: [{ itemId: '', vol: '' }] }] });
+          this.flash(editing.id + ' diajukan ulang — masuk Cek PM.');
+          return;
+        }
+        const req = { id: 'REQ-2026-0' + (33 + s.reqs.length - 6), minggu: 33, butuh: s.butuhDraft, status: 'Cek PM', dibuat: this.now(), oleh: 'Jefta', jobs: jobsData,
+          trail: [{ ts: this.now(), actor: 'Jefta', peran: 'Supervisi', aksi: 'Diajukan', note: jobsData.length + ' item pekerjaan · tanggal kebutuhan ' + this.tgl(s.butuhDraft) }] };
+        this.setState({ reqs: s.reqs.concat([req]), draft: [{ jobId: '', vol: '', mats: [{ itemId: '', vol: '' }] }], screen: 'riwayat' });
+        this.flash('Permintaan ' + req.id + ' diajukan untuk tanggal kirim ' + this.tgl(s.butuhDraft) + '.');
+      },
+      workTitle: workName, workRows, workEmpty: !workRows.length && !(role === 'purchasing' && readyUnits.length),
+      workSub: { supervisi: 'Kiriman yang menunggu penerimaan atau perbaikan Anda.', pm: 'Permintaan yang menunggu pemeriksaan tahapan dan validasi BoQ.', qs: 'Permintaan yang menunggu pemeriksaan volume terhadap BoQ.', gudang: 'Cek gudang hanya muncul atas permintaan Purchasing.', purchasing: 'Minta cek gudang, susun PO multi-toko beserta terminnya, dan gabungkan tagihan untuk Finance.', finance: 'Rekap per toko, nota, dan unggah bukti transfer.', direktur: '' }[role],
+      showGabung: role === 'purchasing' && readyUnits.length > 0, gabungRows,
+      gabungInfo: gabungPicked.length ? gabungPicked.length + ' tagihan dipilih · total ' + rp(gabungPicked.reduce((a, u) => a + u.nilai, 0)) : 'Pilih tagihan yang akan dibayarkan.',
+      onGabung: () => {
+        if (!gabungPicked.length) { this.flash('Pilih minimal satu tagihan.'); return; }
+        const pay = { id: 'PAY-2026-00' + (6 + s.pays.length), minggu: 33, status: 'Di Finance', dibuat: this.now(), oleh: 'Rina Astuti', bukti: false,
+          items: gabungPicked.map(u => ({ poId: u.poId, toko: u.toko, jenis: u.jenis, due: u.due })),
+          trail: [{ ts: this.now(), actor: 'Rina Astuti', peran: 'Purchasing', aksi: 'Tagihan digabung dan dikirim ke Finance',
+            note: gabungPicked.map(u => u.poId + ' ' + u.toko + ' (' + u.jenis + ')').join('; ') }] };
+        this.setState({ pays: s.pays.concat([pay]), gabungSel: {} });
+        this.flash(pay.id + ' dikirim ke Finance — ' + rp(gabungPicked.reduce((a, u) => a + u.nilai, 0)));
+      },
+      sel: cur ? {
+        id: d.id, jenis: this.JENIS[t], status: d.status, dibuat: d.dibuat,
+        pemohon: t === 'req' ? d.oleh + ' — Supervisi' : t === 'pay' ? d.oleh + ' — Purchasing' : (d.pemohon || d.oleh) + ' — Supervisi',
+        asal: t === 'sbk' || t === 'po' ? d.reqId : (t === 'pay' ? this.payPoIds(d).join(', ') : ''),
+        nilai: rp(nilai), nilaiLabel: t === 'req' ? 'Estimasi BoQ' : t === 'po' ? 'Total PO' : 'Nilai',
+        sub: t === 'req' ? this.proyekNama(d.proyek) + ' · minggu ' + d.minggu + ' · ' + (d.jobs || []).length + ' item pekerjaan'
+          : t === 'pay' ? (d.items || []).length + ' tagihan · ' + finGroups.length + ' toko · ' + this.payPoIds(d).length + ' PO'
+          : 'Minggu ' + d.minggu,
+        butuhTxt: isReq ? this.tgl(d.butuh) + ' — ' + this.sisaTxt(d.butuh) : '',
+        butuhFg: selSisa !== null && selSisa <= 5 ? this.ORANGE : 'var(--color-text)',
+        flag: nOver ? nOver + ' item pekerjaan melebihi sisa BoQ' : (isReq && selSisa !== null && selSisa <= 5 && !['Selesai', 'Dibatalkan', 'Ditahan'].includes(d.status) ? 'Genting — tanggal kebutuhan ' + this.sisaTxt(d.butuh) : ''),
+        flagBg: nOver ? this.RED : this.ORANGE, ttdList
+      } : {},
+      canPrint: !!cur && (t === 'po' || t === 'sbk'),
+      onPrintDoc: () => { this.flash('Menyiapkan ' + d.id + ' untuk dicetak.'); setTimeout(() => window.print(), 400); },
+      showJobs: isReq && selJobs.length > 0, selJobs, boqSummary: nOver ? nOver + ' item melebihi sisa BoQ' : 'Seluruh item dalam sisa BoQ',
+      showLineTable: (isReq && selLines.length > 0) || t === 'sbk', selLines, tableCols, tableMinW, sumberCol,
+      selTrail, trailCount: String(selTrail.length),
+      lineTableTitle: t === 'sbk' ? 'Material keluar gudang' : 'Rekap order material — agregasi lintas item pekerjaan',
+      hargaLabel: 'Estimasi BoQ',
+      showPoBlocks: !!cur && t === 'po', poBlocks, poTotal: rp(nilai),
+      poSelisih: cur && t === 'po' ? ((nilai - poBoqV > 0 ? '+ ' : '') + rp(nilai - poBoqV)) : '',
+      showPoEdit, poEditLines, poTerminRows,
+      onPoSubmit: () => {
+        if (d.lines.some(l => !l.toko)) { this.flash('Tentukan toko untuk seluruh baris.'); return; }
+        if (d.lines.some(l => !Number(l.harga))) { this.flash('Lengkapi harga nota seluruh baris.'); return; }
+        const tokos = this.tokosOf(d);
+        d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'PO dibuat',
+          note: tokos.map(tk => tk + ' — ' + this.terminLabel(this.terminOf(d, tk)) + ' ' + rp(this.tokoTotal(d, tk))).join('; ') + ' · total ' + rp(this.nilaiPo(d)) + ' sesuai nota' });
+        d.status = 'TTD Direktur'; d.sejak = 'baru saja';
+        this.touch(); this.flash(d.id + ' diajukan ke Direktur — nota terlampir.');
+      },
+      showFinance, finRows: finVendorRows,
+      payTotal: rp(nilai),
+      finNotas: showFinance ? Object.values((d.items || []).reduce((acc, i) => {
+        const k = i.poId + '|' + i.toko;
+        if (!acc[k]) acc[k] = { label: i.poId + ' — ' + i.toko, slotId: 'nota-' + i.poId + '-' + String(i.toko).replace(/\s+/g, '') };
+        return acc;
+      }, {})) : [],
+      buktiKet: showFinance ? (allBuktiDone ? 'Seluruh vendor sudah ada bukti transfer' : 'Unggah satu bukti transfer per vendor — tiap bukti menempel ke vendornya') : '',
+      canLunas: showFinance && role === 'finance' && d.status !== 'Lunas' && allBuktiDone, isLunas: showFinance && d.status === 'Lunas',
+      lunasKet: showFinance && d.status === 'Lunas' ? 'Ditandai lunas oleh Finance · ' + (d.trail.slice(-1)[0] || {}).ts : '',
+      onLunas: () => {
+        if (!allBuktiDone) { this.flash('Unggah bukti transfer untuk seluruh vendor lebih dulu.'); return; }
+        d.bukti = true; d.status = 'Lunas';
+        d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Pembayaran diproses', note: finGroups.length + ' vendor: ' + finGroups.map(g => g.toko).join(', ') });
+        d.trail.push({ ts: this.now(1), actor: me, peran, aksi: 'Bukti transfer diunggah — LUNAS', note: 'Bukti per vendor tampil otomatis di layar Purchasing' });
+        this.touch(); this.flash(d.id + ' LUNAS — ' + finGroups.length + ' bukti transfer tampil di layar Purchasing.');
+      },
+      showSplit, splitLines, splitInfo: nStok + ' item keluar dari stok · ' + nBeli + ' item masuk PO',
+      onSplitSubmit: () => {
+        const stokLines = [], beliLines = [];
+        reqLines.forEach(l => {
+          const ambil = l.ambil === undefined ? Math.min(this.STOK[l.itemId] || 0, Number(l.vol)) : Number(l.ambil);
+          const beli = Number(l.vol) - ambil;
+          l.sumber = ambil > 0 && beli > 0 ? 'campur' : ambil > 0 ? 'stok' : 'beli';
+          if (ambil > 0) stokLines.push({ itemId: l.itemId, vol: ambil });
+          if (beli > 0) beliLines.push({ itemId: l.itemId, vol: beli, harga: Math.round(this.item(l.itemId).harga * 1.02 / 500) * 500, toko: this.item(l.itemId).toko });
+        });
+        const add = { sbks: s.sbks.slice(), pos: s.pos.slice() };
+        if (stokLines.length) add.sbks.push({ id: 'SBK-2026-0' + (12 + s.sbks.length), reqId: d.id, pemohon: d.oleh, minggu: d.minggu, status: 'TTD Direktur', dibuat: this.now(), oleh: 'Rina Astuti', sejak: 'baru saja', lines: stokLines,
+          trail: [{ ts: this.now(), actor: 'Rina Astuti', peran: 'Purchasing', aksi: 'SBK dibuat', note: 'Atas hasil cek gudang ' + d.id }, { ts: this.now(1), actor: me, peran, aksi: 'Diverifikasi Kepala Gudang', note: stokLines.length + ' item tersedia di stok' }] });
+        if (beliLines.length) add.pos.push({ id: 'PO-2026-0' + (18 + s.pos.length), reqId: d.id, pemohon: d.oleh, minggu: d.minggu, status: 'Draft', dibuat: this.now(), oleh: 'Rina Astuti', lines: beliLines,
+          trail: [{ ts: this.now(), actor: me, peran, aksi: 'Item sisa masuk PO', note: beliLines.length + ' item tidak tersedia penuh di gudang — dikembalikan ke Purchasing' }] });
+        d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Hasil cek gudang dikirim', note: stokLines.length + ' item dari stok, ' + beliLines.length + ' item masuk PO' });
+        d.status = 'Menunggu Barang';
+        this.touch(add);
+        this.flash('Hasil cek gudang dikirim — ' + (stokLines.length ? 'SBK terbit' : 'tanpa SBK') + (beliLines.length ? ' dan PO draft menunggu Purchasing.' : '.'));
+      },
+      showTerima, terimaLines, terimaNote: s.terimaNote, onTerimaNote: e => this.setState({ terimaNote: e.target.value }),
+      selisihInfo: nSelisih ? nSelisih + ' item berbeda dari jumlah diminta.' : 'Semua jumlah sesuai permintaan.',
+      onSesuai: () => {
+        d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Diterima di Site — Sesuai', note: s.terimaNote || 'Jumlah lengkap, kondisi baik' });
+        d.trail.push({ ts: this.now(1), actor: me, peran, aksi: 'Selesai', note: 'Permintaan ditutup oleh site' });
+        d.status = 'Selesai'; this.touch({ terimaNote: '' }); this.flash(d.id + ' ditutup — Selesai.');
+      },
+      onSelisih: () => { if (!nSelisih) { this.flash('Ubah dahulu jumlah yang diterima.'); return; } this.setState({ modal: { kind: 'selisih', t, id: d.id } }); },
+      actionBar: canApprove || canEdit || canMintaGudang || canDatang || canRevisiPo,
+      canApprove, canEdit, canMintaGudang, canDatang, canRevisiPo,
+      approveLabel: role === 'direktur' ? 'Tanda tangani' : 'Setujui',
+      approveHint: cur ? { 'Cek PM': 'Lanjut ke Cek QS.', 'Cek QS': 'Lanjut ke tanda tangan Direktur.', 'TTD Direktur': t === 'req' ? 'Diteruskan ke Purchasing.' : t === 'po' ? 'PO dikirim ke toko.' : 'Barang boleh keluar gudang.' }[d.status] || '' : '',
+      onApprove: () => { this.approveDoc(t, d, role); this.touch(); this.flash(d.id + ' → ' + d.status); },
+      onEdit: () => this.setState({ editId: d.id, screen: 'form', butuhDraft: d.butuh, sel: null,
+        draft: (d.jobs || []).map(j => ({ jobId: j.jobId, vol: j.vol, mats: (j.mats || []).map(m => ({ itemId: m.itemId, vol: m.vol })) })) }),
+      onMintaGudang: () => { d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Minta cek gudang', note: 'Gudang diminta mengisi stok tersedia per item' }); d.status = 'Cek Gudang'; this.touch(); this.flash(d.id + ' diteruskan ke Gudang untuk cek stok.'); },
+      onDatang: () => {
+        d.datang = this.isoToday();
+        const buka = this.tokosOf(d).filter(tk => ['dp', 'tempo'].includes(this.terminOf(d, tk)));
+        d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Barang datang di site',
+          note: buka.length ? 'Tagihan berikutnya terbuka: ' + buka.map(tk => tk + ' (' + (this.terminOf(d, tk) === 'dp' ? 'pelunasan 70%' : 'tempo 14 hari, jatuh tempo ' + this.tgl(this.isoAdd(d.datang, 14))) + ')').join('; ') : 'Seluruh tagihan sudah lunas di muka' });
+        d.status = 'Barang Datang';
+        const req = s.reqs.find(r => r.id === d.reqId);
+        if (req && req.status === 'Menunggu Barang') { req.trail.push({ ts: this.now(1), actor: me, peran, aksi: 'Barang lengkap dikirim ke site', note: 'Menunggu penerimaan Supervisi' }); req.status = 'Terima di Site'; }
+        this.touch(); this.flash(d.id + ' ditandai barang datang.');
+      },
+      onRevisiPo: () => { d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Kekurangan dikirim ulang', note: 'Melengkapi selisih dari toko' }); d.status = 'Terima di Site'; this.touch(); this.flash('Kekurangan ' + d.id + ' dikirim ulang ke site.'); },
+      onOpenRevisi: () => this.setState({ modal: { kind: 'revisi', t, id: d.id, note: '' } }),
+      modalRevisi: !!modal && modal.kind === 'revisi', modalSelisih: !!modal && modal.kind === 'selisih',
+      modalId: modal ? modal.id : '', modalNote: modal ? modal.note || '' : '',
+      onModalNote: e => this.setState({ modal: Object.assign({}, modal, { note: e.target.value }) }),
+      onModalClose: () => this.setState({ modal: null }),
+      onModalSend: () => {
+        const note = (modal.note || '').trim();
+        if (!note) { this.flash('Alasan revisi wajib diisi.'); return; }
+        const target = this.docOf(modal.t + '|' + modal.id);
+        target.d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Minta Revisi', note });
+        target.d.status = modal.t === 'req' ? 'Revisi' : 'Draft';
+        this.touch({ modal: null }); this.flash(modal.id + ' dikembalikan untuk revisi.');
+      },
+      sebabVendor: s.sebab === 'vendor', sebabReq: s.sebab === 'request',
+      sebabVendorBorder: s.sebab === 'vendor' ? 'var(--color-accent)' : 'var(--color-divider)',
+      sebabReqBorder: s.sebab === 'request' ? 'var(--color-accent)' : 'var(--color-divider)',
+      onSebabVendor: () => this.setState({ sebab: 'vendor' }), onSebabReq: () => this.setState({ sebab: 'request' }),
+      onSelisihSend: () => {
+        const target = this.docOf(modal.t + '|' + modal.id).d;
+        const tl = this.lines(target);
+        const rincian = tl.filter(l => l.terima !== null && Number(l.terima) !== Number(l.vol))
+          .map(l => this.item(l.itemId).nama + ': diterima ' + l.terima + ' dari ' + l.vol).join('; ');
+        const vendorCause = s.sebab === 'vendor';
+        target.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Diterima di Site — Ada Selisih', note: rincian + (s.terimaNote ? '. ' + s.terimaNote : '') });
+        target.trail.push({ ts: this.now(1), actor: me, peran, aksi: vendorCause ? 'Penyebab: salah kirim / kurang dari toko' : 'Penyebab: salah request dari awal',
+          note: vendorCause ? 'Tanggung jawab Purchasing — memicu revisi PO' : 'Supervisi mengedit permintaan lalu mengajukan ulang' });
+        target.status = vendorCause ? 'Revisi Purchasing' : 'Revisi';
+        if (vendorCause) { const po = s.pos.find(p => p.reqId === target.id); if (po) po.trail.push({ ts: this.now(2), actor: me, peran, aksi: 'Revisi PO diminta site', note: rincian }); }
+        this.touch({ modal: null, terimaNote: '' });
+        this.flash(vendorCause ? target.id + ' dikembalikan ke Purchasing — revisi PO.' : target.id + ' dikembalikan ke Supervisi untuk diedit.');
+      },
+      search: s.search, onSearch: e => this.setState({ search: e.target.value }),
+      jenisFilterEl: React.createElement('select', { className: 'input', value: s.fJenis, style: { width: 'auto' }, onChange: e => this.setState({ fJenis: e.target.value }) },
+        ['Semua jenis', 'Permintaan Material', 'Barang Keluar', 'Purchase Order', 'Pembayaran'].map(o => React.createElement('option', { key: o, value: o }, o))),
+      riwayatRows, riwayatEmpty: !riwayatRows.length, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
