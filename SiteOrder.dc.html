@@ -701,6 +701,9 @@ input,select,textarea,button{font-family:var(--font-body);}
           <sc-if value="{{ sel.flag }}" hint-placeholder-val="{{ false }}">
             <div style="background:{{ sel.flagBg }};color:#fff;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:8px 12px;align-self:flex-start">{{ sel.flag }}</div>
           </sc-if>
+          <sc-if value="{{ sel.isSbk }}" hint-placeholder-val="{{ false }}">
+            <div style="border-left:3px solid var(--color-accent);background:var(--color-surface);padding:var(--space-3) var(--space-4);font-family:var(--font-heading);font-size:16px;font-weight:600;letter-spacing:0.02em">{{ sel.sbkHeader }}</div>
+          </sc-if>
           <div style="display:flex;gap:var(--space-8);flex-wrap:wrap;font-size:13px;border-top:1px solid var(--color-divider);padding-top:var(--space-4)">
             <span class="text-muted">Dibuat<br><strong style="color:var(--color-text);font-size:14px">{{ sel.dibuat }}</strong></span>
             <span class="text-muted">Pemohon<br><strong style="color:var(--color-text);font-size:14px">{{ sel.pemohon }}</strong></span>
@@ -2183,6 +2186,8 @@ class Component extends DCLogic {
         id: this.dispId(d), jenis: this.JENIS[t], status: d.status, dibuat: d.dibuat,
         pemohon: t === 'req' ? d.oleh + ' — Supervisi' : t === 'pay' ? d.oleh + ' — Purchasing' : (d.pemohon || d.oleh) + ' — Supervisi',
         asal: t === 'sbk' || t === 'po' ? this.dispReqId(d.reqId) : (t === 'pay' ? this.payPoIds(d).map(pid => this.dispId(s.pos.find(p => p.id === pid) || { id: pid })).join(', ') : ''),
+        isSbk: t === 'sbk',
+        sbkHeader: t === 'sbk' ? 'Diambil oleh ' + (d.pemohon || d.oleh) + ' — untuk proyek ' + this.proyekNama(d.proyek) : '',
         nilai: rp(nilai), nilaiLabel: t === 'req' ? 'Estimasi BoQ' : t === 'po' ? 'Total PO' : 'Nilai',
         sub: t === 'req' ? this.proyekNama(d.proyek) + ' · minggu ' + d.minggu + ' · ' + (d.jobs || []).length + ' item pekerjaan'
           : t === 'pay' ? (d.items || []).length + ' tagihan · ' + finGroups.length + ' toko · ' + this.payPoIds(d).length + ' PO'
