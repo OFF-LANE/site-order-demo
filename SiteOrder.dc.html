@@ -251,7 +251,10 @@ input,select,textarea,button{font-family:var(--font-body);}
         <sc-for list="{{ bundleView.sections }}" as="sec" hint-placeholder-count="2">
           <div style="display:flex;flex-direction:column;gap:var(--space-5)">
             <div style="border-bottom:2px solid var(--color-accent-900);padding-bottom:var(--space-2);display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);flex-wrap:wrap">
-              <div style="font-family:var(--font-heading);font-size:22px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase">Proyek — {{ sec.proyekLabel }}</div>
+              <div style="display:flex;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+                <span style="font-family:var(--font-heading);font-size:22px;font-weight:700;letter-spacing:0.08em;background:var(--color-accent-900);color:var(--color-bg);padding:2px 10px">{{ sec.proyekCode }}</span>
+                <span style="font-family:var(--font-heading);font-size:22px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase">{{ sec.proyekLabel }}</span>
+              </div>
               <span class="text-muted" style="font-size:12px;letter-spacing:0.1em;text-transform:uppercase">{{ sec.proyekKota }}</span>
             </div>
 
@@ -891,9 +894,12 @@ input,select,textarea,button{font-family:var(--font-body);}
             <sc-for list="{{ finSourceGroups }}" as="sg" hint-placeholder-count="2">
               <div style="border:1px solid var(--color-divider);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3)">
                 <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap;border-bottom:1px solid var(--color-divider);padding-bottom:var(--space-2)">
-                  <div>
-                    <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">{{ sg.reqLabel }}</div>
-                    <div class="text-muted" style="font-size:12.5px">{{ sg.reqSub }}</div>
+                  <div style="display:flex;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+                    <span style="font-family:var(--font-heading);font-size:13px;font-weight:700;letter-spacing:0.08em;background:var(--color-accent-900);color:var(--color-bg);padding:1px 8px">{{ sg.proyekCode }}</span>
+                    <div>
+                      <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">{{ sg.reqLabel }}</div>
+                      <div class="text-muted" style="font-size:12.5px">{{ sg.reqSub }}</div>
+                    </div>
                   </div>
                   <sc-if value="{{ sg.hasReq }}" hint-placeholder-val="{{ true }}">
                     <button onClick="{{ sg.reqOnOpen }}" class="btn btn-ghost" style="font-size:12.5px">Buka permintaan &rarr;</button>
@@ -1499,6 +1505,20 @@ class Component extends DCLogic {
   }
   proyekNama(id) { return this.PROJ(id).nama; }
   proyekKota(id) { return this.PROJ(id).kota; }
+  // F2: nomor dokumen dengan kode proyek untuk TAMPILAN saja — .id internal tetap utuh.
+  //     Idempoten: id yang sudah memuat kode proyek dikembalikan apa adanya.
+  proyekKode(pj) { return ({ pakuwon: 'PKW', trans: 'BDG', plaza: 'JKT' })[pj || 'pakuwon'] || ''; }
+  dispId(doc) {
+    if (!doc || !doc.id) return (doc && doc.id) || '';
+    const code = this.proyekKode(doc.proyek);
+    if (!code || doc.id.indexOf('-' + code + '-') > -1) return doc.id;
+    return doc.id.replace(/^([A-Z]+)-/, '$1-' + code + '-');
+  }
+  dispReqId(reqId) {
+    if (!reqId) return '';
+    const r = this.state.reqs.find(x => x.id === reqId);
+    return r ? this.dispId(r) : reqId;
+  }
   bundleDocs(b) { return (b.keys || []).map(k => this.docOf(k)).filter(Boolean); }
   bundleNilai(b) { return this.bundleDocs(b).reduce((a, x) => a + this.nilaiOf(x.t, x.d), 0); }
   bundleProyeks(b) { return Array.from(new Set(this.bundleDocs(b).map(x => x.d.proyek || 'pakuwon'))); }
@@ -1580,22 +1600,23 @@ class Component extends DCLogic {
     // ---------- notifikasi ----------
     const notifs = [];
     queue.filter(x => !(x.t === 'pay' && x.d.status === 'Lunas')).forEach(x => notifs.push({
-      judul: 'Giliran Anda — ' + x.d.id, sub: this.JENIS[x.t] + ' · ' + x.d.status, ts: 'Dibuat ' + x.d.dibuat,
+      judul: 'Giliran Anda — ' + this.dispId(x.d), sub: this.JENIS[x.t] + ' · ' + x.d.status, ts: 'Dibuat ' + x.d.dibuat,
       dot: 'var(--color-accent)', onOpen: () => this.open(x.t, x.d.id)
     }));
     s.reqs.filter(r => ['Revisi', 'Revisi Purchasing'].includes(r.status)).forEach(r => notifs.push({
-      judul: 'Diminta revisi — ' + r.id, sub: (r.trail.slice(-1)[0] || {}).note || 'Perlu perbaikan', ts: (r.trail.slice(-1)[0] || {}).ts || '',
+      judul: 'Diminta revisi — ' + this.dispId(r), sub: (r.trail.slice(-1)[0] || {}).note || 'Perlu perbaikan', ts: (r.trail.slice(-1)[0] || {}).ts || '',
       dot: this.RED, onOpen: () => this.open('req', r.id)
     }));
     if (role === 'purchasing') {
       s.pays.filter(p => p.status === 'Lunas' && p.bukti).forEach(p => notifs.push({
-        judul: 'Bukti transfer diterima — ' + p.id, sub: 'LUNAS · ' + this.payPoIds(p).join(', ') + ' · ' + this.rp(this.nilaiPay(p)),
+        judul: 'Bukti transfer diterima — ' + this.dispId(p),
+        sub: 'LUNAS · ' + this.payPoIds(p).map(pid => this.dispId(s.pos.find(po => po.id === pid) || { id: pid })).join(', ') + ' · ' + this.rp(this.nilaiPay(p)),
         ts: (p.trail.slice(-1)[0] || {}).ts || '', dot: 'var(--color-accent)', onOpen: () => this.open('pay', p.id)
       }));
     }
     if (['pm', 'qs', 'direktur'].includes(role)) {
       s.reqs.filter(r => !['Selesai', 'Dibatalkan', 'Ditahan'].includes(r.status) && (r.jobs || []).some(j => this.boqCheck(j.jobId, j.vol, r.id, r.proyek).lebih)).forEach(r => notifs.push({
-        judul: 'Volume melebihi BoQ — ' + r.id, sub: (r.jobs || []).filter(j => this.boqCheck(j.jobId, j.vol, r.id, r.proyek).lebih).map(j => this.job(j.jobId).nama).join(', '),
+        judul: 'Volume melebihi BoQ — ' + this.dispId(r), sub: (r.jobs || []).filter(j => this.boqCheck(j.jobId, j.vol, r.id, r.proyek).lebih).map(j => this.job(j.jobId).nama).join(', '),
         ts: 'Perlu cek luasan aktual lapangan', dot: this.RED, onOpen: () => this.open('req', r.id)
       }));
     }
@@ -1645,7 +1666,7 @@ class Component extends DCLogic {
     const pipeStatus = ['Cek PM', 'Cek QS', 'TTD Direktur', 'Di Purchasing', 'Cek Gudang', 'Menunggu Barang', 'Draft', 'Dikirim ke Toko', 'Terima di Site', 'Revisi', 'Revisi Purchasing', 'Di Finance', 'Ditahan', 'Dibatalkan'];
     const pipeline = this.allDocs().filter(x => pipeStatus.includes(x.d.status) && (x.d.proyek || 'pakuwon') === PJ).map(x => {
       const w = this.warnaOf(x.t, x.d);
-      return { id: x.d.id, jenis: this.JENIS[x.t], minggu: x.d.minggu, nilai: rp(this.nilaiOf(x.t, x.d)), status: x.d.status,
+      return { id: this.dispId(x.d), jenis: this.JENIS[x.t], minggu: x.d.minggu, nilai: rp(this.nilaiOf(x.t, x.d)), status: x.d.status,
         pemilik: this.PEMILIK[x.d.status] || '—', warna: w.c, coret: w.coret,
         sisaTxt: x.t === 'req' && !['Selesai', 'Dibatalkan', 'Ditahan'].includes(x.d.status) ? this.sisaTxt(x.d.butuh) : '',
         onOpen: () => this.open(x.t, x.d.id) };
@@ -1662,10 +1683,10 @@ class Component extends DCLogic {
           const dd = x.d, w = this.warnaOf(x.t, dd), sisa = x.t === 'req' ? this.sisaHari(dd.butuh) : null;
           const over = x.t === 'req' ? (dd.jobs || []).filter(j => this.boqCheck(j.jobId, j.vol, dd.id, dd.proyek).lebih).length : 0;
           return {
-            id: dd.id,
+            id: this.dispId(dd),
             sub: x.t === 'req' ? this.proyekKota(dd.proyek) + ' · pemohon ' + dd.oleh + ' · butuh ' + this.tgl(dd.butuh) + ' · ' + (dd.jobs || []).length + ' item pekerjaan'
-              : x.t === 'sbk' ? this.proyekKota(dd.proyek) + ' · dari ' + dd.reqId + ' · pemohon ' + dd.pemohon
-              : this.proyekKota(dd.proyek) + ' · dari ' + dd.reqId + ' · ' + new Set(dd.lines.map(l => l.toko)).size + ' toko',
+              : x.t === 'sbk' ? this.proyekKota(dd.proyek) + ' · dari ' + this.dispReqId(dd.reqId) + ' · pemohon ' + dd.pemohon
+              : this.proyekKota(dd.proyek) + ' · dari ' + this.dispReqId(dd.reqId) + ' · ' + new Set(dd.lines.map(l => l.toko)).size + ' toko',
             ket: x.t === 'req' ? 'Lolos Cek PM dan Cek QS. Berikutnya diproses Purchasing.'
               : x.t === 'sbk' ? 'Diverifikasi Kepala Gudang atas permintaan Purchasing.'
               : 'Verifikasi nominal terhadap nota, lalu PO dikirim ke toko.',
@@ -1674,7 +1695,7 @@ class Component extends DCLogic {
             flag: over ? over + ' item melebihi BoQ' : (sisa !== null && sisa <= 5 ? 'Genting — butuh ' + this.sisaTxt(dd.butuh) : ''),
             flagBg: over ? this.RED : this.ORANGE,
             notaSlot: x.t === 'po' ? 'nota-meja-' + dd.id : '',
-            onApprove: () => { this.approveDoc(x.t, dd, 'direktur'); this.touch(); this.flash(dd.id + ' ditandatangani — ' + dd.status); },
+            onApprove: () => { this.approveDoc(x.t, dd, 'direktur'); this.touch(); this.flash(this.dispId(dd) + ' ditandatangani — ' + dd.status); },
             onRevisi: () => this.setState({ modal: { kind: 'revisi', t: x.t, id: dd.id, note: '' } }),
             onOpen: () => this.open(x.t, dd.id)
           };
@@ -1742,10 +1763,10 @@ class Component extends DCLogic {
       const dd = x.d, t = x.t, w = this.warnaOf(t, dd), sisa = t === 'req' ? this.sisaHari(dd.butuh) : null;
       const over = t === 'req' ? (dd.jobs || []).filter(j => this.boqCheck(j.jobId, j.vol, dd.id, dd.proyek).lebih).length : 0;
       return {
-        id: dd.id,
+        id: this.dispId(dd),
         sub: t === 'req' ? 'Permintaan · butuh ' + this.tgl(dd.butuh) + ' · ' + (dd.jobs || []).length + ' item pekerjaan'
-          : t === 'sbk' ? 'Surat Barang Keluar · dari ' + dd.reqId
-          : t === 'po' ? 'Purchase Order · dari ' + dd.reqId
+          : t === 'sbk' ? 'Surat Barang Keluar · dari ' + this.dispReqId(dd.reqId)
+          : t === 'po' ? 'Purchase Order · dari ' + this.dispReqId(dd.reqId)
           : 'Pengajuan Pembayaran · ' + (dd.items || []).length + ' tagihan',
         ket: t === 'req' && dd.status === 'Di Purchasing' ? 'Tekan "Minta cek gudang" untuk meminta gudang mengisi stok tersedia.'
           : t === 'req' && dd.status === 'Cek Gudang' ? 'Isi stok tersedia per item; sisanya masuk PO.'
@@ -1765,12 +1786,13 @@ class Component extends DCLogic {
     });
     const unpaidUnits = this.payUnits().filter(u => !this.paidBy(u.key));
     const readyUnits = unpaidUnits.filter(u => u.ready);
-    const gabungRows = readyUnits.map(u => ({
-      id: u.poId + ' — ' + u.toko, checked: !!s.gabungSel[u.key], nilai: rp(u.nilai),
-      sub: this.jenisLabel(u.jenis, u.due),
-      border: s.gabungSel[u.key] ? 'var(--color-accent)' : 'var(--color-divider)',
-      onToggle: () => this.setState({ gabungSel: Object.assign({}, s.gabungSel, { [u.key]: !s.gabungSel[u.key] }) })
-    }));
+    const gabungRows = readyUnits.map(u => {
+      const po = s.pos.find(p => p.id === u.poId);
+      return { id: this.dispId(po || { id: u.poId }) + ' — ' + u.toko, checked: !!s.gabungSel[u.key], nilai: rp(u.nilai),
+        sub: this.jenisLabel(u.jenis, u.due),
+        border: s.gabungSel[u.key] ? 'var(--color-accent)' : 'var(--color-divider)',
+        onToggle: () => this.setState({ gabungSel: Object.assign({}, s.gabungSel, { [u.key]: !s.gabungSel[u.key] }) }) };
+    });
     const gabungPicked = readyUnits.filter(u => s.gabungSel[u.key]);
 
     // ---------- detail ----------
@@ -1856,7 +1878,8 @@ class Component extends DCLogic {
     const finGroups = showFinance ? Object.values((d.items || []).reduce((acc, i) => {
       if (!acc[i.toko]) acc[i.toko] = { toko: i.toko, pos: [], items: [], v: 0 };
       const n = this.payItemNilai(i), dekat = i.jenis === 'Tempo' && this.sisaHari(i.due) !== null && this.sisaHari(i.due) <= 5;
-      acc[i.toko].items.push({ poId: i.poId, label: this.jenisLabel(i.jenis, i.due), jenis: i.jenis,
+      const po = s.pos.find(p => p.id === i.poId);
+      acc[i.toko].items.push({ poId: this.dispId(po || { id: i.poId }), label: this.jenisLabel(i.jenis, i.due), jenis: i.jenis,
         nilai: this.rp(n), fg: dekat ? this.ORANGE : 'var(--color-neutral-700)' });
       if (acc[i.toko].pos.indexOf(i.poId) < 0) acc[i.toko].pos.push(i.poId);
       acc[i.toko].v += n;
@@ -1904,7 +1927,7 @@ class Component extends DCLogic {
       return [x.d.id, x.d.status, mat].join(' ').toLowerCase().includes(q);
     }).sort((a, b) => b.d.minggu - a.d.minggu).map(x => {
       const w = this.warnaOf(x.t, x.d);
-      return { id: x.d.id, jenis: jenisNama[x.t], minggu: x.d.minggu, nilai: rp(this.nilaiOf(x.t, x.d)), status: x.d.status, proyek: this.proyekKota(x.d.proyek),
+      return { id: this.dispId(x.d), jenis: jenisNama[x.t], minggu: x.d.minggu, nilai: rp(this.nilaiOf(x.t, x.d)), status: x.d.status, proyek: this.proyekKota(x.d.proyek),
         dibuat: x.d.dibuat, warna: w.c, coret: w.coret,
         sisaTxt: x.t === 'req' && !['Selesai', 'Dibatalkan', 'Ditahan'].includes(x.d.status) ? this.sisaTxt(x.d.butuh) : '',
         onOpen: () => this.open(x.t, x.d.id) };
@@ -1915,8 +1938,8 @@ class Component extends DCLogic {
     const ttdUnbundled = this.allDocs().filter(x => x.d.status === 'TTD Direktur' && !x.d.bundleId).sort((a, b) => ORD[a.t] - ORD[b.t]);
     const bundlePickRows = ttdUnbundled.map(x => {
       const key = x.t + '|' + x.d.id, on = !!s.bundleSel[key];
-      return { key, checked: on, jenis: this.JENIS[x.t], id: x.d.id, proyek: this.proyekKota(x.d.proyek),
-        nilai: rp(this.nilaiOf(x.t, x.d)), sub: x.d.reqId ? 'dari ' + x.d.reqId : (x.d.jobs || []).length + ' item pekerjaan',
+      return { key, checked: on, jenis: this.JENIS[x.t], id: this.dispId(x.d), proyek: this.proyekKota(x.d.proyek),
+        nilai: rp(this.nilaiOf(x.t, x.d)), sub: x.d.reqId ? 'dari ' + this.dispReqId(x.d.reqId) : (x.d.jobs || []).length + ' item pekerjaan',
         border: on ? 'var(--color-accent)' : 'var(--color-divider)',
         onToggle: () => this.setState({ bundleSel: Object.assign({}, s.bundleSel, { [key]: !s.bundleSel[key] }) }) };
     });
@@ -1965,8 +1988,9 @@ class Component extends DCLogic {
       const buildDocView = x => {
         const dd = x.d, key = x.t + '|' + dd.id, dispo = dk[key] || '';
         seqNo += 1;
-        return { key, no: seqNo, jenis: this.JENIS[x.t], id: dd.id, proyek: this.proyekNama(dd.proyek),
-          pemohon: dd.pemohon || dd.oleh, asal: dd.reqId || '-',
+        const dispIdStr = this.dispId(dd);
+        return { key, no: seqNo, jenis: this.JENIS[x.t], id: dispIdStr, proyek: this.proyekNama(dd.proyek),
+          pemohon: dd.pemohon || dd.oleh, asal: dd.reqId ? this.dispReqId(dd.reqId) : '-',
           hasAsal: !!dd.reqId,
           nilaiLabel: x.t === 'po' ? 'Total PO' : x.t === 'sbk' ? 'Nilai stok keluar' : 'Estimasi BoQ',
           nilai: rp(this.nilaiOf(x.t, dd)), dispo, decided: !!dispo,
@@ -1976,7 +2000,7 @@ class Component extends DCLogic {
           canAct: openB.status === 'Menunggu TTD' && !dispo,
           isPo: x.t === 'po', isSbk: x.t === 'sbk', isReq: x.t === 'req', notPo: x.t !== 'po',
           poBlocks: x.t === 'po' ? poBlocksOf(dd) : [], lines: x.t !== 'po' ? docLinesOf(x.t, dd) : [], jobs: x.t === 'req' ? docJobsOf(dd) : [],
-          notas: x.t === 'po' ? this.tokosOf(dd).map(tk => ({ label: dd.id + ' \u2014 ' + tk, slotId: 'nota-' + dd.id + '-' + tk.replace(/\s+/g, '') })) : [],
+          notas: x.t === 'po' ? this.tokosOf(dd).map(tk => ({ label: dispIdStr + ' \u2014 ' + tk, slotId: 'nota-' + dd.id + '-' + tk.replace(/\s+/g, '') })) : [],
           hasNotas: x.t === 'po' && this.tokosOf(dd).length > 0,
           onApprove: () => decide(x, 'setuju'), onReject: () => decide(x, 'tolak') };
       };
@@ -1990,12 +2014,12 @@ class Component extends DCLogic {
           const first = gDocs[0].d;
           return {
             reqId: rk,
-            reqLabel: 'Permintaan ' + rk,
+            reqLabel: 'Permintaan ' + this.dispReqId(rk),
             reqSub: 'Pemohon ' + (first.pemohon || first.oleh),
             docs: gDocs.map(buildDocView)
           };
         });
-        return { proyekLabel: this.proyekNama(pj), proyekKota: this.proyekKota(pj), reqGroups };
+        return { proyekLabel: this.proyekNama(pj), proyekKota: this.proyekKota(pj), proyekCode: this.proyekKode(pj), reqGroups };
       });
       bundleView = {
         id: openB.id, oleh: openB.oleh, dibuat: openB.dibuat, status: openB.status, selesai: openB.status !== 'Menunggu TTD', pending: openB.status === 'Menunggu TTD',
@@ -2032,12 +2056,13 @@ class Component extends DCLogic {
         const relPos = poIds.map(pid => s.pos.find(p => p.id === pid)).filter(Boolean);
         const relSbks = s.sbks.filter(sb => sb.reqId === rid);
         return {
-          reqId: rid, reqLabel: 'Permintaan ' + rid,
+          reqId: rid, reqLabel: 'Permintaan ' + this.dispReqId(rid),
           reqSub: req ? this.proyekNama(req.proyek) + ' · pemohon ' + (req.oleh || '-') : '(permintaan tidak ditemukan)',
+          proyekCode: req ? this.proyekKode(req.proyek) : '',
           hasReq: !!req,
           reqOnOpen: req ? () => this.open('req', rid) : () => this.flash('Permintaan ' + rid + ' tidak tersedia di data demo.'),
           pos: relPos.map(po => ({
-            id: po.id, total: rp(this.nilaiPo(po)),
+            id: this.dispId(po), total: rp(this.nilaiPo(po)),
             poOnOpen: () => this.open('po', po.id),
             blocks: Object.values(po.lines.reduce((acc, l) => {
               const tk = l.toko || 'Belum ditentukan';
@@ -2050,7 +2075,7 @@ class Component extends DCLogic {
               notaSlotId: 'nota-' + po.id + '-' + g.toko.replace(/\s+/g, '') }))
           })),
           sbks: relSbks.map(sb => ({
-            id: sb.id, total: rp(this.nilaiSbk(sb)),
+            id: this.dispId(sb), total: rp(this.nilaiSbk(sb)),
             sbkOnOpen: () => this.open('sbk', sb.id),
             pemohon: sb.pemohon || sb.oleh,
             lines: sb.lines.map((l, i) => { const it = this.item(l.itemId);
@@ -2064,7 +2089,7 @@ class Component extends DCLogic {
     // ---------- finance multi-bukti per vendor ----------
     const finVendorRows = showFinance ? finGroups.map(g => {
       const done = !!(d.buktiToko || {})[g.toko];
-      return { toko: g.toko, poList: g.pos.join(', '), nilai: rp(g.v), items: g.items,
+      return { toko: g.toko, poList: g.pos.map(pid => this.dispId(s.pos.find(p => p.id === pid) || { id: pid })).join(', '), nilai: rp(g.v), items: g.items,
         buktiSlotId: 'bukti-' + d.id + '-' + g.toko.replace(/\s+/g, ''),
         done, doneLabel: done ? '\u2713 Bukti transfer terunggah' : 'Belum ada bukti transfer',
         doneFg: done ? 'var(--color-accent-700)' : 'var(--color-neutral-600)',
@@ -2155,9 +2180,9 @@ class Component extends DCLogic {
         this.flash(pay.id + ' dikirim ke Finance — ' + rp(gabungPicked.reduce((a, u) => a + u.nilai, 0)));
       },
       sel: cur ? {
-        id: d.id, jenis: this.JENIS[t], status: d.status, dibuat: d.dibuat,
+        id: this.dispId(d), jenis: this.JENIS[t], status: d.status, dibuat: d.dibuat,
         pemohon: t === 'req' ? d.oleh + ' — Supervisi' : t === 'pay' ? d.oleh + ' — Purchasing' : (d.pemohon || d.oleh) + ' — Supervisi',
-        asal: t === 'sbk' || t === 'po' ? d.reqId : (t === 'pay' ? this.payPoIds(d).join(', ') : ''),
+        asal: t === 'sbk' || t === 'po' ? this.dispReqId(d.reqId) : (t === 'pay' ? this.payPoIds(d).map(pid => this.dispId(s.pos.find(p => p.id === pid) || { id: pid })).join(', ') : ''),
         nilai: rp(nilai), nilaiLabel: t === 'req' ? 'Estimasi BoQ' : t === 'po' ? 'Total PO' : 'Nilai',
         sub: t === 'req' ? this.proyekNama(d.proyek) + ' · minggu ' + d.minggu + ' · ' + (d.jobs || []).length + ' item pekerjaan'
           : t === 'pay' ? (d.items || []).length + ' tagihan · ' + finGroups.length + ' toko · ' + this.payPoIds(d).length + ' PO'
