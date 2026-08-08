@@ -1282,24 +1282,29 @@ class Component extends DCLogic {
     super(p);
     this.RED = '#b23b32'; this.ORANGE = '#c1741f'; this.GREY = '#8a8d8f';
     this.TODAY = new Date('2026-08-04T08:00:00');
+    // `kat` = kategori BoQ Dashboard (lama). `kategori` = kategori laporan
+    // realisasi belanja / kartu stok (baru, uppercase): CIVIL, ME, FURNITURE,
+    // FINISHING, LAS REX, BOX PANEL.
     this.CAT = [
-      { id: 'pasir', nama: 'Pasir pasang/halus', spek: 'Lumajang', satuan: 'kubik', harga: 320000, kat: 'sipil', toko: 'Toko Megabaja' },
-      { id: 'semen', nama: 'Semen Gresik 40 kg', spek: 'PCC', satuan: 'sak', harga: 62000, kat: 'sipil', toko: 'Toko Megabaja' },
-      { id: 'hebel', nama: 'Hebel 10 cm', spek: '60 × 20 cm', satuan: 'kubik', harga: 720000, kat: 'sipil', toko: 'Toko Megabaja' },
-      { id: 'tripfur', nama: 'Triplek 9 mm grade furniture', spek: '1220 × 2440 mm', satuan: 'lembar', harga: 195000, kat: 'panel', toko: 'Toko Nunut' },
-      { id: 'tripsemi', nama: 'Triplek 9 mm semi kriyung', spek: '1220 × 2440 mm', satuan: 'lembar', harga: 148000, kat: 'panel', toko: 'Toko Nunut' },
-      { id: 'hpl', nama: 'HPL TH007AA', spek: 'Taco · 1220 × 2440 mm', satuan: 'lembar', harga: 210000, kat: 'panel', toko: 'Toko Nunut' },
-      { id: 'gyp9', nama: 'Gypsum A+ 9 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 62000, kat: 'rangka', toko: 'Toko Megabaja' },
-      { id: 'gyp12', nama: 'Gypsum A+ 12 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 88000, kat: 'rangka', toko: 'Toko Megabaja' },
-      { id: 'hollow', nama: 'Hollow galvanis 20×40', spek: 'Tebal 0,3 mm · 4 m', satuan: 'batang', harga: 68000, kat: 'rangka', toko: 'Toko Megabaja' },
-      { id: 'skrup', nama: 'Skrup 2,5 cm', spek: 'Gypsum · isi 1000', satuan: 'dus', harga: 95000, kat: 'rangka', toko: 'Toko Asia' },
-      { id: 'kompon', nama: 'Kompon', spek: 'Jointing compound 25 kg', satuan: 'sak', harga: 135000, kat: 'finishing', toko: 'Toko Asia' },
-      { id: 'duco', nama: 'Cat duco', spek: 'Putih matte', satuan: 'liter', harga: 165000, kat: 'finishing', toko: 'Toko Asia' },
-      { id: 'sealant', nama: 'Sealant silikon', spek: 'Netral · 300 ml', satuan: 'tube', harga: 38000, kat: 'finishing', toko: 'Toko Asia' },
-      { id: 'keramik', nama: 'Keramik 60×60', spek: 'Granit polished', satuan: 'dus', harga: 148000, kat: 'lantai', toko: 'Toko Megabaja' },
-      { id: 'vinyl', nama: 'Vinyl flooring 3 mm', spek: 'Wood series', satuan: 'm²', harga: 145000, kat: 'lantai', toko: 'Toko Nunut' },
-      { id: 'nym', nama: 'Kabel NYM 3×2,5', spek: 'Roll 50 m', satuan: 'roll', harga: 780000, kat: 'mep', toko: 'Toko Asia' }
+      { id: 'pasir', nama: 'Pasir pasang/halus', spek: 'Lumajang', satuan: 'kubik', harga: 320000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja' },
+      { id: 'semen', nama: 'Semen Gresik 40 kg', spek: 'PCC', satuan: 'sak', harga: 62000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja' },
+      { id: 'hebel', nama: 'Hebel 10 cm', spek: '60 × 20 cm', satuan: 'kubik', harga: 720000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja' },
+      { id: 'tripfur', nama: 'Triplek 9 mm grade furniture', spek: '1220 × 2440 mm', satuan: 'lembar', harga: 195000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut' },
+      { id: 'tripsemi', nama: 'Triplek 9 mm semi kriyung', spek: '1220 × 2440 mm', satuan: 'lembar', harga: 148000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut' },
+      { id: 'hpl', nama: 'HPL TH007AA', spek: 'Taco · 1220 × 2440 mm', satuan: 'lembar', harga: 210000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut' },
+      { id: 'gyp9', nama: 'Gypsum A+ 9 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 62000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Megabaja' },
+      { id: 'gyp12', nama: 'Gypsum A+ 12 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 88000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Megabaja' },
+      { id: 'hollow', nama: 'Hollow galvanis 20×40', spek: 'Tebal 0,3 mm · 4 m', satuan: 'batang', harga: 68000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Megabaja' },
+      { id: 'skrup', nama: 'Skrup 2,5 cm', spek: 'Gypsum · isi 1000', satuan: 'dus', harga: 95000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Asia' },
+      { id: 'kompon', nama: 'Kompon', spek: 'Jointing compound 25 kg', satuan: 'sak', harga: 135000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Asia' },
+      { id: 'duco', nama: 'Cat duco', spek: 'Putih matte', satuan: 'liter', harga: 165000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Asia' },
+      { id: 'sealant', nama: 'Sealant silikon', spek: 'Netral · 300 ml', satuan: 'tube', harga: 38000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Asia' },
+      { id: 'keramik', nama: 'Keramik 60×60', spek: 'Granit polished', satuan: 'dus', harga: 148000, kat: 'lantai', kategori: 'FINISHING', toko: 'Toko Megabaja' },
+      { id: 'vinyl', nama: 'Vinyl flooring 3 mm', spek: 'Wood series', satuan: 'm²', harga: 145000, kat: 'lantai', kategori: 'FINISHING', toko: 'Toko Nunut' },
+      { id: 'nym', nama: 'Kabel NYM 3×2,5', spek: 'Roll 50 m', satuan: 'roll', harga: 780000, kat: 'mep', kategori: 'ME', toko: 'Toko Asia' }
     ];
+    this.KATEGORI = ['CIVIL', 'ME', 'FURNITURE', 'FINISHING', 'LAS REX', 'BOX PANEL'];
+    this.PPN_DEFAULT = 0.11;
     this.KAT = [
       { id: 'rangka', nama: 'Rangka & Plafon', budget: 145000000 }, { id: 'panel', nama: 'Kayu & Panel', budget: 130000000 },
       { id: 'sipil', nama: 'Pekerjaan Sipil', budget: 55000000 }, { id: 'finishing', nama: 'Finishing & Cat', budget: 32000000 },
@@ -1378,7 +1383,7 @@ class Component extends DCLogic {
           trail: [T('15 Jul 2026, 11.30', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Harga dari nota Toko Megabaja'), T('15 Jul 2026, 15.20', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', ''), T('16 Jul 2026, 08.40', 'Rina Astuti', 'Purchasing', 'PO dikirim ke toko', ''), T('17 Jul 2026, 07.30', 'Rina Astuti', 'Purchasing', 'Barang datang di site', '')] },
         { id: 'PO-2026-019', reqId: 'REQ-2026-029', pemohon: 'Jefta', minggu: 30, status: 'Barang Datang', dibuat: '23 Jul 2026, 11.00', oleh: 'Rina Astuti',
           termins: { 'Toko Nunut': 'dp', 'Toko Asia': 'lunas' }, datang: '2026-07-24',
-          lines: [{ itemId: 'tripfur', vol: 60, harga: 201000, toko: 'Toko Nunut' }, { itemId: 'hpl', vol: 45, harga: 216000, toko: 'Toko Nunut' }, { itemId: 'sealant', vol: 24, harga: 39000, toko: 'Toko Asia' }],
+          lines: [{ itemId: 'tripfur', vol: 60, harga: 201000, toko: 'Toko Nunut' }, { itemId: 'hpl', vol: 45, harga: 216000, toko: 'Toko Nunut' }, { itemId: 'sealant', vol: 24, harga: 39000, toko: 'Toko Asia', ppnRate: 0 }],
           trail: [T('23 Jul 2026, 11.00', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Dua toko dalam satu surat: Nunut dan Asia'), T('23 Jul 2026, 15.45', 'Ir. Bambang Wijaya', 'Direktur', 'TTD Direktur', 'Nominal cocok dengan nota'), T('24 Jul 2026, 08.10', 'Rina Astuti', 'Purchasing', 'PO dikirim ke toko', ''), T('24 Jul 2026, 16.45', 'Rina Astuti', 'Purchasing', 'Barang datang di site', '')] },
         { id: 'PO-2026-020', reqId: 'REQ-2026-030', pemohon: 'Jefta', minggu: 31, status: 'Barang Datang', dibuat: '31 Jul 2026, 10.20', oleh: 'Rina Astuti',
           termins: { 'Toko Megabaja': 'dp', 'Toko Asia': 'tempo' }, datang: '2026-08-03',
@@ -1425,7 +1430,7 @@ class Component extends DCLogic {
     this.state.pos = this.state.pos.concat([
       P('pakuwon', { id: 'PO-2026-021', reqId: 'REQ-2026-033', pemohon: 'Jefta', minggu: 32, status: 'TTD Direktur', sejak: 'baru saja', bundleId: 'TTD-2026-004', dibuat: '3 Agu 2026, 14.10', oleh: 'Rina Astuti',
         termins: { 'Toko Megabaja': 'lunas', 'Toko Asia': 'tempo' },
-        lines: [{ itemId: 'pasir', vol: 4, harga: 330000, toko: 'Toko Megabaja' }, { itemId: 'skrup', vol: 10, harga: 97000, toko: 'Toko Asia' }, { itemId: 'kompon', vol: 4, harga: 138000, toko: 'Toko Asia' }],
+        lines: [{ itemId: 'pasir', vol: 4, harga: 330000, toko: 'Toko Megabaja' }, { itemId: 'skrup', vol: 10, harga: 97000, toko: 'Toko Asia', ppnRate: 0 }, { itemId: 'kompon', vol: 4, harga: 138000, toko: 'Toko Asia' }],
         trail: [T('3 Agu 2026, 14.10', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Megabaja — Lunas di muka; Asia — Tempo 14 hari · sesuai nota')] }),
       P('pakuwon', { id: 'PO-2026-022', reqId: 'REQ-2026-034', pemohon: 'Jefta', minggu: 33, status: 'TTD Direktur', sejak: 'baru saja', bundleId: 'TTD-2026-004', dibuat: '4 Agu 2026, 10.30', oleh: 'Rina Astuti',
         termins: { 'Toko Asia': 'dp' },
@@ -1468,7 +1473,16 @@ class Component extends DCLogic {
         trail: [T('4 Agu 2026, 16.20', 'Rina Astuti', 'Purchasing', 'Pengajuan tanda tangan gabungan dibuat', '3 PO + 2 SBK dari 2 proyek (Pakuwon, Bandung) digabung menjadi satu pengajuan tanda tangan')] }
     ];
   }
-  item(id) { return this.CAT.find(c => c.id === id) || { nama: '', spek: '', satuan: '', harga: 0, kat: '', toko: '' }; }
+  item(id) { return this.CAT.find(c => c.id === id) || { nama: '', spek: '', satuan: '', harga: 0, kat: '', kategori: '', toko: '' }; }
+  // ─── PPN pada baris PO ────────────────────────────────────────────────────
+  //  `harga`  = harga satuan DENGAN PPN (nilai di nota toko, sudah gross-up).
+  //  `ppnRate` = default 0.11 (PKP); set 0 untuk toko kecil non-PKP.
+  //  DPP dan komponen PPN dihitung backward dari harga inklusif.
+  poLinePpnRate(l) { return l && l.ppnRate !== undefined ? Number(l.ppnRate) : this.PPN_DEFAULT; }
+  poLineDpp(l) { const rate = this.poLinePpnRate(l); return Number(l.harga || 0) / (1 + rate); }
+  poLinePpnSatuan(l) { return Number(l.harga || 0) - this.poLineDpp(l); }
+  poLineTotalPpn(l) { return this.poLinePpnSatuan(l) * Number(l.vol || 0); }
+  poLineTotalBeli(l) { return Number(l.harga || 0) * Number(l.vol || 0); }
   job(id) { return this.JOBS.find(j => j.id === id) || { nama: '', satuan: '', boq: 0, terpakai: 0 }; }
   terminOf(po, toko) { return (po.termins || {})[toko] || 'tempo'; }
   terminLabel(id) { return (this.TERMIN.find(t => t.id === id) || this.TERMIN[2]).label; }
