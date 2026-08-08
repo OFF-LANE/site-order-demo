@@ -1159,6 +1159,110 @@ input,select,textarea,button{font-family:var(--font-body);}
       </div>
     </sc-if>
 
+    <sc-if value="{{ showStok }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:var(--space-4);flex-wrap:wrap">
+          <div>
+            <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Kartu Stok Gudang</div>
+            <h1 style="font-size:28px;margin:var(--space-2) 0 0">Stok material, log masuk, log keluar</h1>
+            <div style="font-size:13px;color:{{ reorderFgTop }};font-weight:600;margin-top:var(--space-1)">{{ reorderTotalTxt }}</div>
+          </div>
+          <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center">
+            <span class="text-muted" style="font-size:12px">Lokasi</span>
+            {{ lokasiFilterEl }}
+            <button onClick="{{ onExportStok }}" class="btn btn-secondary" style="min-height:40px">Ekspor Excel (CSV)</button>
+          </div>
+        </div>
+
+        <nav class="no-print" style="background:var(--color-surface);border-bottom:1px solid var(--color-divider)">
+          <div style="display:flex;gap:2px">
+            <button onClick="{{ onStokTabKartu }}" style="border:none;background:transparent;cursor:pointer;padding:10px 16px;font-family:var(--font-heading);font-size:14px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:{{ stokTabKartuFg }};border-bottom:3px solid {{ stokTabKartuLine }}">Kartu Stok</button>
+            <button onClick="{{ onStokTabMasuk }}" style="border:none;background:transparent;cursor:pointer;padding:10px 16px;font-family:var(--font-heading);font-size:14px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:{{ stokTabMasukFg }};border-bottom:3px solid {{ stokTabMasukLine }}">Barang Masuk</button>
+            <button onClick="{{ onStokTabKeluar }}" style="border:none;background:transparent;cursor:pointer;padding:10px 16px;font-family:var(--font-heading);font-size:14px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:{{ stokTabKeluarFg }};border-bottom:3px solid {{ stokTabKeluarLine }}">Barang Keluar</button>
+          </div>
+        </nav>
+
+        <sc-if value="{{ stokTabKartu }}" hint-placeholder-val="{{ true }}">
+          <sc-if value="{{ stokEmpty }}" hint-placeholder-val="{{ false }}">
+            <div class="text-muted" style="padding:var(--space-8);text-align:center;font-size:13.5px">Tidak ada material yang cocok dengan filter.</div>
+          </sc-if>
+          <sc-for list="{{ stokGroups }}" as="sg" hint-placeholder-count="3">
+            <div class="card blueprint" style="padding:var(--space-4);gap:var(--space-3);overflow-x:auto">
+              <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div style="font-family:var(--font-heading);font-size:16px;font-weight:700;letter-spacing:0.08em;background:var(--color-accent-900);color:var(--color-bg);padding:4px 10px;align-self:flex-start">{{ sg.kategori }}</div>
+              <div style="min-width:1080px">
+                <div style="display:grid;grid-template-columns:40px 1.8fr 90px 80px 80px 90px 80px 110px 120px 100px 90px;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+                  <span>No</span><span>Nama Material</span><span style="text-align:right">Stok Awal</span><span style="text-align:right">Masuk</span><span style="text-align:right">Keluar</span><span style="text-align:right">Stok Akhir</span><span>Satuan</span><span>Kategori</span><span>Lokasi</span><span style="text-align:right">Reorder Pt</span><span>Reorder</span>
+                </div>
+                <sc-for list="{{ sg.rows }}" as="sr" hint-placeholder-count="4">
+                  <div style="display:grid;grid-template-columns:40px 1.8fr 90px 80px 80px 90px 80px 110px 120px 100px 90px;gap:var(--space-3);align-items:center;padding:6px 0;border-bottom:1px solid var(--color-divider);font-size:13px;background:{{ sr.bg }}">
+                    <span class="text-muted">{{ sr.no }}</span>
+                    <span><span style="font-weight:600">{{ sr.nama }}</span><span class="text-muted" style="display:block;font-size:11.5px">{{ sr.spek }}</span></span>
+                    <span style="text-align:right">{{ sr.stokAwal }}</span>
+                    <span style="text-align:right;color:var(--color-accent-700)">{{ sr.masuk }}</span>
+                    <span style="text-align:right;color:var(--color-neutral-700)">{{ sr.keluar }}</span>
+                    <span style="text-align:right;font-weight:700;color:{{ sr.akhirFg }}">{{ sr.stokAkhir }}</span>
+                    <span class="text-muted">{{ sr.satuan }}</span>
+                    <span class="text-muted" style="font-size:11.5px">{{ sr.kategori }}</span>
+                    <span class="text-muted" style="font-size:11.5px">{{ sr.lokasi }}</span>
+                    <span style="text-align:right">{{ sr.reorderPoint }}</span>
+                    <span style="font-weight:700;color:{{ sr.reorderFg }}">{{ sr.reorderTxt }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </sc-if>
+
+        <sc-if value="{{ stokTabMasuk }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-4);overflow-x:auto">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="min-width:1080px">
+              <div style="display:grid;grid-template-columns:110px 2fr 110px 80px 80px 140px 2fr;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+                <span>Tanggal</span><span>Material</span><span>Kategori</span><span>Satuan</span><span style="text-align:right">Qty</span><span>Lokasi Masuk</span><span>Catatan</span>
+              </div>
+              <sc-if value="{{ logMasukEmpty }}" hint-placeholder-val="{{ false }}"><div class="text-muted" style="padding:var(--space-6);text-align:center;font-size:13px">Belum ada barang masuk.</div></sc-if>
+              <sc-for list="{{ logMasukRows }}" as="lm" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:110px 2fr 110px 80px 80px 140px 2fr;gap:var(--space-3);align-items:center;padding:6px 0;border-bottom:1px solid var(--color-divider);font-size:13px">
+                  <span class="text-muted">{{ lm.tglTxt }}</span>
+                  <span style="font-weight:600">{{ lm.material }}</span>
+                  <span class="text-muted" style="font-size:11.5px">{{ lm.kategori }}</span>
+                  <span class="text-muted">{{ lm.satuan }}</span>
+                  <span style="text-align:right;font-weight:700;color:var(--color-accent-700)">{{ lm.qty }}</span>
+                  <span class="text-muted" style="font-size:11.5px">{{ lm.lokasi }}</span>
+                  <span style="font-size:12.5px">{{ lm.catatan }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ stokTabKeluar }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-4);overflow-x:auto">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="min-width:1080px">
+              <div style="display:grid;grid-template-columns:110px 2fr 110px 80px 80px 190px 2fr 110px;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+                <span>Tanggal</span><span>Material</span><span>Kategori</span><span>Satuan</span><span style="text-align:right">Qty</span><span>Proyek Tujuan</span><span>Catatan</span><span>Flag</span>
+              </div>
+              <sc-if value="{{ logKeluarEmpty }}" hint-placeholder-val="{{ false }}"><div class="text-muted" style="padding:var(--space-6);text-align:center;font-size:13px">Belum ada barang keluar.</div></sc-if>
+              <sc-for list="{{ logKeluarRows }}" as="lk" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:110px 2fr 110px 80px 80px 190px 2fr 110px;gap:var(--space-3);align-items:center;padding:6px 0;border-bottom:1px solid var(--color-divider);font-size:13px;background:{{ lk.bg }}">
+                  <span class="text-muted">{{ lk.tglTxt }}</span>
+                  <span style="font-weight:600">{{ lk.material }}</span>
+                  <span class="text-muted" style="font-size:11.5px">{{ lk.kategori }}</span>
+                  <span class="text-muted">{{ lk.satuan }}</span>
+                  <span style="text-align:right;font-weight:700;color:var(--color-neutral-800)">{{ lk.qty }}</span>
+                  <span style="font-size:12.5px">{{ lk.proyek }}</span>
+                  <span style="font-size:12.5px">{{ lk.catatan }}</span>
+                  <span style="font-weight:700;color:{{ lk.overFg }};font-size:11.5px;letter-spacing:0.08em">{{ lk.overTxt }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ showRiwayat }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;flex-direction:column;gap:var(--space-4)">
         <div>
@@ -1284,24 +1388,58 @@ class Component extends DCLogic {
     this.TODAY = new Date('2026-08-04T08:00:00');
     // `kat` = kategori BoQ Dashboard (lama). `kategori` = kategori laporan
     // realisasi belanja / kartu stok (baru, uppercase): CIVIL, ME, FURNITURE,
-    // FINISHING, LAS REX, BOX PANEL.
+    // FINISHING, LAS REX, BOX PANEL. Setiap item bawa lokasi gudang, titik
+    // reorder, dan stok awal — dipakai kartu stok.
+    this.LOKASI = ['GUDANG LOKET', 'GUDANG PROYEK'];
     this.CAT = [
-      { id: 'pasir', nama: 'Pasir pasang/halus', spek: 'Lumajang', satuan: 'kubik', harga: 320000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja' },
-      { id: 'semen', nama: 'Semen Gresik 40 kg', spek: 'PCC', satuan: 'sak', harga: 62000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja' },
-      { id: 'hebel', nama: 'Hebel 10 cm', spek: '60 × 20 cm', satuan: 'kubik', harga: 720000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja' },
-      { id: 'tripfur', nama: 'Triplek 9 mm grade furniture', spek: '1220 × 2440 mm', satuan: 'lembar', harga: 195000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut' },
-      { id: 'tripsemi', nama: 'Triplek 9 mm semi kriyung', spek: '1220 × 2440 mm', satuan: 'lembar', harga: 148000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut' },
-      { id: 'hpl', nama: 'HPL TH007AA', spek: 'Taco · 1220 × 2440 mm', satuan: 'lembar', harga: 210000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut' },
-      { id: 'gyp9', nama: 'Gypsum A+ 9 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 62000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Megabaja' },
-      { id: 'gyp12', nama: 'Gypsum A+ 12 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 88000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Megabaja' },
-      { id: 'hollow', nama: 'Hollow galvanis 20×40', spek: 'Tebal 0,3 mm · 4 m', satuan: 'batang', harga: 68000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Megabaja' },
-      { id: 'skrup', nama: 'Skrup 2,5 cm', spek: 'Gypsum · isi 1000', satuan: 'dus', harga: 95000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Asia' },
-      { id: 'kompon', nama: 'Kompon', spek: 'Jointing compound 25 kg', satuan: 'sak', harga: 135000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Asia' },
-      { id: 'duco', nama: 'Cat duco', spek: 'Putih matte', satuan: 'liter', harga: 165000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Asia' },
-      { id: 'sealant', nama: 'Sealant silikon', spek: 'Netral · 300 ml', satuan: 'tube', harga: 38000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Asia' },
-      { id: 'keramik', nama: 'Keramik 60×60', spek: 'Granit polished', satuan: 'dus', harga: 148000, kat: 'lantai', kategori: 'FINISHING', toko: 'Toko Megabaja' },
-      { id: 'vinyl', nama: 'Vinyl flooring 3 mm', spek: 'Wood series', satuan: 'm²', harga: 145000, kat: 'lantai', kategori: 'FINISHING', toko: 'Toko Nunut' },
-      { id: 'nym', nama: 'Kabel NYM 3×2,5', spek: 'Roll 50 m', satuan: 'roll', harga: 780000, kat: 'mep', kategori: 'ME', toko: 'Toko Asia' }
+      // CIVIL — 11
+      { id: 'pasir', nama: 'Pasir pasang/halus', spek: 'Lumajang', satuan: 'kubik', harga: 320000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja', lokasi: 'GUDANG PROYEK', reorderPoint: 3, stokAwal: 2 },
+      { id: 'semen', nama: 'Semen Gresik 40 kg', spek: 'PCC', satuan: 'sak', harga: 62000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja', lokasi: 'GUDANG PROYEK', reorderPoint: 20, stokAwal: 40 },
+      { id: 'hebel', nama: 'Hebel 10 cm', spek: '60 × 20 cm', satuan: 'kubik', harga: 720000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja', lokasi: 'GUDANG PROYEK', reorderPoint: 2, stokAwal: 0 },
+      { id: 'gyp9', nama: 'Gypsum A+ 9 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 62000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Megabaja', lokasi: 'GUDANG LOKET', reorderPoint: 30, stokAwal: 40 },
+      { id: 'gyp12', nama: 'Gypsum A+ 12 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 88000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Megabaja', lokasi: 'GUDANG LOKET', reorderPoint: 20, stokAwal: 15 },
+      { id: 'hollow', nama: 'Hollow galvanis 20×40', spek: 'Tebal 0,3 mm · 4 m', satuan: 'batang', harga: 68000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Megabaja', lokasi: 'GUDANG LOKET', reorderPoint: 30, stokAwal: 60 },
+      { id: 'skrup', nama: 'Skrup 2,5 cm', spek: 'Gypsum · isi 1000', satuan: 'dus', harga: 95000, kat: 'rangka', kategori: 'CIVIL', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 5, stokAwal: 4 },
+      { id: 'paku', nama: 'Paku beton 3 in', spek: 'Kotak 1 kg', satuan: 'kotak', harga: 42000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 8, stokAwal: 12 },
+      { id: 'bataringan', nama: 'Bata ringan Citicon', spek: '60 × 20 × 7,5 cm', satuan: 'kubik', harga: 615000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja', lokasi: 'GUDANG PROYEK', reorderPoint: 3, stokAwal: 6 },
+      { id: 'betoninstan', nama: 'Beton instan MU-380', spek: 'Sak 40 kg', satuan: 'sak', harga: 78000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Megabaja', lokasi: 'GUDANG PROYEK', reorderPoint: 20, stokAwal: 32 },
+      { id: 'waterproof', nama: 'Waterproofing Aquaproof', spek: 'Ember 4 kg', satuan: 'ember', harga: 245000, kat: 'sipil', kategori: 'CIVIL', toko: 'Toko Warna Prima', lokasi: 'GUDANG LOKET', reorderPoint: 4, stokAwal: 3 },
+      // FURNITURE — 8
+      { id: 'tripfur', nama: 'Triplek 9 mm grade furniture', spek: '1220 × 2440 mm', satuan: 'lembar', harga: 195000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut', lokasi: 'GUDANG LOKET', reorderPoint: 8, stokAwal: 5 },
+      { id: 'tripsemi', nama: 'Triplek 9 mm semi kriyung', spek: '1220 × 2440 mm', satuan: 'lembar', harga: 148000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut', lokasi: 'GUDANG LOKET', reorderPoint: 6, stokAwal: 0 },
+      { id: 'hpl', nama: 'HPL TH007AA', spek: 'Taco · 1220 × 2440 mm', satuan: 'lembar', harga: 210000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut', lokasi: 'GUDANG LOKET', reorderPoint: 8, stokAwal: 10 },
+      { id: 'engsel', nama: 'Engsel soss 35 mm', spek: 'Soft-close', satuan: 'pasang', harga: 32000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut', lokasi: 'GUDANG LOKET', reorderPoint: 40, stokAwal: 60 },
+      { id: 'handle', nama: 'Handle pintu kabinet 128 mm', spek: 'Stainless satin', satuan: 'batang', harga: 45000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut', lokasi: 'GUDANG LOKET', reorderPoint: 20, stokAwal: 22 },
+      { id: 'rellaci', nama: 'Rel laci soft-close 450 mm', spek: 'Under-mount', satuan: 'pasang', harga: 96000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut', lokasi: 'GUDANG LOKET', reorderPoint: 15, stokAwal: 8 },
+      { id: 'kayusolid', nama: 'Kayu solid meranti 4/6', spek: 'Panjang 4 m', satuan: 'batang', harga: 165000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut', lokasi: 'GUDANG PROYEK', reorderPoint: 10, stokAwal: 14 },
+      { id: 'edging', nama: 'Edging PVC 22 mm', spek: 'Roll 50 m', satuan: 'roll', harga: 78000, kat: 'panel', kategori: 'FURNITURE', toko: 'Toko Nunut', lokasi: 'GUDANG LOKET', reorderPoint: 6, stokAwal: 9 },
+      // FINISHING — 9
+      { id: 'kompon', nama: 'Kompon', spek: 'Jointing compound 25 kg', satuan: 'sak', harga: 135000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 10, stokAwal: 0 },
+      { id: 'duco', nama: 'Cat duco', spek: 'Putih matte', satuan: 'liter', harga: 165000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Warna Prima', lokasi: 'GUDANG LOKET', reorderPoint: 15, stokAwal: 25 },
+      { id: 'sealant', nama: 'Sealant silikon', spek: 'Netral · 300 ml', satuan: 'tube', harga: 38000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 25, stokAwal: 40 },
+      { id: 'keramik', nama: 'Keramik 60×60', spek: 'Granit polished', satuan: 'dus', harga: 148000, kat: 'lantai', kategori: 'FINISHING', toko: 'Toko Megabaja', lokasi: 'GUDANG PROYEK', reorderPoint: 20, stokAwal: 0 },
+      { id: 'vinyl', nama: 'Vinyl flooring 3 mm', spek: 'Wood series', satuan: 'm²', harga: 145000, kat: 'lantai', kategori: 'FINISHING', toko: 'Toko Nunut', lokasi: 'GUDANG PROYEK', reorderPoint: 30, stokAwal: 0 },
+      { id: 'cattembok', nama: 'Cat tembok Dulux Pentalite', spek: 'Galon 2,5 L', satuan: 'galon', harga: 165000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Warna Prima', lokasi: 'GUDANG LOKET', reorderPoint: 10, stokAwal: 14 },
+      { id: 'thinner', nama: 'Thinner ND super', spek: 'Kaleng 4 L', satuan: 'kaleng', harga: 92000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Warna Prima', lokasi: 'GUDANG LOKET', reorderPoint: 8, stokAwal: 12 },
+      { id: 'dempul', nama: 'Dempul kayu Sanpolac', spek: 'Kaleng 1 kg', satuan: 'kaleng', harga: 55000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Warna Prima', lokasi: 'GUDANG LOKET', reorderPoint: 6, stokAwal: 5 },
+      { id: 'primerwall', nama: 'Primer wall sealer', spek: 'Galon 5 kg', satuan: 'galon', harga: 285000, kat: 'finishing', kategori: 'FINISHING', toko: 'Toko Warna Prima', lokasi: 'GUDANG LOKET', reorderPoint: 4, stokAwal: 2 },
+      // ME — 6
+      { id: 'nym', nama: 'Kabel NYM 3×2,5', spek: 'Roll 50 m', satuan: 'roll', harga: 780000, kat: 'mep', kategori: 'ME', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 3, stokAwal: 2 },
+      { id: 'conduit', nama: 'Pipa conduit HI 20 mm', spek: 'Panjang 4 m', satuan: 'batang', harga: 24000, kat: 'mep', kategori: 'ME', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 40, stokAwal: 55 },
+      { id: 'saklardobel', nama: 'Saklar Broco dobel', spek: 'Seri Zeta', satuan: 'buah', harga: 48000, kat: 'mep', kategori: 'ME', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 20, stokAwal: 18 },
+      { id: 'stopkontak', nama: 'Stop kontak Broco arde', spek: 'Seri Zeta', satuan: 'buah', harga: 52000, kat: 'mep', kategori: 'ME', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 20, stokAwal: 24 },
+      { id: 'lampuled', nama: 'Lampu downlight LED 12 W', spek: 'Warm-white', satuan: 'buah', harga: 68000, kat: 'mep', kategori: 'ME', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 30, stokAwal: 45 },
+      { id: 'exhaust', nama: 'Exhaust fan 10 in', spek: 'KDK 25AUFA', satuan: 'unit', harga: 620000, kat: 'mep', kategori: 'ME', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 3, stokAwal: 2 },
+      // LAS REX — 4
+      { id: 'weldrod', nama: 'Elektroda las RD-260', spek: 'Kotak 5 kg', satuan: 'kotak', harga: 195000, kat: 'sipil', kategori: 'LAS REX', toko: 'Toko Megabaja', lokasi: 'GUDANG LOKET', reorderPoint: 6, stokAwal: 8 },
+      { id: 'grilleac', nama: 'Grille AC Rexal 4-way', spek: '600 × 600 mm', satuan: 'unit', harga: 385000, kat: 'mep', kategori: 'LAS REX', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 4, stokAwal: 3 },
+      { id: 'registerac', nama: 'Register AC linier', spek: 'Aluminium anodized', satuan: 'unit', harga: 320000, kat: 'mep', kategori: 'LAS REX', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 4, stokAwal: 5 },
+      { id: 'platbesi', nama: 'Plat besi hitam 3 mm', spek: '1200 × 2400 mm', satuan: 'lembar', harga: 1180000, kat: 'sipil', kategori: 'LAS REX', toko: 'Toko Megabaja', lokasi: 'GUDANG PROYEK', reorderPoint: 2, stokAwal: 4 },
+      // BOX PANEL — 4
+      { id: 'boxpanel60', nama: 'Box panel 60 × 40 × 20', spek: 'Powder-coat abu', satuan: 'unit', harga: 780000, kat: 'mep', kategori: 'BOX PANEL', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 2, stokAwal: 3 },
+      { id: 'mcb3p', nama: 'MCB 3P 32 A Schneider', spek: 'Domae', satuan: 'buah', harga: 265000, kat: 'mep', kategori: 'BOX PANEL', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 6, stokAwal: 4 },
+      { id: 'contactor', nama: 'Contactor 25 A Schneider', spek: 'LC1D25', satuan: 'buah', harga: 485000, kat: 'mep', kategori: 'BOX PANEL', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 3, stokAwal: 5 },
+      { id: 'busbar', nama: 'Busbar tembaga 4×20', spek: 'Panjang 1 m', satuan: 'batang', harga: 425000, kat: 'mep', kategori: 'BOX PANEL', toko: 'Toko Asia', lokasi: 'GUDANG LOKET', reorderPoint: 3, stokAwal: 2 }
     ];
     this.KATEGORI = ['CIVIL', 'ME', 'FURNITURE', 'FINISHING', 'LAS REX', 'BOX PANEL'];
     this.PPN_DEFAULT = 0.11;
@@ -1332,7 +1470,9 @@ class Component extends DCLogic {
       { id: 'tempo', label: 'Tempo 14 hari', ket: 'Barang dikirim lebih dulu, dibayar dalam 14 hari.' }
     ];
     this.DP = 0.3;
-    this.STOK = { pasir: 2, semen: 40, hebel: 0, tripfur: 5, tripsemi: 0, hpl: 10, gyp9: 40, gyp12: 15, hollow: 60, skrup: 4, kompon: 0, duco: 25, sealant: 40, keramik: 0, vinyl: 0, nym: 2 };
+    // Stok "awal" per item ditarik dari CAT.stokAwal — satu sumber kebenaran
+    // untuk kartu stok dan form cek gudang.
+    this.STOK = {}; this.CAT.forEach(c => { this.STOK[c.id] = c.stokAwal || 0; });
     this.PEOPLE = { supervisi: 'Jefta', pm: 'Andi Prasetyo', qs: 'Maya Kusuma', gudang: 'Sudirman', purchasing: 'Rina Astuti', finance: 'Dewi Lestari', direktur: 'Ir. Bambang Wijaya' };
     this.RLBL = { supervisi: 'Supervisi Site', pm: 'Project Manager', qs: 'Quantity Surveyor', gudang: 'Kepala Gudang', purchasing: 'Purchasing', finance: 'Finance', direktur: 'Direktur' };
     this.PERAN = { supervisi: 'Supervisi', pm: 'PM', qs: 'QS', gudang: 'Kepala Gudang', purchasing: 'Purchasing', finance: 'Finance', direktur: 'Direktur' };
@@ -1483,6 +1623,32 @@ class Component extends DCLogic {
   poLinePpnSatuan(l) { return Number(l.harga || 0) - this.poLineDpp(l); }
   poLineTotalPpn(l) { return this.poLinePpnSatuan(l) * Number(l.vol || 0); }
   poLineTotalBeli(l) { return Number(l.harga || 0) * Number(l.vol || 0); }
+  // Unduh CSV (Excel membacanya native — BOM UTF-8 + CRLF).
+  downloadCsv(filename, header, rows) {
+    const esc = v => { const s = String(v == null ? '' : v); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+    const body = [header].concat(rows).map(r => r.map(esc).join(',')).join('\r\n');
+    const blob = new Blob(['﻿' + body], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+  }
+  // Harga beli terakhir per item (dari baris PO, prefer status 'Barang Datang',
+  // jatuh balik ke PO manapun). Dipakai untuk menilai pemakaian stok WS.
+  hargaBeliTerakhir(itemId) {
+    const s = this.state;
+    const cand = s.pos.slice().sort((a, b) => (b.datang || b.dibuat || '').localeCompare(a.datang || a.dibuat || ''));
+    for (const p of cand) {
+      if (p.status !== 'Barang Datang') continue;
+      const l = (p.lines || []).find(x => x.itemId === itemId);
+      if (l && Number(l.harga)) return { harga: Number(l.harga), ppnRate: this.poLinePpnRate(l), poId: p.id };
+    }
+    for (const p of cand) {
+      const l = (p.lines || []).find(x => x.itemId === itemId);
+      if (l && Number(l.harga)) return { harga: Number(l.harga), ppnRate: this.poLinePpnRate(l), poId: p.id };
+    }
+    const it = this.item(itemId);
+    return { harga: Number(it.harga || 0), ppnRate: this.PPN_DEFAULT, poId: '' };
+  }
   job(id) { return this.JOBS.find(j => j.id === id) || { nama: '', satuan: '', boq: 0, terpakai: 0 }; }
   terminOf(po, toko) { return (po.termins || {})[toko] || 'tempo'; }
   terminLabel(id) { return (this.TERMIN.find(t => t.id === id) || this.TERMIN[2]).label; }
@@ -1656,6 +1822,8 @@ class Component extends DCLogic {
     if (role === 'supervisi') tabs.push(['form', s.editId ? 'Edit Permintaan' : 'Buat Permintaan']);
     tabs.push(['budget', 'Dashboard Budget']);
     if (role !== 'direktur') tabs.push(['work', workName + (queue.length ? ' (' + queue.length + ')' : '')]);
+    if (['gudang', 'purchasing', 'qs', 'finance', 'direktur'].includes(role)) tabs.push(['stok', 'Kartu Stok']);
+    if (['qs', 'pm', 'purchasing', 'finance', 'direktur'].includes(role)) tabs.push(['realisasi', 'Realisasi Belanja']);
     tabs.push(['riwayat', 'Riwayat']);
     const navTabs = tabs.map(([k, label]) => ({
       label, fg: s.screen === k ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
@@ -2186,6 +2354,80 @@ class Component extends DCLogic {
     const proyekFilterEl = React.createElement('select', { className: 'input', value: s.fProyek || 'Semua proyek', style: { width: 'auto' }, onChange: e => this.setState({ fProyek: e.target.value }) },
       ['Semua proyek'].concat(this.PROJECTS.map(p => p.nama)).map(o => React.createElement('option', { key: o, value: o }, o)));
 
+    // ---------- kartu stok ----------
+    const stokLokasi = s.fLokasi || 'Semua lokasi';
+    const stokTab = s.stokTab || 'kartu';
+    const masukMap = {}, keluarMap = {};
+    s.pos.forEach(p => { if (p.status !== 'Barang Datang') return; (p.lines || []).forEach(l => { masukMap[l.itemId] = (masukMap[l.itemId] || 0) + Number(l.vol || 0); }); });
+    s.sbks.forEach(sb => (sb.lines || []).forEach(l => { keluarMap[l.itemId] = (keluarMap[l.itemId] || 0) + Number(l.vol || 0); }));
+    const stokFiltered = this.CAT.filter(c => stokLokasi === 'Semua lokasi' || c.lokasi === stokLokasi);
+    let stokNo = 0, reorderTotal = 0;
+    const stokGroups = this.KATEGORI.map(k => {
+      const rows = stokFiltered.filter(c => c.kategori === k).map(c => {
+        const awal = c.stokAwal || 0, masuk = masukMap[c.id] || 0, keluar = keluarMap[c.id] || 0;
+        const akhir = awal + masuk - keluar;
+        const reorder = akhir <= (c.reorderPoint || 0);
+        if (reorder) reorderTotal += 1;
+        stokNo += 1;
+        return { no: stokNo, nama: c.nama, spek: c.spek, satuan: c.satuan,
+          stokAwal: this.num(awal), masuk: this.num(masuk), keluar: this.num(keluar),
+          stokAkhir: this.num(akhir), akhirFg: reorder ? this.RED : 'var(--color-text)',
+          kategori: c.kategori, lokasi: c.lokasi, reorderPoint: this.num(c.reorderPoint),
+          reorderTxt: reorder ? 'Ya' : 'Tidak', reorderFg: reorder ? this.RED : 'var(--color-accent-700)',
+          bg: reorder ? 'color-mix(in srgb, #b23b32 8%, transparent)' : 'transparent' };
+      });
+      return { kategori: k, rows, hasRows: rows.length > 0 };
+    }).filter(g => g.hasRows);
+    const logMasukRows = [];
+    s.pos.forEach(p => { if (p.status !== 'Barang Datang') return; (p.lines || []).forEach(l => {
+      const it = this.item(l.itemId);
+      logMasukRows.push({ tgl: p.datang || '', tglTxt: p.datang ? this.tgl(p.datang) : p.dibuat,
+        material: it.nama, kategori: it.kategori, satuan: it.satuan, qty: this.num(l.vol),
+        lokasi: it.lokasi, catatan: 'Pembelian dari ' + (l.toko || '-') + ' · ' + this.dispId(p) });
+    }); });
+    // seed dua "balikan dari proyek" untuk demo variasi asal
+    logMasukRows.push({ tgl: '2026-08-01', tglTxt: this.tgl('2026-08-01'),
+      material: this.item('hpl').nama, kategori: 'FURNITURE', satuan: 'lembar', qty: '3',
+      lokasi: 'GUDANG LOKET', catatan: 'Balikan dari proyek Fit-out Tenant Trans Studio Mall Bandung' });
+    logMasukRows.push({ tgl: '2026-07-28', tglTxt: this.tgl('2026-07-28'),
+      material: this.item('sealant').nama, kategori: 'FINISHING', satuan: 'tube', qty: '6',
+      lokasi: 'GUDANG LOKET', catatan: 'Balikan dari proyek Fit-out Tenant Pakuwon Mall Surabaya' });
+    logMasukRows.sort((a, b) => (b.tgl || '').localeCompare(a.tgl || ''));
+    const logKeluarRows = [];
+    s.sbks.forEach(sb => (sb.lines || []).forEach(l => {
+      const it = this.item(l.itemId);
+      const req = s.reqs.find(r => r.id === sb.reqId);
+      const tersedia = (it.stokAwal || 0) + (masukMap[l.itemId] || 0);
+      const over = Number(l.vol) > tersedia;
+      logKeluarRows.push({ tgl: sb.dibuat, tglTxt: sb.dibuat, material: it.nama,
+        kategori: it.kategori, satuan: it.satuan, qty: this.num(l.vol),
+        proyek: this.proyekNama((req && req.proyek) || sb.proyek || 'pakuwon'),
+        catatan: sb.reqId ? 'Untuk ' + this.dispReqId(sb.reqId) + ' · ' + this.dispId(sb) : this.dispId(sb),
+        over, overTxt: over ? 'OVERLIMIT' : '',
+        bg: over ? 'color-mix(in srgb, #b23b32 10%, transparent)' : 'transparent',
+        overFg: over ? this.RED : 'var(--color-neutral-600)' });
+    }));
+    const lokasiFilterEl = React.createElement('select', { className: 'input', value: stokLokasi, style: { width: 'auto' }, onChange: e => this.setState({ fLokasi: e.target.value }) },
+      ['Semua lokasi'].concat(this.LOKASI).map(o => React.createElement('option', { key: o, value: o }, o)));
+    const onExportStok = () => {
+      if (stokTab === 'masuk') {
+        this.downloadCsv('barang-masuk.csv',
+          ['TANGGAL','MATERIAL','KATEGORI','SATUAN','QTY','LOKASI MASUK','CATATAN'],
+          logMasukRows.map(r => [r.tglTxt, r.material, r.kategori, r.satuan, r.qty, r.lokasi, r.catatan]));
+      } else if (stokTab === 'keluar') {
+        this.downloadCsv('barang-keluar.csv',
+          ['TANGGAL','MATERIAL','KATEGORI','SATUAN','QTY','PROYEK','CATATAN','FLAG'],
+          logKeluarRows.map(r => [r.tglTxt, r.material, r.kategori, r.satuan, r.qty, r.proyek, r.catatan, r.overTxt]));
+      } else {
+        const rows = [];
+        stokGroups.forEach(g => g.rows.forEach(r => rows.push([r.no, r.nama, r.spek, r.stokAwal, r.masuk, r.keluar, r.stokAkhir, r.satuan, r.kategori, r.lokasi, r.reorderPoint, r.reorderTxt])));
+        this.downloadCsv('kartu-stok.csv',
+          ['#','MATERIAL','SPESIFIKASI','STOK AWAL','MASUK','KELUAR','STOK AKHIR','SATUAN','KATEGORI','LOKASI','REORDER POINT','STATUS REORDER'],
+          rows);
+      }
+      this.flash('CSV diunduh — buka dengan Excel.');
+    };
+
     return {
       roleChips, navTabs, userName: me, roleLabel: this.RLBL[role], mainW: (this.props.modeHp ?? false) ? '440px' : '1180px',
       showNotif: s.showNotif, notifs, notifEmpty: !notifs.length, notifCount: notifs.length ? String(notifs.length) : '',
@@ -2193,6 +2435,23 @@ class Component extends DCLogic {
       onWa: () => this.flash('Kanal WhatsApp belum diaktifkan pada demo ini.'),
       showMeja: s.screen === 'meja', showBudget: s.screen === 'budget', showForm: role === 'supervisi' && s.screen === 'form',
       showWork: s.screen === 'work', showDetail: s.screen === 'detail' && !!cur, showRiwayat: s.screen === 'riwayat',
+      showStok: s.screen === 'stok',
+      stokGroups, stokEmpty: !stokGroups.length,
+      stokTabKartu: stokTab === 'kartu', stokTabMasuk: stokTab === 'masuk', stokTabKeluar: stokTab === 'keluar',
+      stokTabKartuFg: stokTab === 'kartu' ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
+      stokTabMasukFg: stokTab === 'masuk' ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
+      stokTabKeluarFg: stokTab === 'keluar' ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
+      stokTabKartuLine: stokTab === 'kartu' ? 'var(--color-accent)' : 'transparent',
+      stokTabMasukLine: stokTab === 'masuk' ? 'var(--color-accent)' : 'transparent',
+      stokTabKeluarLine: stokTab === 'keluar' ? 'var(--color-accent)' : 'transparent',
+      onStokTabKartu: () => this.setState({ stokTab: 'kartu' }),
+      onStokTabMasuk: () => this.setState({ stokTab: 'masuk' }),
+      onStokTabKeluar: () => this.setState({ stokTab: 'keluar' }),
+      lokasiFilterEl, onExportStok,
+      logMasukRows, logMasukEmpty: !logMasukRows.length,
+      logKeluarRows, logKeluarEmpty: !logKeluarRows.length,
+      reorderTotalTxt: reorderTotal ? reorderTotal + ' item butuh reorder' : 'Semua stok di atas titik reorder',
+      reorderFgTop: reorderTotal ? this.RED : 'var(--color-accent-700)',
       showBundle: s.screen === 'bundle' && !!bundleView, bundleView, bundleCards, bundleEmpty: !bundleCards.length,
       proyekNama: this.proyekNama(s.proyek), proyekOpening: this.PROJ(s.proyek).opening, proyekSelectEl, proyekFilterEl,
       showBundleBuilder: role === 'purchasing' && ttdUnbundled.length > 0, bundlePickRows,
