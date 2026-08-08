@@ -1456,6 +1456,9 @@ class Component extends DCLogic {
   payItemNilai(i) { const po = this.state.pos.find(x => x.id === i.poId); return po ? this.unitNilai(po, i.toko, i.jenis) : 0; }
   payPoIds(p) { return Array.from(new Set((p.items || []).map(i => i.poId))); }
   rp(n) {
+    // F1: Supervisi tidak melihat nominal — satu override menutup seluruh nominal
+    //     di Dashboard Budget, detail dokumen, form Rencana Kerja, dan Riwayat.
+    if (this.state && this.state.role === 'supervisi') return '—';
     const neg = n < 0, a = Math.abs(n); let s;
     if (a >= 1000000000) s = 'Rp ' + (a / 1000000000).toFixed(2).replace('.', ',') + ' M';
     else if (a >= 1000000) s = 'Rp ' + (a / 1000000).toFixed(1).replace('.', ',') + ' jt';
