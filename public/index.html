@@ -1263,6 +1263,138 @@ input,select,textarea,button{font-family:var(--font-body);}
       </div>
     </sc-if>
 
+    <sc-if value="{{ showRealisasi }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:var(--space-4);flex-wrap:wrap">
+          <div>
+            <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Laporan Realisasi Belanja</div>
+            <h1 style="font-size:28px;margin:var(--space-2) 0 0">Per proyek — resume, PPN, dan detail per kategori</h1>
+          </div>
+          <div style="display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap">
+            {{ proyekSelectEl }}
+            <button onClick="{{ onExportRealisasi }}" class="btn btn-secondary" style="min-height:40px">Ekspor Excel (CSV)</button>
+          </div>
+        </div>
+
+        <div class="card blueprint" style="padding:var(--space-4);gap:var(--space-3)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-4)">
+            <div>
+              <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Proyek</div>
+              <div style="font-family:var(--font-heading);font-size:17px;font-weight:700;margin-top:2px">{{ realisasiHeaderProyek }}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Periode</div>
+              <div style="font-family:var(--font-heading);font-size:17px;font-weight:700;margin-top:2px">{{ realisasiHeaderPeriode }}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Luasan</div>
+              <div style="font-family:var(--font-heading);font-size:17px;font-weight:700;margin-top:2px">{{ realisasiHeaderLuasan }}</div>
+            </div>
+          </div>
+        </div>
+
+        <nav class="no-print" style="background:var(--color-surface);border-bottom:1px solid var(--color-divider)">
+          <div style="display:flex;gap:2px">
+            <button onClick="{{ onRealisasiTabResume }}" style="border:none;background:transparent;cursor:pointer;padding:10px 16px;font-family:var(--font-heading);font-size:14px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:{{ realisasiTabResumeFg }};border-bottom:3px solid {{ realisasiTabResumeLine }}">Resume Belanja</button>
+            <button onClick="{{ onRealisasiTabPpn }}" style="border:none;background:transparent;cursor:pointer;padding:10px 16px;font-family:var(--font-heading);font-size:14px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:{{ realisasiTabPpnFg }};border-bottom:3px solid {{ realisasiTabPpnLine }}">Resume PPN</button>
+            <button onClick="{{ onRealisasiTabDetail }}" style="border:none;background:transparent;cursor:pointer;padding:10px 16px;font-family:var(--font-heading);font-size:14px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:{{ realisasiTabDetailFg }};border-bottom:3px solid {{ realisasiTabDetailLine }}">Detail per Kategori</button>
+          </div>
+        </nav>
+
+        <sc-if value="{{ realisasiTabResume }}" hint-placeholder-val="{{ true }}">
+          <div class="card blueprint" style="padding:var(--space-4);overflow-x:auto">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="min-width:520px">
+              <div style="display:grid;grid-template-columns:50px 1fr 180px;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+                <span>No</span><span>Description</span><span style="text-align:right">Total</span>
+              </div>
+              <sc-for list="{{ resumeRows }}" as="rr" hint-placeholder-count="10">
+                <div style="display:grid;grid-template-columns:50px 1fr 180px;gap:var(--space-3);align-items:center;padding:8px 0;border-bottom:1px solid var(--color-divider);font-size:14px">
+                  <span class="text-muted">{{ rr.no }}</span>
+                  <span style="font-weight:600">{{ rr.label }}</span>
+                  <span style="text-align:right;font-family:var(--font-heading);font-weight:700">{{ rr.total }}</span>
+                </div>
+              </sc-for>
+              <div style="display:grid;grid-template-columns:50px 1fr 180px;gap:var(--space-3);align-items:center;padding:12px 0;border-top:2px solid var(--color-accent-900);font-size:16px">
+                <span></span>
+                <span style="font-family:var(--font-heading);font-weight:700;letter-spacing:0.06em;text-transform:uppercase">Total</span>
+                <span style="text-align:right;font-family:var(--font-heading);font-weight:700;font-size:20px">{{ resumeGrand }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ realisasiTabPpn }}" hint-placeholder-val="{{ false }}">
+          <div class="card blueprint" style="padding:var(--space-4);overflow-x:auto">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="min-width:520px">
+              <div style="display:grid;grid-template-columns:50px 1fr 180px;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+                <span>No</span><span>Description</span><span style="text-align:right">Total PPN</span>
+              </div>
+              <sc-for list="{{ resumePpnRows }}" as="rp" hint-placeholder-count="10">
+                <div style="display:grid;grid-template-columns:50px 1fr 180px;gap:var(--space-3);align-items:center;padding:8px 0;border-bottom:1px solid var(--color-divider);font-size:14px">
+                  <span class="text-muted">{{ rp.no }}</span>
+                  <span style="font-weight:600">{{ rp.label }}</span>
+                  <span style="text-align:right;font-family:var(--font-heading);font-weight:700">{{ rp.total }}</span>
+                </div>
+              </sc-for>
+              <div style="display:grid;grid-template-columns:50px 1fr 180px;gap:var(--space-3);align-items:center;padding:12px 0;border-top:2px solid var(--color-accent-900);font-size:16px">
+                <span></span>
+                <span style="font-family:var(--font-heading);font-weight:700;letter-spacing:0.06em;text-transform:uppercase">Total PPN</span>
+                <span style="text-align:right;font-family:var(--font-heading);font-weight:700;font-size:20px">{{ resumeGrandPpn }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ realisasiTabDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ catChips }}" as="cc" hint-placeholder-count="10">
+              <button onClick="{{ cc.onPick }}" style="border:1px solid var(--color-divider);background:{{ cc.bg }};color:{{ cc.fg }};cursor:pointer;padding:6px 12px;font-family:var(--font-heading);font-size:12.5px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase">{{ cc.label }}</button>
+            </sc-for>
+          </div>
+          <div class="card blueprint" style="padding:var(--space-4);overflow-x:auto">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div style="font-family:var(--font-heading);font-size:16px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">{{ realisasiCat }}</div>
+            <div style="min-width:1280px">
+              <div style="display:grid;grid-template-columns:95px 40px 2fr 65px 70px 130px 130px 105px 130px 140px 160px;gap:var(--space-2);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700)">
+                <span>Tgl</span><span>No</span><span>Description</span><span style="text-align:right">Qty</span><span>Satuan</span><span style="text-align:right">Hrg + PPN</span><span style="text-align:right">Hrg – PPN</span><span style="text-align:right">PPN Sat.</span><span style="text-align:right">Total PPN</span><span style="text-align:right">Total Beli</span><span>Toko</span>
+              </div>
+              <sc-if value="{{ detailEmpty }}" hint-placeholder-val="{{ false }}"><div class="text-muted" style="padding:var(--space-6);text-align:center;font-size:13px">Belum ada transaksi untuk kategori ini.</div></sc-if>
+              <sc-for list="{{ detailRows }}" as="dr" hint-placeholder-count="6">
+                <sc-if value="{{ dr.subtotal }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid;grid-template-columns:95px 40px 2fr 65px 70px 130px 130px 105px 130px 140px 160px;gap:var(--space-2);align-items:center;padding:8px 0;border-top:1px dashed var(--color-accent);background:color-mix(in srgb, var(--color-accent) 6%, transparent);font-size:12.5px;font-weight:700">
+                    <span></span><span></span>
+                    <span style="letter-spacing:0.05em;text-transform:uppercase">{{ dr.label }}</span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span style="text-align:right">{{ dr.totalPpn }}</span>
+                    <span style="text-align:right">{{ dr.totalBeli }}</span>
+                    <span></span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ dr.no }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:grid;grid-template-columns:95px 40px 2fr 65px 70px 130px 130px 105px 130px 140px 160px;gap:var(--space-2);align-items:center;padding:6px 0;border-bottom:1px solid var(--color-divider);font-size:12.5px">
+                    <span class="text-muted">{{ dr.tgl }}</span>
+                    <span class="text-muted">{{ dr.no }}</span>
+                    <span style="font-weight:600">{{ dr.desc }}</span>
+                    <span style="text-align:right">{{ dr.qty }}</span>
+                    <span class="text-muted">{{ dr.satuan }}</span>
+                    <span style="text-align:right">{{ dr.hargaPpn }}</span>
+                    <span style="text-align:right">{{ dr.hargaDpp }}</span>
+                    <span style="text-align:right">{{ dr.ppnSatuan }}</span>
+                    <span style="text-align:right;color:var(--color-neutral-700)">{{ dr.totalPpn }}</span>
+                    <span style="text-align:right;font-weight:700">{{ dr.totalBeli }}</span>
+                    <span class="text-muted" style="font-size:11.5px">{{ dr.toko }}</span>
+                  </div>
+                </sc-if>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ showRiwayat }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;flex-direction:column;gap:var(--space-4)">
         <div>
@@ -1459,9 +1591,9 @@ class Component extends DCLogic {
     ];
     this.TOKO = [{ nama: 'Toko Megabaja' }, { nama: 'Toko Asia' }, { nama: 'Toko Nunut' }, { nama: 'Toko Warna Prima' }];
     this.PROJECTS = [
-      { id: 'pakuwon', nama: 'Fit-out Tenant Pakuwon Mall Surabaya', kota: 'Surabaya', opening: '25 Sep 2026', spv: 'Jefta', terpakai: {} },
-      { id: 'trans', nama: 'Fit-out Tenant Trans Studio Mall Bandung', kota: 'Bandung', opening: '12 Okt 2026', spv: 'Hendra Gunawan', terpakai: { keramik: 120, plafon: 180, partisi: 60, kabinet: 20, catduco: 30 } },
-      { id: 'plaza', nama: 'Fit-out Tenant Plaza Indonesia Jakarta', kota: 'Jakarta', opening: '30 Okt 2026', spv: 'Bagas Nugroho', terpakai: { plafon: 220, catduco: 40, kabinet: 35, keramik: 90 } }
+      { id: 'pakuwon', nama: 'Fit-out Tenant Pakuwon Mall Surabaya', kota: 'Surabaya', opening: '25 Sep 2026', spv: 'Jefta', terpakai: {}, luasan: '452 m²', periode: '1 Jul 2026 – 25 Sep 2026' },
+      { id: 'trans', nama: 'Fit-out Tenant Trans Studio Mall Bandung', kota: 'Bandung', opening: '12 Okt 2026', spv: 'Hendra Gunawan', terpakai: { keramik: 120, plafon: 180, partisi: 60, kabinet: 20, catduco: 30 }, luasan: '388 m²', periode: '15 Jul 2026 – 12 Okt 2026' },
+      { id: 'plaza', nama: 'Fit-out Tenant Plaza Indonesia Jakarta', kota: 'Jakarta', opening: '30 Okt 2026', spv: 'Bagas Nugroho', terpakai: { plafon: 220, catduco: 40, kabinet: 35, keramik: 90 }, luasan: '520 m²', periode: '20 Jul 2026 – 30 Okt 2026' }
     ];
     this.PROJ = id => this.PROJECTS.find(p => p.id === id) || this.PROJECTS[0];
     this.TERMIN = [
@@ -1605,6 +1737,36 @@ class Component extends DCLogic {
         termins: { 'Toko Nunut': 'tempo' },
         lines: [{ itemId: 'hpl', vol: 20, harga: 217000, toko: 'Toko Nunut' }],
         trail: [T('5 Agu 2026, 11.20', 'Rina Astuti', 'Purchasing', 'PO dibuat', 'Nunut \u2014 Tempo 14 hari \u00b7 sesuai nota')] })
+    ]);
+    // \u2500\u2500\u2500 PO auxiliary: Addwork / Pembelian Alat Kerja / Sewa Alat \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+    //   Baris ini memakai `deskripsi` (bukan itemId) + `subKategori` supaya
+    //   masuk ke kategori laporan realisasi yang tepat tanpa mengganggu
+    //   Kartu Stok (yang meng-skip baris tanpa itemId).
+    this.state.pos = this.state.pos.concat([
+      P('pakuwon', { id: 'PO-2026-030', pemohon: 'Rina Astuti', minggu: 30, status: 'Barang Datang', datang: '2026-07-22', dibuat: '20 Jul 2026, 09.30', oleh: 'Rina Astuti',
+        termins: { 'CV Karya Anugerah': 'tempo' },
+        lines: [
+          { deskripsi: 'Pekerjaan bobok dinding partisi eksisting', subKategori: 'Addwork', vol: 12, satuan: 'm\u00b2', harga: 285000, toko: 'CV Karya Anugerah' },
+          { deskripsi: 'Grout ulang lantai loading dock', subKategori: 'Addwork', vol: 24, satuan: 'm\u00b2', harga: 165000, toko: 'CV Karya Anugerah' }
+        ],
+        trail: [T('20 Jul 2026, 09.30', 'Rina Astuti', 'Purchasing', 'PO addwork dibuat', 'Pekerjaan tambah di luar kontrak utama'), T('22 Jul 2026, 14.00', 'Rina Astuti', 'Purchasing', 'Pekerjaan selesai \u2014 jasa diterima', '')] }),
+      P('pakuwon', { id: 'PO-2026-031', pemohon: 'Rina Astuti', minggu: 30, status: 'Barang Datang', datang: '2026-07-23', dibuat: '18 Jul 2026, 10.00', oleh: 'Rina Astuti',
+        termins: { 'Toko Bangunan Jaya': 'lunas' },
+        lines: [
+          { deskripsi: 'Bor tangan 13 mm Bosch GBM 350', subKategori: 'Pembelian Alat Kerja', vol: 2, satuan: 'unit', harga: 1250000, toko: 'Toko Bangunan Jaya' },
+          { deskripsi: 'Mata bor set beton', subKategori: 'Pembelian Alat Kerja', vol: 3, satuan: 'set', harga: 185000, toko: 'Toko Bangunan Jaya', ppnRate: 0 }
+        ],
+        trail: [T('18 Jul 2026, 10.00', 'Rina Astuti', 'Purchasing', 'PO alat kerja dibuat', ''), T('23 Jul 2026, 09.00', 'Rina Astuti', 'Purchasing', 'Alat diterima di gudang', '')] }),
+      P('pakuwon', { id: 'PO-2026-032', pemohon: 'Rina Astuti', minggu: 31, status: 'Barang Datang', datang: '2026-07-27', dibuat: '25 Jul 2026, 14.00', oleh: 'Rina Astuti',
+        termins: { 'Rental Scaffolding Sukses': 'tempo' },
+        lines: [
+          { deskripsi: 'Sewa scaffolding 12 set \u00d7 30 hari', subKategori: 'Sewa Alat', vol: 12, satuan: 'set', harga: 750000, toko: 'Rental Scaffolding Sukses' }
+        ],
+        trail: [T('25 Jul 2026, 14.00', 'Rina Astuti', 'Purchasing', 'PO sewa alat dibuat', ''), T('27 Jul 2026, 08.00', 'Rina Astuti', 'Purchasing', 'Scaffolding terpasang di site', '')] }),
+      P('plaza', { id: 'PO-2026-033', pemohon: 'Rina Astuti', minggu: 31, status: 'Barang Datang', datang: '2026-07-30', dibuat: '28 Jul 2026, 09.00', oleh: 'Rina Astuti',
+        termins: { 'CV Karya Anugerah': 'tempo' },
+        lines: [{ deskripsi: 'Sanding & finishing kolom eksisting', subKategori: 'Addwork', vol: 18, satuan: 'm\u00b2', harga: 220000, toko: 'CV Karya Anugerah' }],
+        trail: [T('28 Jul 2026, 09.00', 'Rina Astuti', 'Purchasing', 'PO addwork dibuat', 'Plaza \u2014 kolom eksisting')] })
     ]);
     this.state.pays.forEach(p => { if (p.bukti && !p.buktiToko) { p.buktiToko = {}; Array.from(new Set((p.items || []).map(i => i.toko))).forEach(tk => p.buktiToko[tk] = true); } if (!p.buktiToko) p.buktiToko = {}; });
     this.state.bundles = [
@@ -2358,8 +2520,8 @@ class Component extends DCLogic {
     const stokLokasi = s.fLokasi || 'Semua lokasi';
     const stokTab = s.stokTab || 'kartu';
     const masukMap = {}, keluarMap = {};
-    s.pos.forEach(p => { if (p.status !== 'Barang Datang') return; (p.lines || []).forEach(l => { masukMap[l.itemId] = (masukMap[l.itemId] || 0) + Number(l.vol || 0); }); });
-    s.sbks.forEach(sb => (sb.lines || []).forEach(l => { keluarMap[l.itemId] = (keluarMap[l.itemId] || 0) + Number(l.vol || 0); }));
+    s.pos.forEach(p => { if (p.status !== 'Barang Datang') return; (p.lines || []).forEach(l => { if (!l.itemId) return; masukMap[l.itemId] = (masukMap[l.itemId] || 0) + Number(l.vol || 0); }); });
+    s.sbks.forEach(sb => (sb.lines || []).forEach(l => { if (!l.itemId) return; keluarMap[l.itemId] = (keluarMap[l.itemId] || 0) + Number(l.vol || 0); }));
     const stokFiltered = this.CAT.filter(c => stokLokasi === 'Semua lokasi' || c.lokasi === stokLokasi);
     let stokNo = 0, reorderTotal = 0;
     const stokGroups = this.KATEGORI.map(k => {
@@ -2380,6 +2542,7 @@ class Component extends DCLogic {
     }).filter(g => g.hasRows);
     const logMasukRows = [];
     s.pos.forEach(p => { if (p.status !== 'Barang Datang') return; (p.lines || []).forEach(l => {
+      if (!l.itemId) return;   // baris addwork/alat/sewa tidak masuk kartu stok
       const it = this.item(l.itemId);
       logMasukRows.push({ tgl: p.datang || '', tglTxt: p.datang ? this.tgl(p.datang) : p.dibuat,
         material: it.nama, kategori: it.kategori, satuan: it.satuan, qty: this.num(l.vol),
@@ -2409,6 +2572,122 @@ class Component extends DCLogic {
     }));
     const lokasiFilterEl = React.createElement('select', { className: 'input', value: stokLokasi, style: { width: 'auto' }, onChange: e => this.setState({ fLokasi: e.target.value }) },
       ['Semua lokasi'].concat(this.LOKASI).map(o => React.createElement('option', { key: o, value: o }, o)));
+    // ---------- realisasi belanja per proyek ----------
+    const REALISASI_CATS = [
+      { label: 'Addwork', matches: null },                    // via subKategori
+      { label: 'Material Civil', matches: 'CIVIL' },
+      { label: 'Material Furniture', matches: 'FURNITURE' },
+      { label: 'Material ME', matches: 'ME' },
+      { label: 'Material Finishing', matches: 'FINISHING' },
+      { label: 'Las Rex', matches: 'LAS REX' },
+      { label: 'Box Panel', matches: 'BOX PANEL' },
+      { label: 'Pemakaian Stok WS', matches: null },          // dari SBK
+      { label: 'Pembelian Alat Kerja', matches: null },       // via subKategori
+      { label: 'Sewa Alat', matches: null }                   // via subKategori
+    ];
+    const RPJ = s.proyek;
+    const posPJRealisasi = s.pos.filter(p => (p.proyek || 'pakuwon') === RPJ && p.status === 'Barang Datang');
+    const sbksPJRealisasi = s.sbks.filter(sb => (sb.proyek || 'pakuwon') === RPJ);
+    const catOfPoLine = l => {
+      if (l.subKategori) return l.subKategori;
+      if (l.itemId) {
+        const map = { 'CIVIL': 'Material Civil', 'FURNITURE': 'Material Furniture', 'ME': 'Material ME',
+          'FINISHING': 'Material Finishing', 'LAS REX': 'Las Rex', 'BOX PANEL': 'Box Panel' };
+        return map[this.item(l.itemId).kategori] || null;
+      }
+      return null;
+    };
+    // Total belanja & PPN per kategori laporan
+    const rTotal = {}, rPpn = {};
+    posPJRealisasi.forEach(p => (p.lines || []).forEach(l => {
+      const c = catOfPoLine(l); if (!c) return;
+      rTotal[c] = (rTotal[c] || 0) + this.poLineTotalBeli(l);
+      rPpn[c] = (rPpn[c] || 0) + this.poLineTotalPpn(l);
+    }));
+    // Pemakaian Stok WS — nilai dari harga beli terakhir
+    sbksPJRealisasi.forEach(sb => (sb.lines || []).forEach(l => {
+      if (!l.itemId) return;
+      const info = this.hargaBeliTerakhir(l.itemId);
+      const total = info.harga * Number(l.vol || 0);
+      const dpp = info.harga / (1 + info.ppnRate);
+      const totalPpnLine = (info.harga - dpp) * Number(l.vol || 0);
+      rTotal['Pemakaian Stok WS'] = (rTotal['Pemakaian Stok WS'] || 0) + total;
+      rPpn['Pemakaian Stok WS'] = (rPpn['Pemakaian Stok WS'] || 0) + totalPpnLine;
+    }));
+    const rGrand = REALISASI_CATS.reduce((a, c) => a + (rTotal[c.label] || 0), 0);
+    const rGrandPpn = REALISASI_CATS.reduce((a, c) => a + (rPpn[c.label] || 0), 0);
+    const resumeRows = REALISASI_CATS.map((c, i) => ({ no: i + 1, label: c.label, total: rp(rTotal[c.label] || 0), zero: !(rTotal[c.label] > 0) }));
+    const resumePpnRows = REALISASI_CATS.map((c, i) => ({ no: i + 1, label: c.label, total: rp(rPpn[c.label] || 0), zero: !(rPpn[c.label] > 0) }));
+
+    const realisasiTab = s.realisasiTab || 'resume';
+    const realisasiCat = s.realisasiCat || REALISASI_CATS[0].label;
+    const catChips = REALISASI_CATS.map(c => ({ label: c.label, aktif: realisasiCat === c.label,
+      bg: realisasiCat === c.label ? 'var(--color-accent-900)' : 'var(--color-surface)',
+      fg: realisasiCat === c.label ? 'var(--color-bg)' : 'var(--color-neutral-800)',
+      onPick: () => this.setState({ realisasiCat: c.label }) }));
+
+    // Detail per kategori aktif
+    const detailRows = [];
+    if (realisasiCat === 'Pemakaian Stok WS') {
+      let no = 0;
+      sbksPJRealisasi.forEach(sb => {
+        let subT = 0, subP = 0;
+        const start = detailRows.length;
+        (sb.lines || []).forEach(l => {
+          if (!l.itemId) return;
+          const it = this.item(l.itemId);
+          const info = this.hargaBeliTerakhir(l.itemId);
+          const dpp = info.harga / (1 + info.ppnRate);
+          const ppn = info.harga - dpp;
+          const total = info.harga * Number(l.vol);
+          const tp = ppn * Number(l.vol);
+          no += 1; subT += total; subP += tp;
+          detailRows.push({ tgl: sb.dibuat, no, desc: it.nama, qty: this.num(l.vol), satuan: it.satuan,
+            hargaPpn: rp(info.harga), hargaDpp: rp(dpp), ppnSatuan: rp(ppn),
+            totalPpn: rp(tp), totalBeli: rp(total),
+            toko: info.poId ? '(dari stok — harga rujukan ' + this.dispId({ id: info.poId, proyek: RPJ }) + ')' : '(dari stok — harga master)' });
+        });
+        if (detailRows.length > start) {
+          detailRows.push({ subtotal: true, label: 'Subtotal ' + this.dispId(sb), totalPpn: rp(subP), totalBeli: rp(subT) });
+        }
+      });
+    } else {
+      let no = 0;
+      posPJRealisasi.forEach(p => {
+        const filtered = (p.lines || []).filter(l => catOfPoLine(l) === realisasiCat);
+        if (!filtered.length) return;
+        let subT = 0, subP = 0;
+        filtered.forEach(l => {
+          const desc = l.deskripsi || (l.itemId ? this.item(l.itemId).nama : '-');
+          const satuan = l.satuan || (l.itemId ? this.item(l.itemId).satuan : '-');
+          const dpp = this.poLineDpp(l); const ppnSatuan = this.poLinePpnSatuan(l);
+          const total = this.poLineTotalBeli(l); const tp = this.poLineTotalPpn(l);
+          no += 1; subT += total; subP += tp;
+          detailRows.push({ tgl: p.datang || '', no, desc, qty: this.num(l.vol), satuan,
+            hargaPpn: rp(Number(l.harga || 0)), hargaDpp: rp(dpp), ppnSatuan: rp(ppnSatuan),
+            totalPpn: rp(tp), totalBeli: rp(total), toko: l.toko || '-' });
+        });
+        detailRows.push({ subtotal: true, label: 'Subtotal ' + this.dispId(p), totalPpn: rp(subP), totalBeli: rp(subT) });
+      });
+    }
+    const detailEmpty = !detailRows.filter(r => !r.subtotal).length;
+
+    const onExportRealisasi = () => {
+      if (realisasiTab === 'resume' || realisasiTab === 'ppn') {
+        const rows = (realisasiTab === 'ppn' ? resumePpnRows : resumeRows).map(r => [r.no, r.label, r.total]);
+        rows.push(['', 'TOTAL', rp(realisasiTab === 'ppn' ? rGrandPpn : rGrand)]);
+        this.downloadCsv('realisasi-' + realisasiTab + '-' + RPJ + '.csv', ['NO', 'DESCRIPTION', 'TOTAL'], rows);
+      } else {
+        const rows = detailRows.map(r => r.subtotal
+          ? ['', '', r.label, '', '', '', '', '', r.totalPpn, r.totalBeli, '']
+          : [r.tgl, r.no, r.desc, r.qty, r.satuan, r.hargaPpn, r.hargaDpp, r.ppnSatuan, r.totalPpn, r.totalBeli, r.toko]);
+        this.downloadCsv('realisasi-' + realisasiCat.replace(/\s+/g, '_') + '-' + RPJ + '.csv',
+          ['TGL', 'NO', 'DESCRIPTION', 'QTY', 'SATUAN', 'HARGA SATUAN DENGAN PPN', 'HARGA SATUAN TANPA PPN', 'PPN SATUAN', 'TOTAL PPN', 'TOTAL PEMBELIAN', 'TOKO'],
+          rows);
+      }
+      this.flash('CSV realisasi diunduh — buka dengan Excel.');
+    };
+
     const onExportStok = () => {
       if (stokTab === 'masuk') {
         this.downloadCsv('barang-masuk.csv',
@@ -2452,6 +2731,25 @@ class Component extends DCLogic {
       logKeluarRows, logKeluarEmpty: !logKeluarRows.length,
       reorderTotalTxt: reorderTotal ? reorderTotal + ' item butuh reorder' : 'Semua stok di atas titik reorder',
       reorderFgTop: reorderTotal ? this.RED : 'var(--color-accent-700)',
+      // realisasi belanja
+      showRealisasi: s.screen === 'realisasi',
+      realisasiHeaderProyek: this.proyekNama(RPJ),
+      realisasiHeaderPeriode: this.PROJ(RPJ).periode || '-',
+      realisasiHeaderLuasan: this.PROJ(RPJ).luasan || '-',
+      realisasiTabResume: realisasiTab === 'resume', realisasiTabPpn: realisasiTab === 'ppn', realisasiTabDetail: realisasiTab === 'detail',
+      realisasiTabResumeFg: realisasiTab === 'resume' ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
+      realisasiTabPpnFg: realisasiTab === 'ppn' ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
+      realisasiTabDetailFg: realisasiTab === 'detail' ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
+      realisasiTabResumeLine: realisasiTab === 'resume' ? 'var(--color-accent)' : 'transparent',
+      realisasiTabPpnLine: realisasiTab === 'ppn' ? 'var(--color-accent)' : 'transparent',
+      realisasiTabDetailLine: realisasiTab === 'detail' ? 'var(--color-accent)' : 'transparent',
+      onRealisasiTabResume: () => this.setState({ realisasiTab: 'resume' }),
+      onRealisasiTabPpn: () => this.setState({ realisasiTab: 'ppn' }),
+      onRealisasiTabDetail: () => this.setState({ realisasiTab: 'detail' }),
+      resumeRows, resumePpnRows,
+      resumeGrand: rp(rGrand), resumeGrandPpn: rp(rGrandPpn),
+      catChips, realisasiCat, detailRows, detailEmpty,
+      onExportRealisasi,
       showBundle: s.screen === 'bundle' && !!bundleView, bundleView, bundleCards, bundleEmpty: !bundleCards.length,
       proyekNama: this.proyekNama(s.proyek), proyekOpening: this.PROJ(s.proyek).opening, proyekSelectEl, proyekFilterEl,
       showBundleBuilder: role === 'purchasing' && ttdUnbundled.length > 0, bundlePickRows,
