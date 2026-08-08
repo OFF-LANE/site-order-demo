@@ -765,9 +765,10 @@ input,select,textarea,button{font-family:var(--font-body);}
               <div style="display:grid;grid-template-columns:{{ tableCols }};gap:var(--space-4);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
                 <span>#</span><span>Material</span><span>Spesifikasi</span><span style="text-align:right">Qty</span><span>Satuan</span><span style="text-align:right">{{ hargaLabel }}</span>
                 <sc-if value="{{ sumberCol }}" hint-placeholder-val="{{ false }}"><span>Sumber</span></sc-if>
+                <sc-if value="{{ remarkCol }}" hint-placeholder-val="{{ false }}"><span>Catatan</span></sc-if>
               </div>
               <sc-for list="{{ selLines }}" as="ln" hint-placeholder-count="4">
-                <div style="display:grid;grid-template-columns:{{ tableCols }};gap:var(--space-4);align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+                <div style="display:grid;grid-template-columns:{{ tableCols }};gap:var(--space-4);align-items:flex-start;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
                   <span class="text-muted">{{ ln.no }}</span>
                   <span style="font-weight:600">{{ ln.nama }}</span>
                   <span class="text-muted" style="font-size:12.5px">{{ ln.spek }}</span>
@@ -776,6 +777,20 @@ input,select,textarea,button{font-family:var(--font-body);}
                   <span style="text-align:right">{{ ln.subtotal }}</span>
                   <sc-if value="{{ sumberCol }}" hint-placeholder-val="{{ false }}">
                     <span style="font-size:12px;font-weight:600;color:{{ ln.sumberFg }}">{{ ln.sumberLabel }}</span>
+                  </sc-if>
+                  <sc-if value="{{ remarkCol }}" hint-placeholder-val="{{ false }}">
+                    <span style="display:flex;flex-direction:column;gap:6px">
+                      <sc-for list="{{ ln.remarks }}" as="rk" hint-placeholder-count="1">
+                        <span style="border-left:3px solid {{ rk.border }};background:{{ rk.bg }};color:{{ rk.fg }};padding:6px 8px;display:flex;flex-direction:column;gap:2px">
+                          <span style="font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700">{{ rk.kindLabel }}</span>
+                          <span style="font-size:12.5px;color:var(--color-text)">{{ rk.note }}</span>
+                          <span class="text-muted" style="font-size:11px">{{ rk.by }}</span>
+                        </span>
+                      </sc-for>
+                      <sc-if value="{{ ln.canRemark }}" hint-placeholder-val="{{ true }}">
+                        <button onClick="{{ ln.onAddRemark }}" class="btn btn-ghost no-print" style="font-size:12px;padding:2px 4px;align-self:flex-start">+ Tambah catatan</button>
+                      </sc-if>
+                    </span>
                   </sc-if>
                 </div>
               </sc-for>
@@ -1220,6 +1235,37 @@ input,select,textarea,button{font-family:var(--font-body);}
         <div class="dialog-actions">
           <button onClick="{{ onModalClose }}" class="btn btn-secondary">Batal</button>
           <button onClick="{{ onSelisihSend }}" class="btn btn-primary">Catat selisih</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ modalRemark }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop">
+      <div class="dialog blueprint">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="dialog-title">Catatan baris — {{ modalItemNama }}</div>
+        <div class="dialog-body">Permintaan {{ modalReqId }}. Pilih jenis catatan lalu tulis pesan singkat.</div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <label class="radio" style="align-items:flex-start;border:1px solid {{ remarkKindPurchasingBorder }};padding:var(--space-3)">
+            <input type="radio" name="remarkKind" checked="{{ remarkKindPurchasing }}" onChange="{{ onRemarkKindPurchasing }}"><span class="dot" style="margin-top:3px"></span>
+            <span>
+              <span style="display:block;font-weight:600;font-size:14px">Catatan ke Purchasing</span>
+              <span class="text-muted" style="display:block;font-size:12.5px">Baris disetujui; catatan menempel untuk dilihat Purchasing (mis. merek pengganti bila kosong).</span>
+            </span>
+          </label>
+          <label class="radio" style="align-items:flex-start;border:1px solid {{ remarkKindRevisiBorder }};padding:var(--space-3)">
+            <input type="radio" name="remarkKind" checked="{{ remarkKindRevisi }}" onChange="{{ onRemarkKindRevisi }}"><span class="dot" style="margin-top:3px"></span>
+            <span>
+              <span style="display:block;font-weight:600;font-size:14px">Catatan revisi</span>
+              <span class="text-muted" style="display:block;font-size:12.5px">Baris ini perlu diperbaiki Supervisi (mis. volume kurang tepat). Status permintaan tidak berubah otomatis.</span>
+            </span>
+          </label>
+        </div>
+        <textarea class="input" rows="3" placeholder="Tulis catatan singkat" value="{{ modalNote }}" onChange="{{ onModalNote }}"></textarea>
+        <div class="dialog-actions">
+          <button onClick="{{ onModalClose }}" class="btn btn-secondary">Batal</button>
+          <button onClick="{{ onRemarkSend }}" class="btn btn-primary">Simpan catatan</button>
         </div>
       </div>
     </div>
@@ -1808,13 +1854,30 @@ class Component extends DCLogic {
     const isReq = t === 'req';
     const reqLines = isReq ? this.lines(d) : [];
     const sumberCol = isReq && reqLines.some(l => l.sumber);
+    // F5: PM/QS boleh menempel catatan per baris material (revisi / ke Purchasing).
+    //     Kolom "Catatan" tampil bila ada remark atau role sedang berhak membuat.
+    const canRemark = isReq && ((role === 'pm' && d.status === 'Cek PM') || (role === 'qs' && d.status === 'Cek QS'));
+    if (isReq && d && !d.remarks) d.remarks = {};
+    const remarksOf = itemId => (isReq && d && d.remarks && d.remarks[itemId]) || [];
+    const remarkCol = isReq && (canRemark || reqLines.some(l => remarksOf(l.itemId).length > 0));
     let tableCols = '26px 1.6fr 1.2fr 70px 70px 120px', tableMinW = '660px';
     if (sumberCol) { tableCols += ' 140px'; tableMinW = '810px'; }
+    if (remarkCol) { tableCols += ' 240px'; tableMinW = (parseInt(tableMinW, 10) + 240) + 'px'; }
     const selLines = (isReq ? reqLines : t === 'sbk' ? d.lines : []).map((l, i) => {
       const it = this.item(l.itemId);
+      const rs = isReq ? remarksOf(l.itemId).map(r => ({
+        note: r.note, by: r.by + ' · ' + r.ts,
+        kindLabel: r.kind === 'revisi' ? 'Revisi' : 'Ke Purchasing',
+        border: r.kind === 'revisi' ? this.RED : 'var(--color-accent)',
+        bg: r.kind === 'revisi' ? '#fdecea' : 'var(--color-accent-100)',
+        fg: r.kind === 'revisi' ? this.RED : 'var(--color-accent-800)'
+      })) : [];
       return { no: i + 1, nama: it.nama, spek: it.spek, vol: this.num(l.vol), satuan: it.satuan, subtotal: rp(Number(l.vol) * it.harga),
         sumberLabel: l.sumber === 'stok' ? 'Stok gudang' : l.sumber === 'beli' ? 'Beli (PO)' : l.sumber === 'campur' ? 'Stok + PO' : '—',
-        sumberFg: l.sumber ? 'var(--color-accent-700)' : 'var(--color-neutral-600)' };
+        sumberFg: l.sumber ? 'var(--color-accent-700)' : 'var(--color-neutral-600)',
+        remarks: rs, hasRemarks: rs.length > 0, canRemark,
+        onAddRemark: () => this.setState({ modal: { kind: 'remark', reqId: d.id, itemId: l.itemId, itemNama: it.nama, note: '', remarkKind: 'purchasing' } })
+      };
     });
     const selJobs = isReq ? (d.jobs || []).map((j, i) => {
       const info = this.boqCheck(j.jobId, j.vol, d.id, d.proyek);
@@ -2203,7 +2266,7 @@ class Component extends DCLogic {
       canPrint: !!cur && (t === 'po' || t === 'sbk'),
       onPrintDoc: () => { this.flash('Menyiapkan ' + d.id + ' untuk dicetak.'); setTimeout(() => window.print(), 400); },
       showJobs: isReq && selJobs.length > 0, selJobs, boqSummary: nOver ? nOver + ' item melebihi sisa BoQ' : 'Seluruh item dalam sisa BoQ',
-      showLineTable: (isReq && selLines.length > 0) || t === 'sbk', selLines, tableCols, tableMinW, sumberCol,
+      showLineTable: (isReq && selLines.length > 0) || t === 'sbk', selLines, tableCols, tableMinW, sumberCol, remarkCol,
       selTrail, trailCount: String(selTrail.length),
       lineTableTitle: t === 'sbk' ? 'Material keluar gudang' : 'Rekap order material — agregasi lintas item pekerjaan',
       hargaLabel: 'Estimasi BoQ',
@@ -2285,6 +2348,7 @@ class Component extends DCLogic {
       onRevisiPo: () => { d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Kekurangan dikirim ulang', note: 'Melengkapi selisih dari toko' }); d.status = 'Terima di Site'; this.touch(); this.flash('Kekurangan ' + d.id + ' dikirim ulang ke site.'); },
       onOpenRevisi: () => this.setState({ modal: { kind: 'revisi', t, id: d.id, note: '' } }),
       modalRevisi: !!modal && modal.kind === 'revisi', modalSelisih: !!modal && modal.kind === 'selisih',
+      modalRemark: !!modal && modal.kind === 'remark',
       modalId: modal ? modal.id : '', modalNote: modal ? modal.note || '' : '',
       onModalNote: e => this.setState({ modal: Object.assign({}, modal, { note: e.target.value }) }),
       onModalClose: () => this.setState({ modal: null }),
@@ -2295,6 +2359,25 @@ class Component extends DCLogic {
         target.d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Minta Revisi', note });
         target.d.status = modal.t === 'req' ? 'Revisi' : 'Draft';
         this.touch({ modal: null }); this.flash(modal.id + ' dikembalikan untuk revisi.');
+      },
+      modalItemNama: modal && modal.kind === 'remark' ? modal.itemNama : '',
+      modalReqId: modal && modal.kind === 'remark' ? this.dispReqId(modal.reqId) : '',
+      remarkKindRevisi: !!modal && modal.kind === 'remark' && modal.remarkKind === 'revisi',
+      remarkKindPurchasing: !!modal && modal.kind === 'remark' && modal.remarkKind === 'purchasing',
+      remarkKindRevisiBorder: modal && modal.kind === 'remark' && modal.remarkKind === 'revisi' ? this.RED : 'var(--color-divider)',
+      remarkKindPurchasingBorder: modal && modal.kind === 'remark' && modal.remarkKind === 'purchasing' ? 'var(--color-accent)' : 'var(--color-divider)',
+      onRemarkKindRevisi: () => this.setState({ modal: Object.assign({}, modal, { remarkKind: 'revisi' }) }),
+      onRemarkKindPurchasing: () => this.setState({ modal: Object.assign({}, modal, { remarkKind: 'purchasing' }) }),
+      onRemarkSend: () => {
+        const note = (modal.note || '').trim();
+        if (!note) { this.flash('Isi catatan lebih dulu.'); return; }
+        const target = s.reqs.find(r => r.id === modal.reqId); if (!target) return;
+        if (!target.remarks) target.remarks = {};
+        if (!target.remarks[modal.itemId]) target.remarks[modal.itemId] = [];
+        target.remarks[modal.itemId].push({ kind: modal.remarkKind, note, by: me + ' (' + peran + ')', ts: this.now() });
+        target.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Catatan pada baris material', note: (modal.remarkKind === 'revisi' ? '[Revisi] ' : '[Ke Purchasing] ') + modal.itemNama + ' — ' + note });
+        this.touch({ modal: null });
+        this.flash('Catatan disimpan pada ' + modal.itemNama + '.');
       },
       sebabVendor: s.sebab === 'vendor', sebabReq: s.sebab === 'request',
       sebabVendorBorder: s.sebab === 'vendor' ? 'var(--color-accent)' : 'var(--color-divider)',
