@@ -1785,6 +1785,16 @@ class Component extends DCLogic {
   poLinePpnSatuan(l) { return Number(l.harga || 0) - this.poLineDpp(l); }
   poLineTotalPpn(l) { return this.poLinePpnSatuan(l) * Number(l.vol || 0); }
   poLineTotalBeli(l) { return Number(l.harga || 0) * Number(l.vol || 0); }
+  // Render trail note. Bila entry membawa `noteParts` (array string | {rp:n}),
+  // rp() dipanggil saat DISPLAY — jadi override peran Supervisi (F1) ikut
+  // menutup nominal yang di-embed di jejak audit historis. Fallback ke
+  // entry.note literal untuk trail seed lama.
+  renderNote(e) {
+    if (e && Array.isArray(e.noteParts)) {
+      return e.noteParts.map(p => (p && typeof p === 'object' && 'rp' in p) ? this.rp(p.rp) : String(p == null ? '' : p)).join('');
+    }
+    return (e && e.note) || '';
+  }
   // Unduh CSV (Excel membacanya native — BOM UTF-8 + CRLF).
   downloadCsv(filename, header, rows) {
     const esc = v => { const s = String(v == null ? '' : v); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
@@ -2237,7 +2247,7 @@ class Component extends DCLogic {
     const nOver = selJobs.filter(x => x.warn).length;
     const trail = cur ? d.trail : [];
     const selTrail = trail.map((e, i) => ({
-      ts: e.ts, actor: e.actor, peran: e.peran, aksi: e.aksi, note: e.note, hasLine: i < trail.length - 1,
+      ts: e.ts, actor: e.actor, peran: e.peran, aksi: e.aksi, note: this.renderNote(e), hasLine: i < trail.length - 1,
       dot: /Revisi|Selisih|Dibatalkan|Ditahan/.test(e.aksi) ? this.RED : /Disetujui|TTD|Selesai|LUNAS|Lunas|keluar/.test(e.aksi) ? 'var(--color-accent)' : 'var(--color-neutral-500)',
       titleColor: /Revisi|Selisih|Dibatalkan/.test(e.aksi) ? this.RED : 'var(--color-text)'
     }));
@@ -2508,7 +2518,7 @@ class Component extends DCLogic {
         doneFg: done ? 'var(--color-accent-700)' : 'var(--color-neutral-600)',
         border: done ? 'var(--color-accent)' : 'var(--color-divider)',
         canMark: role === 'finance' && d.status !== 'Lunas' && !done,
-        onMark: () => { d.buktiToko = Object.assign({}, d.buktiToko || {}, { [g.toko]: true }); d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Bukti transfer diunggah \u2014 ' + g.toko, note: 'Transfer ' + rp(g.v) + ' ke ' + g.toko }); this.touch(); this.flash('Bukti transfer ' + g.toko + ' diunggah.'); } };
+        onMark: () => { d.buktiToko = Object.assign({}, d.buktiToko || {}, { [g.toko]: true }); d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Bukti transfer diunggah \u2014 ' + g.toko, noteParts: ['Transfer ', { rp: g.v }, ' ke ' + g.toko] }); this.touch(); this.flash('Bukti transfer ' + g.toko + ' diunggah.'); } };
     }) : [];
     const allBuktiDone = showFinance && finGroups.length > 0 && finGroups.every(g => (d.buktiToko || {})[g.toko]);
     const proyekSelectEl = React.createElement('select', { className: 'input', value: s.proyek, style: { width: 'auto' }, onChange: e => this.setState({ proyek: e.target.value }) },
@@ -2848,8 +2858,18 @@ class Component extends DCLogic {
         if (d.lines.some(l => !l.toko)) { this.flash('Tentukan toko untuk seluruh baris.'); return; }
         if (d.lines.some(l => !Number(l.harga))) { this.flash('Lengkapi harga nota seluruh baris.'); return; }
         const tokos = this.tokosOf(d);
-        d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'PO dibuat',
-          note: tokos.map(tk => tk + ' — ' + this.terminLabel(this.terminOf(d, tk)) + ' ' + rp(this.tokoTotal(d, tk))).join('; ') + ' · total ' + rp(this.nilaiPo(d)) + ' sesuai nota' });
+        // noteParts: nilai per toko + total dibungkus {rp} agar tunduk pada
+        // override peran Supervisi saat trail dibuka nanti.
+        const parts = [];
+        tokos.forEach((tk, i) => {
+          if (i) parts.push('; ');
+          parts.push(tk + ' — ' + this.terminLabel(this.terminOf(d, tk)) + ' ');
+          parts.push({ rp: this.tokoTotal(d, tk) });
+        });
+        parts.push(' · total ');
+        parts.push({ rp: this.nilaiPo(d) });
+        parts.push(' sesuai nota');
+        d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'PO dibuat', noteParts: parts });
         d.status = 'TTD Direktur'; d.sejak = 'baru saja';
         this.touch(); this.flash(d.id + ' diajukan ke Direktur — nota terlampir.');
       },
