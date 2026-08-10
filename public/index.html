@@ -2800,7 +2800,26 @@ class Component extends DCLogic {
       bSelisihFg: selisihTotal > 0 ? this.RED : 'var(--color-accent-700)',
       bSelisihBorder: selisihTotal > 0 ? this.RED : 'var(--color-divider)',
       katRows, boqRows, weekBars, pipeline, pipelineEmpty: !pipeline.length,
-      onExport: () => this.flash('Demo: rekap budget dan validasi BoQ diunduh sebagai berkas Excel.'),
+      onExport: () => {
+        const budgetRows = this.KAT.map(k => {
+          const e = estKat[k.id] || 0, a = aktKat[k.id] || 0;
+          return [k.nama, k.budget, e, a, a - e];
+        });
+        budgetRows.push(['TOTAL', budgetTotal, estTotal, aktTotal, selisihTotal]);
+        const boqExport = this.JOBS.filter(j => aktifReqs.some(r => (r.jobs || []).some(x => x.jobId === j.id))).map(j => {
+          const diminta = aktifReqs.reduce((a, r) => a + (r.jobs || []).filter(x => x.jobId === j.id).reduce((b, x) => b + Number(x.vol || 0), 0), 0);
+          const terpakai = this.terpakaiBase(j.id, PJ);
+          const sisa = j.boq - terpakai - diminta;
+          return [j.nama, j.satuan, j.boq, terpakai, diminta, sisa, sisa < 0 ? 'MELEBIHI' : 'OK'];
+        });
+        this.downloadCsv('budget-' + this.proyekKode(PJ) + '.csv',
+          ['KATEGORI', 'BUDGET', 'ESTIMASI BOQ', 'AKTUAL PO', 'SELISIH'],
+          budgetRows);
+        this.downloadCsv('boq-validation-' + this.proyekKode(PJ) + '.csv',
+          ['ITEM PEKERJAAN', 'SATUAN', 'BoQ', 'TERPAKAI', 'DIMINTA BERJALAN', 'SISA', 'STATUS'],
+          boqExport);
+        this.flash('Dua CSV diunduh — budget & validasi BoQ (' + this.proyekNama(PJ) + ').');
+      },
       formTitle: editing ? 'Edit Permintaan — ' + editing.id : 'Rencana Kerja & Permintaan Material',
       formSub: editing ? 'Perbaiki sesuai catatan revisi, lalu ajukan ulang.' : 'Isi item pekerjaan lebih dulu; material menempel di bawahnya.',
       submitLabel: editing ? 'Simpan & ajukan ulang' : 'Ajukan permintaan',
