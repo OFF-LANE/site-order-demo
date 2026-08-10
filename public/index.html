@@ -19,6 +19,18 @@ a{color:var(--color-accent-700);} a:hover{color:var(--color-accent-800);}
 input,select,textarea,button{font-family:var(--font-body);}
 @keyframes toastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
 @media print{.no-print{display:none !important} body{background:#fff} main{padding:0 !important;max-width:none !important} .bundle-doc{break-inside:avoid;page-break-inside:avoid} .bundle-notas{break-before:page;page-break-before:always}}
+/* Container query: <main> menjadi konteks — modeHp mengecilkan main ke 440px,
+   HP asli mengecilkan viewport → keduanya memicu layout tumpuk untuk bundle. */
+main{container-type:inline-size;container-name:shell}
+@container shell (max-width: 500px){
+  .bundle-doc-top{flex-direction:column !important;align-items:flex-start !important}
+  .bundle-doc-top > *{text-align:left !important;width:100%}
+  .bundle-po-line,.bundle-doc-line{grid-template-columns:1fr !important;row-gap:4px !important}
+  .bundle-po-line > *,.bundle-doc-line > *{text-align:left !important}
+  .bundle-po-line > *::before,.bundle-doc-line > *::before{content:attr(data-l) " ";font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);margin-right:6px}
+  .bundle-doc-actions{flex-direction:column !important;align-items:stretch !important}
+  .bundle-doc-actions > *{width:100%}
+}
 </style>
 </helmet>
 <div style="min-height:100vh;display:flex;flex-direction:column">
@@ -268,7 +280,7 @@ input,select,textarea,button{font-family:var(--font-body);}
                 <sc-for list="{{ rg.docs }}" as="bd" hint-placeholder-count="2">
                   <div class="card blueprint bundle-doc" style="padding:var(--space-6);gap:var(--space-4);border-color:{{ bd.border }}">
                     <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-                    <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;flex-wrap:wrap">
+                    <div class="bundle-doc-top" style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;flex-wrap:wrap">
                       <div>
                         <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Dokumen {{ bd.no }} &middot; {{ bd.jenis }}</div>
                         <div style="font-family:var(--font-heading);font-size:22px;font-weight:700;letter-spacing:0.03em">{{ bd.id }}</div>
@@ -290,8 +302,8 @@ input,select,textarea,button{font-family:var(--font-body);}
                               <span class="text-muted" style="font-size:12px">{{ pb.nItem }}</span>
                             </div>
                             <sc-for list="{{ pb.lines }}" as="pl" hint-placeholder-count="2">
-                              <div style="display:grid;grid-template-columns:1.6fr 100px 120px 120px;gap:var(--space-4);align-items:center;font-size:13px;border-top:1px solid var(--color-divider);padding-top:6px">
-                                <span style="font-weight:600">{{ pl.nama }}</span><span>{{ pl.qty }}</span><span class="text-muted" style="text-align:right">{{ pl.harga }}</span><span style="text-align:right;font-weight:600">{{ pl.subtotal }}</span>
+                              <div class="bundle-po-line" style="display:grid;grid-template-columns:1.6fr 100px 120px 120px;gap:var(--space-4);align-items:center;font-size:13px;border-top:1px solid var(--color-divider);padding-top:6px">
+                                <span data-l="Material" style="font-weight:600">{{ pl.nama }}</span><span data-l="Qty">{{ pl.qty }}</span><span data-l="Hrg satuan" class="text-muted" style="text-align:right">{{ pl.harga }}</span><span data-l="Subtotal" style="text-align:right;font-weight:600">{{ pl.subtotal }}</span>
                               </div>
                             </sc-for>
                             <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline"><span class="text-muted" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase">Subtotal {{ pb.toko }}</span><span style="font-family:var(--font-heading);font-size:18px;font-weight:700">{{ pb.subtotal }}</span></div>
@@ -306,8 +318,8 @@ input,select,textarea,button{font-family:var(--font-body);}
                           <span>#</span><span>Material</span><span>Spesifikasi</span><span style="text-align:right">Qty</span><span style="text-align:right">Estimasi BoQ</span>
                         </div>
                         <sc-for list="{{ bd.lines }}" as="ln" hint-placeholder-count="3">
-                          <div style="display:grid;grid-template-columns:26px 1.6fr 1.2fr 120px 120px;gap:var(--space-4);align-items:center;padding:8px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
-                            <span class="text-muted">{{ ln.no }}</span><span style="font-weight:600">{{ ln.nama }}</span><span class="text-muted" style="font-size:12.5px">{{ ln.spek }}</span><span style="text-align:right;font-weight:600">{{ ln.qty }}</span><span style="text-align:right">{{ ln.subtotal }}</span>
+                          <div class="bundle-doc-line" style="display:grid;grid-template-columns:26px 1.6fr 1.2fr 120px 120px;gap:var(--space-4);align-items:center;padding:8px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+                            <span data-l="No" class="text-muted">{{ ln.no }}</span><span data-l="Material" style="font-weight:600">{{ ln.nama }}</span><span data-l="Spek" class="text-muted" style="font-size:12.5px">{{ ln.spek }}</span><span data-l="Qty" style="text-align:right;font-weight:600">{{ ln.qty }}</span><span data-l="BoQ" style="text-align:right">{{ ln.subtotal }}</span>
                           </div>
                         </sc-for>
                       </div>
@@ -338,7 +350,7 @@ input,select,textarea,button{font-family:var(--font-body);}
                     </sc-if>
 
                     <sc-if value="{{ bd.canAct }}" hint-placeholder-val="{{ true }}">
-                      <div class="no-print" style="display:flex;gap:var(--space-2);flex-wrap:wrap;border-top:1px solid var(--color-divider);padding-top:var(--space-3)">
+                      <div class="no-print bundle-doc-actions" style="display:flex;gap:var(--space-2);flex-wrap:wrap;border-top:1px solid var(--color-divider);padding-top:var(--space-3)">
                         <button onClick="{{ bd.onApprove }}" class="btn btn-primary" style="min-height:42px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Setujui dokumen ini</button>
                         <button onClick="{{ bd.onReject }}" class="btn btn-secondary" style="min-height:42px">Tolak</button>
                       </div>
