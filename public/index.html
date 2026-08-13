@@ -2885,7 +2885,11 @@ class Component extends DCLogic {
         const jobsData = valid.map(j => ({ jobId: j.jobId, vol: Number(j.vol), mats: (j.mats || []).filter(m => m.itemId && Number(m.vol) > 0).map(m => ({ itemId: m.itemId, vol: Number(m.vol) })) }));
         if (editing) {
           editing.jobs = jobsData; editing.butuh = s.butuhDraft; editing._lines = null;
-          editing.trail.push({ ts: this.now(), actor: 'Jefta', peran: 'Supervisi', aksi: 'Diajukan Ulang', note: 'Rencana kerja diperbaiki sesuai catatan revisi · tanggal kebutuhan ' + this.tgl(s.butuhDraft) });
+          if (editing.remarks && Object.keys(editing.remarks).length) {
+            editing.remarksArsip = (editing.remarksArsip || []).concat([{ ts: this.now(), snap: editing.remarks }]);
+            editing.remarks = {};
+          }
+          editing.trail.push({ ts: this.now(), actor: 'Jefta', peran: 'Supervisi', aksi: 'Diajukan Ulang', note: 'Rencana kerja diperbaiki sesuai catatan revisi · tanggal kebutuhan ' + this.tgl(s.butuhDraft) + ' · catatan revisi lama diarsipkan' });
           editing.status = 'Cek PM';
           this.touch({ editId: null, screen: 'riwayat', draft: [{ jobId: '', vol: '', mats: [{ itemId: '', vol: '' }] }] });
           this.flash(editing.id + ' diajukan ulang — masuk Cek PM.');
