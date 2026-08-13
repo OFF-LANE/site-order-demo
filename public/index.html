@@ -1150,7 +1150,14 @@ main{container-type:inline-size;container-name:shell}
             <sc-if value="{{ canApprove }}" hint-placeholder-val="{{ false }}">
               <button onClick="{{ onApprove }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">{{ approveLabel }}</button>
               <button onClick="{{ onOpenRevisi }}" class="btn btn-secondary" style="min-height:44px">Minta revisi</button>
+              <sc-if value="{{ canHold }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ onOpenHold }}" class="btn btn-secondary" style="min-height:44px;background:#8a8d8f;color:var(--color-bg);border-color:#8a8d8f">Tahan</button>
+              </sc-if>
               <span class="text-muted" style="font-size:13px">{{ approveHint }}</span>
+            </sc-if>
+            <sc-if value="{{ canResume }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ onResume }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Lanjutkan</button>
+              <span class="text-muted" style="font-size:13px">{{ resumeHint }}</span>
             </sc-if>
             <sc-if value="{{ canEdit }}" hint-placeholder-val="{{ false }}">
               <button onClick="{{ onEdit }}" class="btn btn-primary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Edit rencana kerja</button>
@@ -1482,6 +1489,21 @@ main{container-type:inline-size;container-name:shell}
         <div class="dialog-actions">
           <button onClick="{{ onModalClose }}" class="btn btn-secondary">Batal</button>
           <button onClick="{{ onModalSend }}" class="btn btn-primary">Kirim revisi</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ modalHold }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop">
+      <div class="dialog blueprint">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div class="dialog-title">Tahan permintaan — {{ modalId }}</div>
+        <div class="dialog-body">Selama ditahan, permintaan tidak dihitung sebagai keterlambatan approval. Tekan Lanjutkan bila hendak dilepas kembali ke tahap semula.</div>
+        <textarea class="input" rows="4" placeholder="Tulis alasan tahan" value="{{ modalNote }}" onChange="{{ onModalNote }}"></textarea>
+        <div class="dialog-actions">
+          <button onClick="{{ onModalClose }}" class="btn btn-secondary">Batal</button>
+          <button onClick="{{ onHoldSend }}" class="btn btn-primary">Tahan permintaan</button>
         </div>
       </div>
     </div>
@@ -2384,6 +2406,8 @@ class Component extends DCLogic {
     }) : [];
     const nSelisih = showTerima ? reqLines.filter(l => l.terima !== null && Number(l.terima) !== Number(l.vol)).length : 0;
     const canApprove = !!cur && ((role === 'direktur' && d.status === 'TTD Direktur') || (role === 'pm' && d.status === 'Cek PM') || (role === 'qs' && d.status === 'Cek QS'));
+    const canHold = !!cur && t === 'req' && ((role === 'pm' && d.status === 'Cek PM') || (role === 'qs' && d.status === 'Cek QS'));
+    const canResume = !!cur && t === 'req' && d.status === 'Ditahan' && ((role === 'pm' && d.holdFrom === 'Cek PM') || (role === 'qs' && d.holdFrom === 'Cek QS'));
     const canEdit = !!cur && isReq && role === 'supervisi' && d.status === 'Revisi';
     const canMintaGudang = !!cur && isReq && role === 'purchasing' && d.status === 'Di Purchasing';
     const canDatang = !!cur && t === 'po' && role === 'purchasing' && d.status === 'Dikirim ke Toko';
@@ -3002,8 +3026,9 @@ class Component extends DCLogic {
         d.status = 'Selesai'; this.touch({ terimaNote: '' }); this.flash(d.id + ' ditutup — Selesai.');
       },
       onSelisih: () => { if (!nSelisih) { this.flash('Ubah dahulu jumlah yang diterima.'); return; } this.setState({ modal: { kind: 'selisih', t, id: d.id } }); },
-      actionBar: canApprove || canEdit || canMintaGudang || canDatang || canRevisiPo,
-      canApprove, canEdit, canMintaGudang, canDatang, canRevisiPo,
+      actionBar: canApprove || canEdit || canMintaGudang || canDatang || canRevisiPo || canHold || canResume,
+      canApprove, canEdit, canMintaGudang, canDatang, canRevisiPo, canHold, canResume,
+      resumeHint: canResume ? 'Dilepas kembali ke tahap semula: ' + (d.holdFrom || '-') : '',
       approveLabel: role === 'direktur' ? 'Tanda tangani' : 'Setujui',
       approveHint: cur ? { 'Cek PM': 'Lanjut ke Cek QS.', 'Cek QS': 'Lanjut ke tanda tangan Direktur.', 'TTD Direktur': t === 'req' ? 'Diteruskan ke Purchasing.' : t === 'po' ? 'PO dikirim ke toko.' : 'Barang boleh keluar gudang.' }[d.status] || '' : '',
       onApprove: () => { this.approveDoc(t, d, role); this.touch(); this.flash(d.id + ' → ' + d.status); },
@@ -3022,7 +3047,15 @@ class Component extends DCLogic {
       },
       onRevisiPo: () => { d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Kekurangan dikirim ulang', note: 'Melengkapi selisih dari toko' }); d.status = 'Terima di Site'; this.touch(); this.flash('Kekurangan ' + d.id + ' dikirim ulang ke site.'); },
       onOpenRevisi: () => this.setState({ modal: { kind: 'revisi', t, id: d.id, note: '' } }),
+      onOpenHold: () => this.setState({ modal: { kind: 'hold', t, id: d.id, note: '' } }),
+      onResume: () => {
+        const back = d.holdFrom || 'Cek PM';
+        d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Lanjutkan setelah ditahan', note: 'Dilepas kembali ke ' + back + ' oleh ' + me });
+        d.status = back; delete d.holdFrom; delete d.holdReason; delete d.holdBy;
+        this.touch(); this.flash(d.id + ' dilanjutkan — kembali ke ' + back + '.');
+      },
       modalRevisi: !!modal && modal.kind === 'revisi', modalSelisih: !!modal && modal.kind === 'selisih',
+      modalHold: !!modal && modal.kind === 'hold',
       modalRemark: !!modal && modal.kind === 'remark',
       modalId: modal ? modal.id : '', modalNote: modal ? modal.note || '' : '',
       onModalNote: e => this.setState({ modal: Object.assign({}, modal, { note: e.target.value }) }),
@@ -3034,6 +3067,15 @@ class Component extends DCLogic {
         target.d.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Minta Revisi', note });
         target.d.status = modal.t === 'req' ? 'Revisi' : 'Draft';
         this.touch({ modal: null }); this.flash(modal.id + ' dikembalikan untuk revisi.');
+      },
+      onHoldSend: () => {
+        const note = (modal.note || '').trim();
+        if (!note) { this.flash('Alasan tahan wajib diisi.'); return; }
+        const target = this.docOf(modal.t + '|' + modal.id).d;
+        target.holdFrom = target.status; target.holdReason = note; target.holdBy = me;
+        target.trail.push({ ts: this.now(), actor: me, peran, aksi: 'Ditahan', note: '[' + peran + '] ' + note + ' — tidak dihitung sebagai keterlambatan approval' });
+        target.status = 'Ditahan';
+        this.touch({ modal: null }); this.flash(modal.id + ' ditahan — tidak dihitung sebagai keterlambatan approval.');
       },
       modalItemNama: modal && modal.kind === 'remark' ? modal.itemNama : '',
       modalReqId: modal && modal.kind === 'remark' ? this.dispReqId(modal.reqId) : '',
