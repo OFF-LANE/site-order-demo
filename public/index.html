@@ -30,6 +30,17 @@ main{container-type:inline-size;container-name:shell}
   .bundle-po-line > *::before,.bundle-doc-line > *::before{content:attr(data-l) " ";font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);margin-right:6px}
   .bundle-doc-actions{flex-direction:column !important;align-items:stretch !important}
   .bundle-doc-actions > *{width:100%}
+  /* jalur Direktur: notifikasi + Meja + Dashboard Budget */
+  .notif-item{min-height:44px}
+  .meja-group-head{flex-direction:column !important;align-items:stretch !important}
+  .meja-group-head > *{width:100%}
+  .meja-all-btn{width:100%}
+  .budget-katrow-head{display:none !important}
+  .budget-katrow{grid-template-columns:1fr !important;row-gap:4px !important;padding:var(--space-3) !important;border:1px solid var(--color-divider) !important;margin-bottom:var(--space-3)}
+  .budget-katrow > *::before{content:attr(data-l) " ";font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);margin-right:6px}
+  .budget-katrow > *{text-align:left !important}
+  .budget-katscroll{min-width:0 !important;overflow-x:visible !important}
+  .budget-katcard{overflow-x:visible !important}
 }
 </style>
 </helmet>
@@ -63,7 +74,7 @@ main{container-type:inline-size;container-name:shell}
           <div class="text-muted" style="padding:var(--space-6);font-size:13px">Tidak ada notifikasi untuk peran ini.</div>
         </sc-if>
         <sc-for list="{{ notifs }}" as="n" hint-placeholder-count="3">
-          <div onClick="{{ n.onOpen }}" style="padding:var(--space-4);border-bottom:1px solid var(--color-divider);cursor:pointer;display:flex;gap:var(--space-3);align-items:flex-start">
+          <div onClick="{{ n.onOpen }}" class="notif-item" style="padding:var(--space-4);border-bottom:1px solid var(--color-divider);cursor:pointer;display:flex;gap:var(--space-3);align-items:flex-start">
             <span style="width:8px;height:8px;background:{{ n.dot }};margin-top:6px;flex-shrink:0"></span>
             <span>
               <span style="display:block;font-size:13.5px;font-weight:600">{{ n.judul }}</span>
@@ -165,13 +176,13 @@ main{container-type:inline-size;container-name:shell}
 
         <sc-for list="{{ mejaGroups }}" as="g" hint-placeholder-count="3">
           <div style="display:flex;flex-direction:column;gap:var(--space-3)">
-            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;border-bottom:1px solid var(--color-divider);padding-bottom:var(--space-2)">
+            <div class="meja-group-head" style="display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;border-bottom:1px solid var(--color-divider);padding-bottom:var(--space-2)">
               <div style="display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap">
                 <h2 style="font-size:21px;margin:0">{{ g.judul }}</h2>
                 <span class="tag tag-accent">{{ g.countLabel }}</span>
                 <span class="text-muted" style="font-size:13px">{{ g.nilai }}</span>
               </div>
-              <button onClick="{{ g.onAll }}" class="btn btn-secondary" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Setujui semua</button>
+              <button onClick="{{ g.onAll }}" class="btn btn-secondary meja-all-btn" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Setujui semua</button>
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--space-4)">
               <sc-for list="{{ g.docs }}" as="d" hint-placeholder-count="2">
@@ -504,21 +515,21 @@ main{container-type:inline-size;container-name:shell}
           </div>
         </div>
 
-        <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4);overflow-x:auto">
+        <div class="card blueprint budget-katcard" style="padding:var(--space-6);gap:var(--space-4);overflow-x:auto">
           <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
           <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Estimasi vs aktual per kategori</div>
-          <div style="min-width:700px">
-            <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 90px;gap:var(--space-4);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+          <div class="budget-katscroll" style="min-width:700px">
+            <div class="budget-katrow-head" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 90px;gap:var(--space-4);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
               <span>Kategori</span><span style="text-align:right">Budget</span><span style="text-align:right">Estimasi</span><span style="text-align:right">Aktual</span><span style="text-align:right">Selisih</span><span style="text-align:right">Serap</span>
             </div>
             <sc-for list="{{ katRows }}" as="kr" hint-placeholder-count="6">
-              <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 90px;gap:var(--space-4);align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+              <div class="budget-katrow" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 90px;gap:var(--space-4);align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
                 <span style="font-weight:600">{{ kr.nama }}</span>
-                <span class="text-muted" style="text-align:right">{{ kr.budget }}</span>
-                <span style="text-align:right">{{ kr.estimasi }}</span>
-                <span style="text-align:right;font-weight:600">{{ kr.aktual }}</span>
-                <span style="text-align:right;font-weight:600;color:{{ kr.selisihFg }}">{{ kr.selisih }}</span>
-                <span style="text-align:right;font-weight:600;color:{{ kr.serapFg }}">{{ kr.serap }}%</span>
+                <span class="text-muted" style="text-align:right" data-l="Budget">{{ kr.budget }}</span>
+                <span style="text-align:right" data-l="Estimasi">{{ kr.estimasi }}</span>
+                <span style="text-align:right;font-weight:600" data-l="Aktual">{{ kr.aktual }}</span>
+                <span style="text-align:right;font-weight:600;color:{{ kr.selisihFg }}" data-l="Selisih">{{ kr.selisih }}</span>
+                <span style="text-align:right;font-weight:600;color:{{ kr.serapFg }}" data-l="Serap">{{ kr.serap }}%</span>
               </div>
             </sc-for>
           </div>
