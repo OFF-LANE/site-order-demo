@@ -83,6 +83,7 @@ main{container-type:inline-size;container-name:shell}
     <div style="max-width:1180px;margin:0 auto;display:flex;gap:var(--space-6);flex-wrap:wrap">
       <span>Proyek — <strong style="color:var(--color-bg)">{{ proyekNama }}</strong></span>
       <span>Opening — <strong style="color:var(--color-bg)">{{ proyekOpening }}</strong></span>
+      <span>Grand Budget — <strong style="color:var(--color-bg)">{{ grandBudget }}</strong> · terserap <strong style="color:var(--color-bg)">{{ grandSerap }}</strong></span>
       <span>{{ userName }} — {{ roleLabel }}</span>
     </div>
   </div>
@@ -380,6 +381,28 @@ main{container-type:inline-size;container-name:shell}
           </div>
         </div>
 
+        <div class="card blueprint budget-grand" style="padding:var(--space-6);gap:var(--space-4);background:var(--color-accent-900);color:var(--color-bg);border-color:var(--color-accent-900)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-300)">Grand Budget Proyek — nilai kontrak</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--space-5);align-items:end">
+            <div>
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-300)">Grand Budget</div>
+              <div style="font-family:var(--font-heading);font-size:30px;font-weight:700;line-height:1.1">{{ grandBudget }}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-300)">Terpakai (PO + stok)</div>
+              <div style="font-family:var(--font-heading);font-size:26px;font-weight:700;line-height:1.1">{{ grandTerpakai }}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-300)">Sisa</div>
+              <div style="font-family:var(--font-heading);font-size:26px;font-weight:700;line-height:1.1">{{ grandSisa }}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-300)">% Serapan</div>
+              <div style="font-family:var(--font-heading);font-size:30px;font-weight:700;line-height:1.1;color:{{ grandSerapFg }}">{{ grandSerap }}</div>
+            </div>
+          </div>
+        </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--space-4)">
           <div class="card blueprint" style="padding:var(--space-6)">
             <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
@@ -1621,9 +1644,9 @@ class Component extends DCLogic {
     ];
     this.tokoInfo = nama => this.TOKO.concat(this.VENDOR_LAIN).find(x => x.nama === nama) || { bank: '-', rek: '-', an: nama || '-' };
     this.PROJECTS = [
-      { id: 'pakuwon', nama: 'Fit-out Tenant Pakuwon Mall Surabaya', kota: 'Surabaya', opening: '25 Sep 2026', spv: 'Jefta', terpakai: {}, luasan: '452 m²', periode: '1 Jul 2026 – 25 Sep 2026' },
-      { id: 'trans', nama: 'Fit-out Tenant Trans Studio Mall Bandung', kota: 'Bandung', opening: '12 Okt 2026', spv: 'Hendra Gunawan', terpakai: { keramik: 120, plafon: 180, partisi: 60, kabinet: 20, catduco: 30 }, luasan: '388 m²', periode: '15 Jul 2026 – 12 Okt 2026' },
-      { id: 'plaza', nama: 'Fit-out Tenant Plaza Indonesia Jakarta', kota: 'Jakarta', opening: '30 Okt 2026', spv: 'Bagas Nugroho', terpakai: { plafon: 220, catduco: 40, kabinet: 35, keramik: 90 }, luasan: '520 m²', periode: '20 Jul 2026 – 30 Okt 2026' }
+      { id: 'pakuwon', nama: 'Fit-out Tenant Pakuwon Mall Surabaya', kota: 'Surabaya', opening: '25 Sep 2026', spv: 'Jefta', terpakai: {}, luasan: '452 m²', periode: '1 Jul 2026 – 25 Sep 2026', grandBudget: 2850000000 },
+      { id: 'trans', nama: 'Fit-out Tenant Trans Studio Mall Bandung', kota: 'Bandung', opening: '12 Okt 2026', spv: 'Hendra Gunawan', terpakai: { keramik: 120, plafon: 180, partisi: 60, kabinet: 20, catduco: 30 }, luasan: '388 m²', periode: '15 Jul 2026 – 12 Okt 2026', grandBudget: 2450000000 },
+      { id: 'plaza', nama: 'Fit-out Tenant Plaza Indonesia Jakarta', kota: 'Jakarta', opening: '30 Okt 2026', spv: 'Bagas Nugroho', terpakai: { plafon: 220, catduco: 40, kabinet: 35, keramik: 90 }, luasan: '520 m²', periode: '20 Jul 2026 – 30 Okt 2026', grandBudget: 3200000000 }
     ];
     this.PROJ = id => this.PROJECTS.find(p => p.id === id) || this.PROJECTS[0];
     this.TERMIN = [
@@ -2816,6 +2839,11 @@ class Component extends DCLogic {
       boqOverKet: boqOverJobs ? 'perlu persetujuan QS & PM' : 'semua dalam sisa BoQ',
       bTotal: rp(budgetTotal), bEstimasi: rp(estTotal), bAktual: rp(aktTotal), bSisa: rp(budgetTotal - aktTotal),
       bSerap: Math.round(aktTotal / budgetTotal * 100),
+      grandBudget: rp(this.PROJ(PJ).grandBudget || 0),
+      grandTerpakai: rp(aktTotal),
+      grandSisa: rp((this.PROJ(PJ).grandBudget || 0) - aktTotal),
+      grandSerap: (this.PROJ(PJ).grandBudget ? Math.round(aktTotal / this.PROJ(PJ).grandBudget * 100) : 0) + '%',
+      grandSerapFg: this.PROJ(PJ).grandBudget && aktTotal / this.PROJ(PJ).grandBudget > 0.85 ? this.RED : 'var(--color-accent-700)',
       bSelisih: selisihTotal === 0 ? '—' : (selisihTotal > 0 ? '+ ' : '') + rp(selisihTotal),
       bSelisihLabel: selisihTotal > 0 ? 'harga nota di atas estimasi BoQ' : selisihTotal < 0 ? 'harga nota di bawah estimasi BoQ' : 'belum ada selisih',
       bSelisihFg: selisihTotal > 0 ? this.RED : 'var(--color-accent-700)',
