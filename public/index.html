@@ -898,6 +898,7 @@ main{container-type:inline-size;container-name:shell}
                   <div>
                     <div style="font-family:var(--font-heading);font-size:18px;font-weight:600">{{ pt.toko }}</div>
                     <div class="text-muted" style="font-size:12.5px">Subtotal {{ pt.subtotal }}</div>
+                    <div class="text-muted" style="font-size:11.5px;margin-top:2px">Rekening: {{ pt.rekTxt }}</div>
                   </div>
                   <div>
                     <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Termin</div>
@@ -1012,6 +1013,11 @@ main{container-type:inline-size;container-name:shell}
                       <span style="text-align:right;font-weight:600">{{ fi.nilai }} <span class="text-muted">· {{ fi.poId }}</span></span>
                     </div>
                   </sc-for>
+                  <div style="border-top:1px solid var(--color-divider);padding-top:var(--space-2);background:var(--color-accent-100);padding:var(--space-2) var(--space-3);display:flex;flex-direction:column;gap:2px">
+                    <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Transfer ke rekening vendor</span>
+                    <span style="font-family:var(--font-heading);font-size:15px;font-weight:700">{{ fr.rekBank }} · {{ fr.rekNo }}</span>
+                    <span class="text-muted" style="font-size:12px">a/n {{ fr.rekAn }}</span>
+                  </div>
                   <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:center;flex-wrap:wrap;border-top:1px solid var(--color-divider);padding-top:var(--space-2)">
                     <span style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Bukti transfer — {{ fr.toko }}</span>
                     <span style="font-size:12.5px;font-weight:600;color:{{ fr.doneFg }}">{{ fr.doneLabel }}</span>
@@ -1601,7 +1607,19 @@ class Component extends DCLogic {
       { id: 'catduco', nama: 'Finishing cat duco kusen', satuan: 'm²', boq: 210, terpakai: 138 },
       { id: 'mepinst', nama: 'Instalasi titik lampu & stop kontak', satuan: 'm¹', boq: 240, terpakai: 152 }
     ];
-    this.TOKO = [{ nama: 'Toko Megabaja' }, { nama: 'Toko Asia' }, { nama: 'Toko Nunut' }, { nama: 'Toko Warna Prima' }];
+    this.TOKO = [
+      { nama: 'Toko Megabaja', bank: 'BCA', rek: '312-059-8812', an: 'PT Megabaja Sentosa' },
+      { nama: 'Toko Asia', bank: 'Mandiri', rek: '142-00-0112943-0', an: 'CV Asia Teknik' },
+      { nama: 'Toko Nunut', bank: 'BNI', rek: '081-2449-177', an: 'Toko Nunut Sejahtera' },
+      { nama: 'Toko Warna Prima', bank: 'BRI', rek: '0888-01-010344-53-0', an: 'Warna Prima Karya' }
+    ];
+    // Vendor jasa/alat non-material — muncul di Finance/Realisasi, tidak di dropdown PO material.
+    this.VENDOR_LAIN = [
+      { nama: 'CV Karya Anugerah', bank: 'Mandiri', rek: '133-00-0556771-2', an: 'CV Karya Anugerah' },
+      { nama: 'Toko Bangunan Jaya', bank: 'BCA', rek: '450-111-2288', an: 'Toko Bangunan Jaya' },
+      { nama: 'Rental Scaffolding Sukses', bank: 'BNI', rek: '076-5123-409', an: 'PT Sukses Scaffolding' }
+    ];
+    this.tokoInfo = nama => this.TOKO.concat(this.VENDOR_LAIN).find(x => x.nama === nama) || { bank: '-', rek: '-', an: nama || '-' };
     this.PROJECTS = [
       { id: 'pakuwon', nama: 'Fit-out Tenant Pakuwon Mall Surabaya', kota: 'Surabaya', opening: '25 Sep 2026', spv: 'Jefta', terpakai: {}, luasan: '452 m²', periode: '1 Jul 2026 – 25 Sep 2026' },
       { id: 'trans', nama: 'Fit-out Tenant Trans Studio Mall Bandung', kota: 'Bandung', opening: '12 Okt 2026', spv: 'Hendra Gunawan', terpakai: { keramik: 120, plafon: 180, partisi: 60, kabinet: 20, catduco: 30 }, luasan: '388 m²', periode: '15 Jul 2026 – 12 Okt 2026' },
@@ -2300,9 +2318,10 @@ class Component extends DCLogic {
       };
     }) : [];
     const poTerminRows = showPoEdit ? this.tokosOf(d).filter(tk => tk !== 'Belum ditentukan').map(tk => {
-      const tm = this.terminOf(d, tk);
+      const tm = this.terminOf(d, tk), inf = this.tokoInfo(tk);
       return {
         toko: tk, subtotal: rp(this.tokoTotal(d, tk)), ket: (this.TERMIN.find(x => x.id === tm) || {}).ket,
+        rekTxt: inf.bank + ' · ' + inf.rek + ' a/n ' + inf.an,
         selectEl: React.createElement('select', { className: 'input', value: tm, style: { marginTop: 2 },
           onChange: e => { d.termins = Object.assign({}, d.termins || {}, { [tk]: e.target.value }); this.touch(); } },
           this.TERMIN.map(x => React.createElement('option', { key: x.id, value: x.id }, x.label)))
@@ -2524,7 +2543,9 @@ class Component extends DCLogic {
     // ---------- finance multi-bukti per vendor ----------
     const finVendorRows = showFinance ? finGroups.map(g => {
       const done = !!(d.buktiToko || {})[g.toko];
+      const inf = this.tokoInfo(g.toko);
       return { toko: g.toko, poList: g.pos.map(pid => this.dispId(s.pos.find(p => p.id === pid) || { id: pid })).join(', '), nilai: rp(g.v), items: g.items,
+        rekBank: inf.bank, rekNo: inf.rek, rekAn: inf.an,
         buktiSlotId: 'bukti-' + d.id + '-' + g.toko.replace(/\s+/g, ''),
         done, doneLabel: done ? '\u2713 Bukti transfer terunggah' : 'Belum ada bukti transfer',
         doneFg: done ? 'var(--color-accent-700)' : 'var(--color-neutral-600)',
