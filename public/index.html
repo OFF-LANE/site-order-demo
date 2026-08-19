@@ -1860,6 +1860,100 @@ class Component extends DCLogic {
         keys: ['po|PO-2026-021', 'po|PO-2026-022', 'po|PO-2026-023', 'sbk|SBK-2026-013', 'sbk|SBK-2026-014'],
         trail: [T('4 Agu 2026, 16.20', 'Rina Astuti', 'Purchasing', 'Pengajuan tanda tangan gabungan dibuat', '3 PO + 2 SBK dari 2 proyek (Pakuwon, Bandung) digabung menjadi satu pengajuan tanda tangan')] }
     ];
+    // ─── OUTSTANDING — pekerjaan sisa (Retensi/Maintenance/Addwork) ───────────
+    // Item bersumber dari BQ (sumberBq: { ref, label }), diajukan QS lewat
+    // "daftar outstanding" → disetujui Direktur → Aktif → progres di lapangan.
+    // Nilai rupiah tetap tunduk pada rp() override peran Supervisi.
+    const O = (id, proyek, jenis, deskripsi, vol, satuan, nilai, target, status, bqRef, bqLabel, extras) => Object.assign({
+      id, proyek, jenis, deskripsi, volume: vol, satuan, nilai, targetTgl: target,
+      penanggung: 'Jefta', status, sumberBq: { ref: bqRef, label: bqLabel },
+      fotoBukti: null, trail: []
+    }, extras || {});
+    this.state.outstandings = [
+      // ── Retensi (aktif, list OTL-2026-001) ──
+      O('OTS-2026-001', 'pakuwon', 'Retensi', 'Perbaikan nat keramik area kasir tenant',
+        12, 'm²', 1800000, '2026-09-05', 'Belum Dikerjakan', 'keramik', 'BoQ Keramik 60×60 · area kasir',
+        { retensiMulai: '2026-08-01', retensiAkhir: '2026-11-01', listId: 'OTL-2026-001',
+          trail: [T('5 Agu 2026, 14.00', 'Maya Kusuma', 'QS', 'Item outstanding disusun', 'Bersumber dari BoQ Keramik · masa retensi'),
+                  T('6 Agu 2026, 10.30', 'Ir. Bambang Wijaya', 'Direktur', 'Disetujui Direktur', 'Bersama 8 item lain dalam OTL-2026-001')] }),
+      O('OTS-2026-002', 'pakuwon', 'Retensi', 'Touch-up cat partisi fitting room',
+        24, 'm²', 950000, '2026-09-12', 'Dikerjakan', 'catduco', 'BoQ Finishing cat duco kusen',
+        { retensiMulai: '2026-08-01', retensiAkhir: '2026-11-01', listId: 'OTL-2026-001',
+          trail: [T('5 Agu 2026, 14.05', 'Maya Kusuma', 'QS', 'Item outstanding disusun', ''),
+                  T('6 Agu 2026, 10.30', 'Ir. Bambang Wijaya', 'Direktur', 'Disetujui Direktur', ''),
+                  T('15 Agu 2026, 08.00', 'Jefta', 'Supervisi', 'Mulai dikerjakan', 'Cat duco dari stok proyek')] }),
+      O('OTS-2026-003', 'pakuwon', 'Retensi', 'Penggantian armatur lampu downlight mati (3 titik)',
+        3, 'unit', 720000, '2026-09-01', 'Selesai', 'mepinst', 'BoQ Instalasi titik lampu',
+        { retensiMulai: '2026-08-01', retensiAkhir: '2026-11-01', listId: 'OTL-2026-001',
+          trail: [T('5 Agu 2026, 14.10', 'Maya Kusuma', 'QS', 'Item outstanding disusun', ''),
+                  T('6 Agu 2026, 10.30', 'Ir. Bambang Wijaya', 'Direktur', 'Disetujui Direktur', ''),
+                  T('11 Agu 2026, 08.30', 'Jefta', 'Supervisi', 'Mulai dikerjakan', 'Armatur dari stok'),
+                  T('13 Agu 2026, 15.20', 'Jefta', 'Supervisi', 'Ditandai Selesai', 'Menunggu verifikasi PM/QS')] }),
+      // ── Maintenance ──
+      O('OTS-2026-004', 'pakuwon', 'Maintenance', 'Pengecekan berkala AC (3 unit)',
+        3, 'unit', 1200000, '2026-10-01', 'Diverifikasi', null, 'BoQ MEP · pemeliharaan AC',
+        { listId: 'OTL-2026-001',
+          trail: [T('5 Agu 2026, 14.15', 'Maya Kusuma', 'QS', 'Item outstanding disusun', ''),
+                  T('6 Agu 2026, 10.30', 'Ir. Bambang Wijaya', 'Direktur', 'Disetujui Direktur', ''),
+                  T('10 Agu 2026, 09.00', 'Jefta', 'Supervisi', 'Mulai dikerjakan', ''),
+                  T('12 Agu 2026, 16.00', 'Jefta', 'Supervisi', 'Ditandai Selesai', 'Filter dibersihkan · gas cek OK'),
+                  T('14 Agu 2026, 09.30', 'Maya Kusuma', 'QS', 'Diverifikasi', 'Foto sesuai · pekerjaan diterima')] }),
+      O('OTS-2026-005', 'pakuwon', 'Maintenance', 'Pembersihan drainase gutter atap',
+        1, 'ls', 650000, '2026-08-25', 'Belum Dikerjakan', null, 'BoQ Civil · pemeliharaan drainase',
+        { listId: 'OTL-2026-001',
+          trail: [T('5 Agu 2026, 14.20', 'Maya Kusuma', 'QS', 'Item outstanding disusun', ''),
+                  T('6 Agu 2026, 10.30', 'Ir. Bambang Wijaya', 'Direktur', 'Disetujui Direktur', '')] }),
+      O('OTS-2026-006', 'pakuwon', 'Maintenance', 'Kalibrasi timer lampu display',
+        1, 'ls', 350000, '2026-08-16', 'Dikerjakan', null, 'BoQ MEP · timer & kontrol',
+        { listId: 'OTL-2026-001',
+          trail: [T('5 Agu 2026, 14.25', 'Maya Kusuma', 'QS', 'Item outstanding disusun', ''),
+                  T('6 Agu 2026, 10.30', 'Ir. Bambang Wijaya', 'Direktur', 'Disetujui Direktur', ''),
+                  T('14 Agu 2026, 09.00', 'Jefta', 'Supervisi', 'Mulai dikerjakan', 'Panel timer diprogram ulang')] }),
+      // ── Addwork ──
+      O('OTS-2026-007', 'pakuwon', 'Addwork', 'Penambahan stop kontak area gudang toko (4 titik)',
+        4, 'titik', 1400000, '2026-08-28', 'Selesai', null, 'Instruksi Direktur Toko · di luar BoQ',
+        { statusTagih: 'Belum diajukan', listId: 'OTL-2026-001',
+          trail: [T('5 Agu 2026, 14.30', 'Maya Kusuma', 'QS', 'Item outstanding disusun', 'Diminta oleh Direktur Toko'),
+                  T('6 Agu 2026, 10.30', 'Ir. Bambang Wijaya', 'Direktur', 'Disetujui Direktur', ''),
+                  T('10 Agu 2026, 08.00', 'Jefta', 'Supervisi', 'Mulai dikerjakan', ''),
+                  T('12 Agu 2026, 15.00', 'Jefta', 'Supervisi', 'Ditandai Selesai', 'Titik terpasang · rapi')] }),
+      O('OTS-2026-008', 'pakuwon', 'Addwork', 'Pemasangan rak backwall tambahan',
+        6, 'm¹', 3200000, '2026-08-15', 'Diverifikasi', null, 'Diminta owner · di luar BoQ',
+        { statusTagih: 'Diajukan', listId: 'OTL-2026-001',
+          trail: [T('5 Agu 2026, 14.35', 'Maya Kusuma', 'QS', 'Item outstanding disusun', ''),
+                  T('6 Agu 2026, 10.30', 'Ir. Bambang Wijaya', 'Direktur', 'Disetujui Direktur', ''),
+                  T('7 Agu 2026, 08.00', 'Jefta', 'Supervisi', 'Mulai dikerjakan', ''),
+                  T('10 Agu 2026, 16.00', 'Jefta', 'Supervisi', 'Ditandai Selesai', ''),
+                  T('11 Agu 2026, 10.00', 'Andi Prasetyo', 'PM', 'Diverifikasi', 'Rak sesuai gambar shop drawing'),
+                  T('13 Agu 2026, 09.00', 'Maya Kusuma', 'QS', 'Tagihan addwork diajukan', 'Sudah masuk termin owner')] }),
+      O('OTS-2026-009', 'pakuwon', 'Addwork', 'Pengecatan ulang kolom belakang',
+        15, 'm²', 1850000, '2026-09-08', 'Belum Dikerjakan', null, 'Diminta owner · di luar BoQ',
+        { statusTagih: 'Belum diajukan', listId: 'OTL-2026-001',
+          trail: [T('5 Agu 2026, 14.40', 'Maya Kusuma', 'QS', 'Item outstanding disusun', ''),
+                  T('6 Agu 2026, 10.30', 'Ir. Bambang Wijaya', 'Direktur', 'Disetujui Direktur', '')] }),
+      // ── Draft (menunggu Direktur, list OTL-2026-002) ──
+      O('OTS-2026-010', 'pakuwon', 'Retensi', 'Perbaikan handle kabinet lepas (6 pasang)',
+        6, 'pasang', 480000, '2026-09-20', 'Draft', 'kabinet', 'BoQ Pasang kabinet & backdrop HPL',
+        { retensiMulai: '2026-08-01', retensiAkhir: '2026-11-01', listId: 'OTL-2026-002',
+          trail: [T('18 Agu 2026, 09.00', 'Maya Kusuma', 'QS', 'Item outstanding disusun', 'Menunggu persetujuan Direktur')] }),
+      O('OTS-2026-011', 'pakuwon', 'Addwork', 'Penambahan hooks display busana (12 titik)',
+        12, 'titik', 720000, '2026-09-05', 'Draft', null, 'Diminta owner · di luar BoQ',
+        { statusTagih: 'Belum diajukan', listId: 'OTL-2026-002',
+          trail: [T('18 Agu 2026, 09.05', 'Maya Kusuma', 'QS', 'Item outstanding disusun', 'Menunggu persetujuan Direktur')] }),
+      O('OTS-2026-012', 'pakuwon', 'Maintenance', 'Servis vinyl flooring (poles ulang)',
+        65, 'm²', 2100000, '2026-09-25', 'Draft', 'vinyl', 'BoQ Finishing lantai · pemeliharaan',
+        { listId: 'OTL-2026-002',
+          trail: [T('18 Agu 2026, 09.10', 'Maya Kusuma', 'QS', 'Item outstanding disusun', 'Menunggu persetujuan Direktur')] })
+    ];
+    this.state.outstandingLists = [
+      { id: 'OTL-2026-001', proyek: 'pakuwon', status: 'Selesai', oleh: 'Maya Kusuma', dibuat: '5 Agu 2026, 14.00',
+        itemIds: ['OTS-2026-001','OTS-2026-002','OTS-2026-003','OTS-2026-004','OTS-2026-005','OTS-2026-006','OTS-2026-007','OTS-2026-008','OTS-2026-009'], dispo: {},
+        trail: [T('5 Agu 2026, 14.00', 'Maya Kusuma', 'QS', 'Daftar outstanding disusun', '9 item · Retensi/Maintenance/Addwork · diajukan ke Direktur'),
+                T('6 Agu 2026, 10.30', 'Ir. Bambang Wijaya', 'Direktur', 'Daftar disetujui — semua item Aktif', '9 item outstanding disetujui sekaligus')] },
+      { id: 'OTL-2026-002', proyek: 'pakuwon', status: 'Menunggu Direktur', oleh: 'Maya Kusuma', dibuat: '18 Agu 2026, 09.00',
+        itemIds: ['OTS-2026-010','OTS-2026-011','OTS-2026-012'], dispo: {},
+        trail: [T('18 Agu 2026, 09.00', 'Maya Kusuma', 'QS', 'Daftar outstanding disusun', '3 item · menunggu persetujuan Direktur')] }
+    ];
   }
   item(id) { return this.CAT.find(c => c.id === id) || { nama: '', spek: '', satuan: '', harga: 0, kat: '', kategori: '', toko: '' }; }
   // ─── PPN pada baris PO ────────────────────────────────────────────────────
@@ -2013,7 +2107,23 @@ class Component extends DCLogic {
   bundleNilai(b) { return this.bundleDocs(b).reduce((a, x) => a + this.nilaiOf(x.t, x.d), 0); }
   bundleProyeks(b) { return Array.from(new Set(this.bundleDocs(b).map(x => x.d.proyek || 'pakuwon'))); }
   flash(m) { clearTimeout(this._tt); this.setState({ toast: m }); this._tt = setTimeout(() => this.setState({ toast: null }), 3600); }
-  touch(extra) { this.setState(Object.assign({ reqs: this.state.reqs.slice(), sbks: this.state.sbks.slice(), pos: this.state.pos.slice(), pays: this.state.pays.slice(), bundles: this.state.bundles.slice() }, extra || {})); }
+  touch(extra) { this.setState(Object.assign({ reqs: this.state.reqs.slice(), sbks: this.state.sbks.slice(), pos: this.state.pos.slice(), pays: this.state.pays.slice(), bundles: this.state.bundles.slice(), outstandings: (this.state.outstandings || []).slice(), outstandingLists: (this.state.outstandingLists || []).slice() }, extra || {})); }
+  // ─── OUTSTANDING helpers ──────────────────────────────────────────────────
+  otsById(id) { return (this.state.outstandings || []).find(o => o.id === id); }
+  otsList(id) { return (this.state.outstandingLists || []).find(l => l.id === id); }
+  otsItemsOfList(l) { return (l.itemIds || []).map(id => this.otsById(id)).filter(Boolean); }
+  otsColor(status) {
+    return {
+      'Draft': 'var(--color-neutral-500)',
+      'Belum Dikerjakan': 'var(--color-neutral-700)',
+      'Dikerjakan': this.ORANGE,
+      'Selesai': 'var(--color-accent-700)',
+      'Diverifikasi': 'var(--color-accent-900)'
+    }[status] || 'var(--color-neutral-600)';
+  }
+  otsJenisFg(j) { return ({ 'Retensi': '#8a5a2b', 'Maintenance': 'var(--color-accent-800)', 'Addwork': this.RED })[j] || 'var(--color-neutral-700)'; }
+  otsTargetTxt(iso) { const n = this.sisaHari(iso); if (n === null) return '-'; if (n < 0) return 'lewat ' + Math.abs(n) + ' hari'; if (n === 0) return 'hari ini'; return n + ' hari lagi'; }
+  otsTargetFg(iso, status) { if (status === 'Diverifikasi' || status === 'Selesai') return 'var(--color-accent-700)'; const n = this.sisaHari(iso); if (n === null) return 'var(--color-neutral-700)'; return n < 0 ? this.RED : n <= 3 ? this.ORANGE : 'var(--color-accent-700)'; }
   nilaiReq(r) { return this.lines(r).reduce((a, l) => a + Number(l.vol || 0) * this.item(l.itemId).harga, 0); }
   nilaiSbk(s) { return s.lines.reduce((a, l) => a + Number(l.vol || 0) * this.item(l.itemId).harga, 0); }
   nilaiPo(p) { return p.lines.reduce((a, l) => a + Number(l.vol || 0) * Number(l.harga || 0), 0); }
