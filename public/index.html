@@ -41,6 +41,12 @@ main{container-type:inline-size;container-name:shell}
   .budget-katrow > *{text-align:left !important}
   .budget-katscroll{min-width:0 !important;overflow-x:visible !important}
   .budget-katcard{overflow-x:visible !important}
+  /* Outstanding — baris item menjadi kartu bertumpuk */
+  .ots-row-head{display:none !important}
+  .ots-row{grid-template-columns:1fr !important;row-gap:4px !important;padding:var(--space-3) !important;border:1px solid var(--color-divider) !important;margin-bottom:var(--space-3)}
+  .ots-row > *::before{content:attr(data-l) " ";font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);margin-right:6px}
+  .ots-row > *{text-align:left !important}
+  .ots-group-head{flex-direction:column !important;align-items:flex-start !important}
 }
 </style>
 </helmet>
@@ -495,6 +501,14 @@ main{container-type:inline-size;container-name:shell}
             <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;line-height:1.1">{{ bSisa }}</div>
             <div class="text-muted" style="font-size:12.5px">{{ bSerap }}% terserap</div>
           </div>
+        </div>
+
+        <div class="card blueprint" style="padding:var(--space-5) var(--space-6);display:flex;gap:var(--space-6);flex-wrap:wrap;align-items:baseline;border-color:var(--color-accent-700)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <span style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Outstanding</span>
+          <span style="font-size:14px"><strong style="font-family:var(--font-heading);letter-spacing:0.02em">Retensi:</strong> {{ otsRetensiTxt }}</span>
+          <span class="text-muted" style="font-size:14px">|</span>
+          <span style="font-size:14px"><strong style="font-family:var(--font-heading);letter-spacing:0.02em">Addwork:</strong> {{ otsAddworkTxt }}</span>
         </div>
 
         <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4);overflow-x:auto">
@@ -3383,6 +3397,17 @@ class Component extends DCLogic {
       grandSisa: rp((this.PROJ(PJ).grandBudget || 0) - aktTotal),
       grandSerap: (this.PROJ(PJ).grandBudget ? Math.round(aktTotal / this.PROJ(PJ).grandBudget * 100) : 0) + '%',
       grandSerapFg: this.PROJ(PJ).grandBudget && aktTotal / this.PROJ(PJ).grandBudget > 0.85 ? this.RED : 'var(--color-accent-700)',
+      // Outstanding strip untuk Dashboard Budget
+      otsRetensiTxt: (() => {
+        const pjOts = (s.outstandings || []).filter(o => o.proyek === PJ && o.jenis === 'Retensi' && o.status !== 'Draft');
+        const done = pjOts.filter(o => o.status === 'Selesai' || o.status === 'Diverifikasi').length;
+        return pjOts.length + ' item · ' + done + ' selesai';
+      })(),
+      otsAddworkTxt: (() => {
+        const pjOts = (s.outstandings || []).filter(o => o.proyek === PJ && o.jenis === 'Addwork' && o.status !== 'Draft' && (o.statusTagih || 'Belum diajukan') === 'Belum diajukan');
+        const total = pjOts.reduce((a, o) => a + Number(o.nilai || 0), 0);
+        return rp(total) + ' belum ditagih (' + pjOts.length + ' item)';
+      })(),
       bSelisih: selisihTotal === 0 ? '—' : (selisihTotal > 0 ? '+ ' : '') + rp(selisihTotal),
       bSelisihLabel: selisihTotal > 0 ? 'harga nota di atas estimasi BoQ' : selisihTotal < 0 ? 'harga nota di bawah estimasi BoQ' : 'belum ada selisih',
       bSelisihFg: selisihTotal > 0 ? this.RED : 'var(--color-accent-700)',
