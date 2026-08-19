@@ -174,6 +174,56 @@ main{container-type:inline-size;container-name:shell}
           </div>
         </sc-if>
 
+        <sc-if value="{{ hasOtsPending }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <div class="meja-group-head" style="display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;border-bottom:1px solid var(--color-divider);padding-bottom:var(--space-2)">
+              <div style="display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap">
+                <h2 style="font-size:21px;margin:0">Daftar Outstanding menunggu persetujuan</h2>
+                <span class="text-muted" style="font-size:13px">Retensi · Maintenance · Addwork — disusun QS</span>
+              </div>
+            </div>
+            <sc-for list="{{ otsPendingCards }}" as="pl" hint-placeholder-count="1">
+              <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-3);border-color:var(--color-accent)">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;flex-wrap:wrap">
+                  <div>
+                    <div style="font-family:var(--font-heading);font-size:22px;font-weight:700">{{ pl.id }}</div>
+                    <div class="text-muted" style="font-size:12.5px">Diajukan {{ pl.oleh }} · {{ pl.dibuat }} · {{ pl.proyek }}</div>
+                  </div>
+                  <span class="tag tag-accent">{{ pl.count }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:var(--space-3) 0">
+                  <span class="text-muted" style="font-size:12.5px">{{ pl.ringkas }}</span>
+                  <span style="font-family:var(--font-heading);font-size:22px;font-weight:700">{{ pl.nilai }}</span>
+                </div>
+                <div style="display:flex;flex-direction:column">
+                  <sc-for list="{{ pl.items }}" as="oi" hint-placeholder-count="3">
+                    <div class="ots-row" style="display:grid;grid-template-columns:150px 1.6fr 90px 110px 110px 130px;gap:var(--space-3);align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+                      <span style="font-family:var(--font-heading);font-weight:700" data-l="Kode">{{ oi.id }}</span>
+                      <span data-l="Deskripsi">
+                        <span style="display:block;font-weight:600">{{ oi.deskripsi }}</span>
+                        <span class="text-muted" style="display:block;font-size:11.5px;color:{{ oi.jenisFg }}">{{ oi.jenis }}</span>
+                      </span>
+                      <span data-l="Volume">{{ oi.volTxt }}</span>
+                      <span data-l="Nilai" style="font-weight:600">{{ oi.nilai }}</span>
+                      <span data-l="Target">{{ oi.target }}</span>
+                      <span data-l="Aksi" class="no-print">
+                        <sc-if value="{{ oi.canApprove }}" hint-placeholder-val="{{ true }}">
+                          <button onClick="{{ oi.onApprove }}" class="btn btn-primary" style="font-size:11.5px;padding:6px 10px;min-height:0">Setujui item</button>
+                        </sc-if>
+                        <sc-if value="{{ oi.canApprove }}" hint-placeholder-val="{{ false }}">
+                          <span style="font-weight:700;color:{{ oi.statusFg }};font-size:12px">{{ oi.status }}</span>
+                        </sc-if>
+                      </span>
+                    </div>
+                  </sc-for>
+                </div>
+                <button onClick="{{ pl.onAll }}" class="btn btn-primary meja-all-btn" style="min-height:44px;font-family:var(--font-heading);letter-spacing:0.05em;text-transform:uppercase">Setujui semua item</button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
         <sc-for list="{{ mejaGroups }}" as="g" hint-placeholder-count="3">
           <div style="display:flex;flex-direction:column;gap:var(--space-3)">
             <div class="meja-group-head" style="display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;border-bottom:1px solid var(--color-divider);padding-bottom:var(--space-2)">
@@ -2304,6 +2354,30 @@ class Component extends DCLogic {
     o.status = nextStatus;
     this.touch(); this.flash(this.dispId(o) + ' → ' + nextStatus);
   }
+  otsApproveItem(itemId) {
+    const o = this.otsById(itemId); if (!o || o.status !== 'Draft') return;
+    const me = this.PEOPLE.direktur;
+    o.status = 'Belum Dikerjakan';
+    o.trail.push({ ts: this.now(), actor: me, peran: 'Direktur', aksi: 'Disetujui Direktur', note: '' });
+    const list = this.otsList(o.listId);
+    if (list && this.otsItemsOfList(list).every(x => x.status !== 'Draft')) {
+      list.status = 'Selesai';
+      list.trail.push({ ts: this.now(1), actor: me, peran: 'Direktur', aksi: 'Daftar selesai diproses', note: 'Seluruh item telah diputuskan' });
+    }
+    this.touch(); this.flash(this.dispId(o) + ' disetujui — Aktif.');
+  }
+  otsApproveAll(listId) {
+    const list = this.otsList(listId); if (!list || list.status !== 'Menunggu Direktur') return;
+    const me = this.PEOPLE.direktur;
+    const items = this.otsItemsOfList(list).filter(x => x.status === 'Draft');
+    items.forEach(o => {
+      o.status = 'Belum Dikerjakan';
+      o.trail.push({ ts: this.now(), actor: me, peran: 'Direktur', aksi: 'Disetujui Direktur', note: 'Bersama daftar ' + list.id });
+    });
+    list.status = 'Selesai';
+    list.trail.push({ ts: this.now(1), actor: me, peran: 'Direktur', aksi: 'Daftar disetujui — semua item Aktif', note: items.length + ' item outstanding disetujui sekaligus' });
+    this.touch(); this.flash(list.id + ' — ' + items.length + ' item outstanding disetujui.');
+  }
   otsBuatReq(id) {
     const o = this.otsById(id); if (!o) return;
     const me = this.PEOPLE.supervisi;
@@ -3092,6 +3166,29 @@ class Component extends DCLogic {
       this.flash('CSV realisasi diunduh — buka dengan Excel.');
     };
 
+    // ─── OUTSTANDING — daftar menunggu Direktur ───────────────────────────────
+    const otsPendingLists = (s.outstandingLists || []).filter(l => l.status === 'Menunggu Direktur');
+    const otsPendingCards = otsPendingLists.map(list => {
+      const items = this.otsItemsOfList(list);
+      const totalNilai = items.reduce((a, o) => a + Number(o.nilai || 0), 0);
+      const perJenis = ['Retensi', 'Maintenance', 'Addwork'].map(j => {
+        const n = items.filter(o => o.jenis === j).length;
+        return n ? n + ' ' + j : null;
+      }).filter(Boolean).join(' · ');
+      return {
+        id: list.id, oleh: list.oleh, dibuat: list.dibuat, proyek: this.proyekNama(list.proyek),
+        count: items.length + ' item', ringkas: perJenis, nilai: rp(totalNilai),
+        onAll: () => this.otsApproveAll(list.id),
+        items: items.map(o => ({
+          id: this.dispId(o), jenis: o.jenis, jenisFg: this.otsJenisFg(o.jenis),
+          deskripsi: o.deskripsi, volTxt: this.num(o.volume) + ' ' + o.satuan, nilai: rp(o.nilai),
+          target: this.tgl(o.targetTgl), penanggung: o.penanggung, status: o.status,
+          canApprove: o.status === 'Draft', statusFg: this.otsColor(o.status),
+          onApprove: () => this.otsApproveItem(o.id)
+        }))
+      };
+    });
+
     // ─── OUTSTANDING view ─────────────────────────────────────────────────────
     const seesRupiah = ['qs', 'pm', 'direktur'].includes(role);
     const OJENIS = ['Retensi', 'Maintenance', 'Addwork'];
@@ -3215,6 +3312,7 @@ class Component extends DCLogic {
       outsGroups, outsEmpty, outsShowPenanggung: role !== 'supervisi',
       otsJenisSel, otsStatusSel, otsPenanggungSel,
       otsDetailView,
+      otsPendingCards, hasOtsPending: role === 'direktur' && otsPendingCards.length > 0,
       stokGroups, stokEmpty: !stokGroups.length,
       stokTabKartu: stokTab === 'kartu', stokTabMasuk: stokTab === 'masuk', stokTabKeluar: stokTab === 'keluar',
       stokTabKartuFg: stokTab === 'kartu' ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
@@ -3266,7 +3364,7 @@ class Component extends DCLogic {
         this.setState({ bundles: s.bundles.concat([bundle]), reqs: s.reqs.slice(), sbks: s.sbks.slice(), pos: s.pos.slice(), bundleSel: {} });
         this.flash(id + ' dikirim ke Direktur — ' + bundlePicked.length + ' dokumen, ' + rp(bundlePicked.reduce((a, x) => a + this.nilaiOf(x.t, x.d), 0)) + '.');
       },
-      mejaGroups, mejaEmpty: !mejaGroups.length && !bundleCards.length, hasBundles: !!bundleCards.length, mejaCount: mejaAll.length,
+      mejaGroups, mejaEmpty: !mejaGroups.length && !bundleCards.length && !(role === 'direktur' && otsPendingCards.length), hasBundles: !!bundleCards.length, mejaCount: mejaAll.length,
       mejaNilai: rp(mejaAll.reduce((a, x) => a + this.nilaiOf(x.t, x.d), 0)),
       belanjaMinggu: rp(s.pos.filter(p => ['TTD Direktur', 'Dikirim ke Toko'].includes(p.status)).reduce((a, p) => a + this.nilaiPo(p), 0)),
       boqOverCount: boqOverJobs, boqBorder: boqOverJobs ? this.RED : 'var(--color-divider)', boqFg: boqOverJobs ? this.RED : 'var(--color-accent-700)',
