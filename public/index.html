@@ -804,7 +804,7 @@ main{container-type:inline-size;container-name:shell}
             <span class="text-muted">Dibuat<br><strong style="color:var(--color-text);font-size:14px">{{ sel.dibuat }}</strong></span>
             <span class="text-muted">Pemohon<br><strong style="color:var(--color-text);font-size:14px">{{ sel.pemohon }}</strong></span>
             <sc-if value="{{ sel.asal }}" hint-placeholder-val="{{ false }}">
-              <span class="text-muted">Kode permintaan asal<br><strong style="color:var(--color-text);font-size:14px">{{ sel.asal }}</strong></span>
+              <span class="text-muted">{{ sel.asalLabel }}<br><strong style="color:var(--color-text);font-size:14px">{{ sel.asal }}</strong></span>
             </sc-if>
             <span class="text-muted">{{ sel.nilaiLabel }}<br><strong style="color:var(--color-text);font-size:14px">{{ sel.nilai }}</strong></span>
             <sc-if value="{{ sel.butuhTxt }}" hint-placeholder-val="{{ false }}">
@@ -2380,15 +2380,14 @@ class Component extends DCLogic {
   }
   otsBuatReq(id) {
     const o = this.otsById(id); if (!o) return;
-    const me = this.PEOPLE.supervisi;
-    const s = this.state;
-    const nextNo = 33 + (s.reqs.length - 6);
-    const req = { id: 'REQ-2026-0' + nextNo, proyek: o.proyek, minggu: 33, butuh: this.isoAdd(this.isoToday(), 3), status: 'Cek PM', dibuat: this.now(), oleh: me, otsId: o.id,
-      jobs: [{ jobId: (o.sumberBq && o.sumberBq.ref) || 'kabinet', vol: Number(o.volume) || 1, mats: [] }],
-      trail: [{ ts: this.now(), actor: me, peran: 'Supervisi', aksi: 'Diajukan', note: 'Permintaan material untuk pekerjaan outstanding ' + this.dispId(o) + ' (' + o.jenis + ')' }] };
-    o.trail.push({ ts: this.now(1), actor: me, peran: 'Supervisi', aksi: 'Permintaan material diajukan', note: 'Tertaut ' + this.dispId(req) });
-    this.setState({ reqs: s.reqs.concat([req]), outstandings: s.outstandings.slice() });
-    this.flash(this.dispId(req) + ' diajukan — tertaut ke ' + this.dispId(o) + '.');
+    // Route SPV ke form permintaan — form akan melampirkan otsId saat submit.
+    this.setState({
+      role: 'supervisi', screen: 'form', editId: null, otsIdDraft: id, proyek: o.proyek,
+      butuhDraft: this.isoAdd(this.isoToday(), 3),
+      draft: [{ jobId: (o.sumberBq && o.sumberBq.ref) || '', vol: o.volume || '', mats: [{ itemId: '', vol: '' }] }],
+      sel: null, showNotif: false
+    });
+    this.flash('Form permintaan disiapkan untuk pekerjaan ' + this.dispId(o) + ' — isi material lalu ajukan.');
   }
   nilaiReq(r) { return this.lines(r).reduce((a, l) => a + Number(l.vol || 0) * this.item(l.itemId).harga, 0); }
   nilaiSbk(s) { return s.lines.reduce((a, l) => a + Number(l.vol || 0) * this.item(l.itemId).harga, 0); }
@@ -3066,8 +3065,16 @@ class Component extends DCLogic {
     const RPJ = s.proyek;
     const posPJRealisasi = s.pos.filter(p => (p.proyek || 'pakuwon') === RPJ && p.status === 'Barang Datang');
     const sbksPJRealisasi = s.sbks.filter(sb => (sb.proyek || 'pakuwon') === RPJ);
-    const catOfPoLine = l => {
+    const catOfPoLine = (p, l) => {
       if (l.subKategori) return l.subKategori;
+      // REQ.otsId → OTS jenis 'Addwork' → seluruh baris PO ikut kategori Addwork
+      if (p && p.reqId) {
+        const req = s.reqs.find(r => r.id === p.reqId);
+        if (req && req.otsId) {
+          const o = this.otsById(req.otsId);
+          if (o && o.jenis === 'Addwork') return 'Addwork';
+        }
+      }
       if (l.itemId) {
         const map = { 'CIVIL': 'Material Civil', 'FURNITURE': 'Material Furniture', 'ME': 'Material ME',
           'FINISHING': 'Material Finishing', 'LAS REX': 'Las Rex', 'BOX PANEL': 'Box Panel' };
@@ -3078,7 +3085,7 @@ class Component extends DCLogic {
     // Total belanja & PPN per kategori laporan
     const rTotal = {}, rPpn = {};
     posPJRealisasi.forEach(p => (p.lines || []).forEach(l => {
-      const c = catOfPoLine(l); if (!c) return;
+      const c = catOfPoLine(p, l); if (!c) return;
       rTotal[c] = (rTotal[c] || 0) + this.poLineTotalBeli(l);
       rPpn[c] = (rPpn[c] || 0) + this.poLineTotalPpn(l);
     }));
@@ -3132,7 +3139,7 @@ class Component extends DCLogic {
     } else {
       let no = 0;
       posPJRealisasi.forEach(p => {
-        const filtered = (p.lines || []).filter(l => catOfPoLine(l) === realisasiCat);
+        const filtered = (p.lines || []).filter(l => catOfPoLine(p, l) === realisasiCat);
         if (!filtered.length) return;
         let subT = 0, subP = 0;
         filtered.forEach(l => {
@@ -3401,8 +3408,8 @@ class Component extends DCLogic {
           boqExport);
         this.flash('Dua CSV diunduh — budget & validasi BoQ (' + this.proyekNama(PJ) + ').');
       },
-      formTitle: editing ? 'Edit Permintaan — ' + editing.id : 'Rencana Kerja & Permintaan Material',
-      formSub: editing ? 'Perbaiki sesuai catatan revisi, lalu ajukan ulang.' : 'Isi item pekerjaan lebih dulu; material menempel di bawahnya.',
+      formTitle: editing ? 'Edit Permintaan — ' + editing.id : (s.otsIdDraft ? 'Permintaan Material — untuk Outstanding ' + this.dispId(this.otsById(s.otsIdDraft) || { id: s.otsIdDraft }) : 'Rencana Kerja & Permintaan Material'),
+      formSub: editing ? 'Perbaiki sesuai catatan revisi, lalu ajukan ulang.' : (s.otsIdDraft ? 'Lengkapi material yang dibutuhkan untuk pekerjaan outstanding. Belanja akan masuk kategori Addwork pada Laporan Realisasi.' : 'Isi item pekerjaan lebih dulu; material menempel di bawahnya.'),
       submitLabel: editing ? 'Simpan & ajukan ulang' : 'Ajukan permintaan',
       jobs, jobCount: s.draft.length + ' item pekerjaan', rekapRows, rekapEmpty: !rekapRows.length, draftNilai: rp(draftTotal),
       butuhDraft: s.butuhDraft, onButuhDraft: e => this.setState({ butuhDraft: e.target.value }),
@@ -3427,10 +3434,15 @@ class Component extends DCLogic {
           this.flash(editing.id + ' diajukan ulang — masuk Cek PM.');
           return;
         }
-        const req = { id: 'REQ-2026-0' + (33 + s.reqs.length - 6), minggu: 33, butuh: s.butuhDraft, status: 'Cek PM', dibuat: this.now(), oleh: 'Jefta', jobs: jobsData,
-          trail: [{ ts: this.now(), actor: 'Jefta', peran: 'Supervisi', aksi: 'Diajukan', note: jobsData.length + ' item pekerjaan · tanggal kebutuhan ' + this.tgl(s.butuhDraft) }] };
-        this.setState({ reqs: s.reqs.concat([req]), draft: [{ jobId: '', vol: '', mats: [{ itemId: '', vol: '' }] }], screen: 'riwayat' });
-        this.flash('Permintaan ' + req.id + ' diajukan untuk tanggal kirim ' + this.tgl(s.butuhDraft) + '.');
+        const otsIdDraft = s.otsIdDraft || null;
+        const req = { id: 'REQ-2026-0' + (33 + s.reqs.length - 6), proyek: s.proyek, minggu: 33, butuh: s.butuhDraft, status: 'Cek PM', dibuat: this.now(), oleh: 'Jefta', jobs: jobsData, otsId: otsIdDraft || undefined,
+          trail: [{ ts: this.now(), actor: 'Jefta', peran: 'Supervisi', aksi: 'Diajukan', note: jobsData.length + ' item pekerjaan · tanggal kebutuhan ' + this.tgl(s.butuhDraft) + (otsIdDraft ? ' · untuk pekerjaan Outstanding ' + this.dispId(this.otsById(otsIdDraft) || { id: otsIdDraft }) : '') }] };
+        if (otsIdDraft) {
+          const o = this.otsById(otsIdDraft);
+          if (o) o.trail.push({ ts: this.now(1), actor: 'Jefta', peran: 'Supervisi', aksi: 'Permintaan material diajukan', note: 'Tertaut ' + this.dispId(req) });
+        }
+        this.setState({ reqs: s.reqs.concat([req]), draft: [{ jobId: '', vol: '', mats: [{ itemId: '', vol: '' }] }], otsIdDraft: null, screen: 'riwayat', outstandings: (s.outstandings || []).slice() });
+        this.flash('Permintaan ' + req.id + ' diajukan' + (otsIdDraft ? ' — tertaut ke ' + this.dispId(this.otsById(otsIdDraft) || { id: otsIdDraft }) : '') + '.');
       },
       workTitle: workName, workRows, workEmpty: !workRows.length && !(role === 'purchasing' && readyUnits.length),
       workSub: { supervisi: 'Kiriman yang menunggu penerimaan atau perbaikan Anda.', pm: 'Permintaan yang menunggu pemeriksaan tahapan dan validasi BoQ.', qs: 'Permintaan yang menunggu pemeriksaan volume terhadap BoQ.', gudang: 'Cek gudang hanya muncul atas permintaan Purchasing.', purchasing: 'Minta cek gudang, susun PO multi-toko beserta terminnya, dan gabungkan tagihan untuk Finance.', finance: 'Rekap per toko, nota, dan unggah bukti transfer.', direktur: '' }[role],
@@ -3448,7 +3460,9 @@ class Component extends DCLogic {
       sel: cur ? {
         id: this.dispId(d), jenis: this.JENIS[t], status: d.status, dibuat: d.dibuat,
         pemohon: t === 'req' ? d.oleh + ' — Supervisi' : t === 'pay' ? d.oleh + ' — Purchasing' : (d.pemohon || d.oleh) + ' — Supervisi',
-        asal: t === 'sbk' || t === 'po' ? this.dispReqId(d.reqId) : (t === 'pay' ? this.payPoIds(d).map(pid => this.dispId(s.pos.find(p => p.id === pid) || { id: pid })).join(', ') : ''),
+        asal: t === 'sbk' || t === 'po' ? this.dispReqId(d.reqId) : (t === 'pay' ? this.payPoIds(d).map(pid => this.dispId(s.pos.find(p => p.id === pid) || { id: pid })).join(', ') : (t === 'req' && d.otsId ? this.dispId(this.otsById(d.otsId) || { id: d.otsId }) + ' (Outstanding · ' + ((this.otsById(d.otsId) || {}).jenis || '-') + ')' : '')),
+        asalLabel: t === 'req' && d.otsId ? 'Untuk pekerjaan Outstanding' : (t === 'pay' ? 'PO terkait' : 'Kode permintaan asal'),
+        hasOtsAsal: t === 'req' && !!d.otsId,
         isSbk: t === 'sbk',
         sbkHeader: t === 'sbk' ? 'Diambil oleh ' + (d.pemohon || d.oleh) + ' — untuk proyek ' + this.proyekNama(d.proyek) : '',
         nilai: rp(nilai), nilaiLabel: t === 'req' ? 'Estimasi BoQ' : t === 'po' ? 'Total PO' : 'Nilai',
