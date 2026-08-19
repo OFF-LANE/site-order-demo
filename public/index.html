@@ -1454,6 +1454,178 @@ main{container-type:inline-size;container-name:shell}
       </div>
     </sc-if>
 
+    <sc-if value="{{ showOuts }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-5)">
+        <div>
+          <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Outstanding</div>
+          <h1 style="font-size:28px;margin:var(--space-2) 0 0">{{ outsTitle }}</h1>
+          <div class="text-muted" style="font-size:13px;margin-top:2px">{{ outsSub }}</div>
+        </div>
+        <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:end">
+          <div><div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Jenis</div>{{ otsJenisSel }}</div>
+          <div><div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Status</div>{{ otsStatusSel }}</div>
+          <sc-if value="{{ outsShowPenanggung }}" hint-placeholder-val="{{ true }}">
+            <div><div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Penanggung</div>{{ otsPenanggungSel }}</div>
+          </sc-if>
+        </div>
+        <sc-if value="{{ outsEmpty }}" hint-placeholder-val="{{ false }}">
+          <div class="card" style="padding:var(--space-8);text-align:center">
+            <div style="font-family:var(--font-heading);font-size:20px">Tidak ada item outstanding</div>
+            <div class="text-muted" style="font-size:13px">Coba ubah filter atau ganti proyek.</div>
+          </div>
+        </sc-if>
+        <sc-for list="{{ outsGroups }}" as="og" hint-placeholder-count="3">
+          <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <div class="ots-group-head" style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:baseline;flex-wrap:wrap;border-bottom:2px solid {{ og.jenisFg }};padding-bottom:var(--space-2)">
+              <div style="display:flex;gap:var(--space-3);align-items:baseline;flex-wrap:wrap">
+                <h2 style="font-family:var(--font-heading);font-size:20px;margin:0;color:{{ og.jenisFg }}">{{ og.jenis }}</h2>
+                <span class="text-muted" style="font-size:12.5px">{{ og.ringkas }}</span>
+              </div>
+              <sc-if value="{{ og.showTotal }}" hint-placeholder-val="{{ false }}">
+                <span style="font-family:var(--font-heading);font-size:17px;font-weight:700">{{ og.totalNilai }}</span>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column">
+              <div class="ots-row-head" style="display:grid;grid-template-columns:160px 1.6fr 110px 120px 130px 130px 130px;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700)">
+                <span>Kode</span><span>Deskripsi</span><span>Volume</span><span>Nilai</span><span>Target</span><span>Penanggung</span><span>Status</span>
+              </div>
+              <sc-for list="{{ og.items }}" as="it" hint-placeholder-count="3">
+                <div class="ots-row" style="display:grid;grid-template-columns:160px 1.6fr 110px 120px 130px 130px 130px;gap:var(--space-3);align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);font-size:13.5px;cursor:pointer" onClick="{{ it.onOpen }}">
+                  <span style="font-family:var(--font-heading);font-weight:700" data-l="Kode">{{ it.id }}</span>
+                  <span data-l="Deskripsi">
+                    <span style="display:block;font-weight:600">{{ it.deskripsi }}</span>
+                    <sc-if value="{{ it.showBq }}" hint-placeholder-val="{{ true }}">
+                      <span class="text-muted" style="display:block;font-size:11.5px">Sumber BQ: {{ it.bqLabel }}</span>
+                    </sc-if>
+                    <sc-if value="{{ it.retensiTxt }}" hint-placeholder-val="{{ false }}">
+                      <span class="text-muted" style="display:block;font-size:11px">{{ it.retensiTxt }}</span>
+                    </sc-if>
+                  </span>
+                  <span data-l="Volume">{{ it.volTxt }}</span>
+                  <span data-l="Nilai">
+                    <sc-if value="{{ it.showNilai }}" hint-placeholder-val="{{ true }}">
+                      <span style="font-weight:600">{{ it.nilai }}</span>
+                    </sc-if>
+                    <sc-if value="{{ it.statusTagih }}" hint-placeholder-val="{{ false }}">
+                      <span class="text-muted" style="display:block;font-size:11px">Tagih: {{ it.statusTagih }}</span>
+                    </sc-if>
+                  </span>
+                  <span data-l="Target">
+                    <span style="display:block">{{ it.target }}</span>
+                    <span style="font-size:11.5px;font-weight:700;color:{{ it.targetFg }}">{{ it.targetTxt }}</span>
+                  </span>
+                  <span class="text-muted" data-l="Penanggung">{{ it.penanggung }}</span>
+                  <span data-l="Status" style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">
+                    <span style="font-weight:700;color:{{ it.statusFg }}">{{ it.status }}</span>
+                    <span class="no-print" style="display:flex;gap:4px;flex-wrap:wrap">
+                      <sc-if value="{{ it.canNext }}" hint-placeholder-val="{{ false }}">
+                        <button onClick="{{ it.onNext }}" class="btn btn-primary" style="font-size:11px;padding:4px 8px;min-height:0" onclick="event.stopPropagation()">{{ it.nextLabel }}</button>
+                      </sc-if>
+                      <sc-if value="{{ it.canVerify }}" hint-placeholder-val="{{ false }}">
+                        <button onClick="{{ it.onVerify }}" class="btn btn-primary" style="font-size:11px;padding:4px 8px;min-height:0" onclick="event.stopPropagation()">Verifikasi</button>
+                      </sc-if>
+                      <sc-if value="{{ it.canReq }}" hint-placeholder-val="{{ false }}">
+                        <button onClick="{{ it.onReq }}" class="btn btn-ghost" style="font-size:11px;padding:4px 8px;min-height:0" onclick="event.stopPropagation()">+ Material</button>
+                      </sc-if>
+                    </span>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showOtsDetail }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+        <div class="no-print"><button onClick="{{ otsDetailView.onBack }}" class="btn btn-ghost">&larr; Kembali ke daftar</button></div>
+        <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-4)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;flex-wrap:wrap">
+            <div>
+              <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:{{ otsDetailView.jenisFg }}">{{ otsDetailView.jenis }}</div>
+              <div style="font-family:var(--font-heading);font-size:24px;font-weight:700">{{ otsDetailView.id }}</div>
+              <div style="font-size:15px;margin-top:4px">{{ otsDetailView.deskripsi }}</div>
+            </div>
+            <span style="font-weight:700;color:{{ otsDetailView.statusFg }}">{{ otsDetailView.status }}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-4);border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:var(--space-3) 0">
+            <div><div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Volume</div><div style="font-size:16px;font-weight:600">{{ otsDetailView.volTxt }}</div></div>
+            <sc-if value="{{ otsDetailView.showNilai }}" hint-placeholder-val="{{ true }}">
+              <div><div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Nilai</div><div style="font-size:16px;font-weight:600">{{ otsDetailView.nilai }}</div></div>
+            </sc-if>
+            <div><div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Target selesai</div><div style="font-size:15px">{{ otsDetailView.target }}</div><div style="font-size:12px;font-weight:700;color:{{ otsDetailView.targetFg }}">{{ otsDetailView.targetTxt }}</div></div>
+            <div><div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Penanggung</div><div style="font-size:15px">{{ otsDetailView.penanggung }}</div></div>
+            <sc-if value="{{ otsDetailView.showBq }}" hint-placeholder-val="{{ true }}">
+              <div><div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Sumber BQ</div><div style="font-size:13px">{{ otsDetailView.bqLabel }}</div></div>
+            </sc-if>
+            <sc-if value="{{ otsDetailView.statusTagih }}" hint-placeholder-val="{{ false }}">
+              <div><div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Status tagih</div><div style="font-size:13px">{{ otsDetailView.statusTagih }}</div></div>
+            </sc-if>
+            <sc-if value="{{ otsDetailView.retensiTxt }}" hint-placeholder-val="{{ false }}">
+              <div><div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700)">Masa retensi</div><div style="font-size:13px">{{ otsDetailView.retensiTxt }}</div></div>
+            </sc-if>
+          </div>
+          <div>
+            <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:4px">Foto bukti pekerjaan</div>
+            <div style="height:220px;border:1px solid var(--color-divider)">
+              <image-slot id="{{ otsDetailView.fotoSlotId }}" shape="rect" placeholder="Foto sebelum/sesudah"></image-slot>
+            </div>
+          </div>
+          <div class="no-print" style="display:flex;gap:var(--space-2);flex-wrap:wrap">
+            <sc-if value="{{ otsDetailView.canNext }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ otsDetailView.onNext }}" class="btn btn-primary" style="min-height:44px">{{ otsDetailView.nextLabel }}</button>
+            </sc-if>
+            <sc-if value="{{ otsDetailView.canVerify }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ otsDetailView.onVerify }}" class="btn btn-primary" style="min-height:44px">Diverifikasi</button>
+            </sc-if>
+            <sc-if value="{{ otsDetailView.canReq }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ otsDetailView.onReq }}" class="btn btn-secondary" style="min-height:44px">Ajukan material untuk pekerjaan ini</button>
+            </sc-if>
+          </div>
+          <sc-if value="{{ otsDetailView.hasReqTaut }}" hint-placeholder-val="{{ false }}">
+            <div style="border-top:1px solid var(--color-divider);padding-top:var(--space-3)">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:var(--space-2)">Permintaan material tertaut</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <sc-for list="{{ otsDetailView.reqTaut }}" as="rt" hint-placeholder-count="1">
+                  <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:center;border:1px solid var(--color-divider);padding:var(--space-2) var(--space-3);cursor:pointer" onClick="{{ rt.onOpen }}">
+                    <span style="font-family:var(--font-heading);font-weight:600">{{ rt.id }}</span>
+                    <span class="tag tag-accent">{{ rt.status }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+        <div class="card blueprint" style="padding:var(--space-6);gap:var(--space-3)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700)">Jejak audit</div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ otsDetailView.trail }}" as="ev" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:18px 1fr;gap:var(--space-4)">
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div style="width:9px;height:9px;background:{{ ev.dot }};margin-top:5px;flex-shrink:0"></div>
+                  <sc-if value="{{ ev.hasLine }}" hint-placeholder-val="{{ true }}"><div style="width:1px;flex:1;background:var(--color-divider);min-height:20px"></div></sc-if>
+                </div>
+                <div style="padding-bottom:var(--space-4)">
+                  <div style="display:flex;justify-content:space-between;gap:var(--space-3);flex-wrap:wrap;align-items:baseline">
+                    <span style="font-family:var(--font-heading);font-size:16px;font-weight:600;color:{{ ev.titleColor }}">{{ ev.aksi }}</span>
+                    <span class="text-muted" style="font-size:12.5px">{{ ev.ts }}</span>
+                  </div>
+                  <div class="text-muted" style="font-size:12.5px">{{ ev.actor }} — {{ ev.peran }}</div>
+                  <sc-if value="{{ ev.note }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:13px;border-left:2px solid var(--color-accent);padding:var(--space-2) var(--space-3);margin-top:var(--space-2);background:var(--color-accent-100)">{{ ev.note }}</div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ showRiwayat }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;flex-direction:column;gap:var(--space-4)">
         <div>
@@ -2124,6 +2296,26 @@ class Component extends DCLogic {
   otsJenisFg(j) { return ({ 'Retensi': '#8a5a2b', 'Maintenance': 'var(--color-accent-800)', 'Addwork': this.RED })[j] || 'var(--color-neutral-700)'; }
   otsTargetTxt(iso) { const n = this.sisaHari(iso); if (n === null) return '-'; if (n < 0) return 'lewat ' + Math.abs(n) + ' hari'; if (n === 0) return 'hari ini'; return n + ' hari lagi'; }
   otsTargetFg(iso, status) { if (status === 'Diverifikasi' || status === 'Selesai') return 'var(--color-accent-700)'; const n = this.sisaHari(iso); if (n === null) return 'var(--color-neutral-700)'; return n < 0 ? this.RED : n <= 3 ? this.ORANGE : 'var(--color-accent-700)'; }
+  otsAdvance(id, nextStatus) {
+    const o = this.otsById(id); if (!o || !nextStatus) return;
+    const role = this.state.role, me = this.PEOPLE[role], peran = this.PERAN[role];
+    const aksiMap = { 'Dikerjakan': 'Mulai dikerjakan', 'Selesai': 'Ditandai Selesai', 'Diverifikasi': 'Diverifikasi' };
+    o.trail.push({ ts: this.now(), actor: me, peran, aksi: aksiMap[nextStatus] || nextStatus, note: '' });
+    o.status = nextStatus;
+    this.touch(); this.flash(this.dispId(o) + ' → ' + nextStatus);
+  }
+  otsBuatReq(id) {
+    const o = this.otsById(id); if (!o) return;
+    const me = this.PEOPLE.supervisi;
+    const s = this.state;
+    const nextNo = 33 + (s.reqs.length - 6);
+    const req = { id: 'REQ-2026-0' + nextNo, proyek: o.proyek, minggu: 33, butuh: this.isoAdd(this.isoToday(), 3), status: 'Cek PM', dibuat: this.now(), oleh: me, otsId: o.id,
+      jobs: [{ jobId: (o.sumberBq && o.sumberBq.ref) || 'kabinet', vol: Number(o.volume) || 1, mats: [] }],
+      trail: [{ ts: this.now(), actor: me, peran: 'Supervisi', aksi: 'Diajukan', note: 'Permintaan material untuk pekerjaan outstanding ' + this.dispId(o) + ' (' + o.jenis + ')' }] };
+    o.trail.push({ ts: this.now(1), actor: me, peran: 'Supervisi', aksi: 'Permintaan material diajukan', note: 'Tertaut ' + this.dispId(req) });
+    this.setState({ reqs: s.reqs.concat([req]), outstandings: s.outstandings.slice() });
+    this.flash(this.dispId(req) + ' diajukan — tertaut ke ' + this.dispId(o) + '.');
+  }
   nilaiReq(r) { return this.lines(r).reduce((a, l) => a + Number(l.vol || 0) * this.item(l.itemId).harga, 0); }
   nilaiSbk(s) { return s.lines.reduce((a, l) => a + Number(l.vol || 0) * this.item(l.itemId).harga, 0); }
   nilaiPo(p) { return p.lines.reduce((a, l) => a + Number(l.vol || 0) * Number(l.harga || 0), 0); }
@@ -2192,6 +2384,7 @@ class Component extends DCLogic {
     if (role !== 'direktur') tabs.push(['work', workName + (queue.length ? ' (' + queue.length + ')' : '')]);
     if (['gudang', 'purchasing', 'qs', 'finance', 'direktur'].includes(role)) tabs.push(['stok', 'Kartu Stok']);
     if (['qs', 'pm', 'purchasing', 'finance', 'direktur'].includes(role)) tabs.push(['realisasi', 'Realisasi Belanja']);
+    if (['qs', 'pm', 'direktur', 'supervisi'].includes(role)) tabs.push(['outs', role === 'supervisi' ? 'Outstanding Saya' : 'Outstanding']);
     tabs.push(['riwayat', 'Riwayat']);
     const navTabs = tabs.map(([k, label]) => ({
       label, fg: s.screen === k ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
@@ -2899,6 +3092,95 @@ class Component extends DCLogic {
       this.flash('CSV realisasi diunduh — buka dengan Excel.');
     };
 
+    // ─── OUTSTANDING view ─────────────────────────────────────────────────────
+    const seesRupiah = ['qs', 'pm', 'direktur'].includes(role);
+    const OJENIS = ['Retensi', 'Maintenance', 'Addwork'];
+    const OSTATUS_AKTIF = ['Belum Dikerjakan', 'Dikerjakan', 'Selesai', 'Diverifikasi'];
+    const otsAll = (s.outstandings || []).filter(o => o.proyek === s.proyek && o.status !== 'Draft');
+    const penanggungOpts = Array.from(new Set(otsAll.map(o => o.penanggung))).filter(Boolean);
+    const fOtsJenis = s.fOtsJenis || 'Semua jenis';
+    const fOtsStatus = s.fOtsStatus || 'Semua status';
+    const fOtsPenanggung = role === 'supervisi' ? me : (s.fOtsPenanggung || 'Semua penanggung');
+    const otsFiltered = otsAll.filter(o =>
+      (fOtsJenis === 'Semua jenis' || o.jenis === fOtsJenis) &&
+      (fOtsStatus === 'Semua status' || o.status === fOtsStatus) &&
+      (fOtsPenanggung === 'Semua penanggung' || o.penanggung === fOtsPenanggung));
+    const canVerify = ['pm', 'qs'].includes(role);
+    const canProgress = ['supervisi', 'pm', 'qs'].includes(role);
+    const buildOtsRow = o => {
+      const jenisFg = this.otsJenisFg(o.jenis);
+      const nextStatus = { 'Belum Dikerjakan': 'Dikerjakan', 'Dikerjakan': 'Selesai' }[o.status] || null;
+      const nextLabel = nextStatus === 'Dikerjakan' ? 'Mulai dikerjakan' : nextStatus === 'Selesai' ? 'Tandai selesai' : '';
+      return {
+        id: this.dispId(o), jenis: o.jenis, jenisFg,
+        deskripsi: o.deskripsi, volTxt: this.num(o.volume) + ' ' + o.satuan,
+        nilai: rp(o.nilai), showNilai: seesRupiah,
+        bqLabel: o.sumberBq && o.sumberBq.label ? o.sumberBq.label : '-', showBq: seesRupiah,
+        target: this.tgl(o.targetTgl), targetTxt: this.otsTargetTxt(o.targetTgl), targetFg: this.otsTargetFg(o.targetTgl, o.status),
+        penanggung: o.penanggung, status: o.status, statusFg: this.otsColor(o.status),
+        statusTagih: o.jenis === 'Addwork' ? (o.statusTagih || 'Belum diajukan') : '',
+        retensiTxt: o.jenis === 'Retensi' && o.retensiMulai ? 'Retensi ' + this.tgl(o.retensiMulai) + ' – ' + this.tgl(o.retensiAkhir) : '',
+        canNext: canProgress && !!nextStatus, nextLabel,
+        canVerify: canVerify && o.status === 'Selesai',
+        canReq: o.jenis === 'Addwork' && ['pm', 'qs', 'supervisi'].includes(role) && o.status !== 'Diverifikasi',
+        onNext: () => this.otsAdvance(o.id, nextStatus),
+        onVerify: () => this.otsAdvance(o.id, 'Diverifikasi'),
+        onReq: () => this.otsBuatReq(o.id),
+        onOpen: () => this.setState({ screen: 'otsDetail', otsId: o.id })
+      };
+    };
+    const outsGroups = OJENIS.map(j => {
+      const items = otsFiltered.filter(o => o.jenis === j);
+      const selesai = items.filter(o => o.status === 'Selesai' || o.status === 'Diverifikasi').length;
+      const verif = items.filter(o => o.status === 'Diverifikasi').length;
+      const total = items.reduce((a, o) => a + Number(o.nilai || 0), 0);
+      return {
+        jenis: j, jenisFg: this.otsJenisFg(j),
+        count: items.length, ringkas: items.length + ' item · ' + selesai + ' selesai · ' + verif + ' diverifikasi',
+        totalNilai: rp(total), showTotal: seesRupiah,
+        items: items.map(buildOtsRow), hasItems: items.length > 0
+      };
+    }).filter(g => g.count > 0);
+    const outsEmpty = !outsGroups.length;
+    const otsJenisSel = React.createElement('select', { className: 'input', value: fOtsJenis, style: { width: 'auto' }, onChange: e => this.setState({ fOtsJenis: e.target.value }) },
+      ['Semua jenis'].concat(OJENIS).map(o => React.createElement('option', { key: o, value: o }, o)));
+    const otsStatusSel = React.createElement('select', { className: 'input', value: fOtsStatus, style: { width: 'auto' }, onChange: e => this.setState({ fOtsStatus: e.target.value }) },
+      ['Semua status'].concat(OSTATUS_AKTIF).map(o => React.createElement('option', { key: o, value: o }, o)));
+    const otsPenanggungSel = React.createElement('select', { className: 'input', value: fOtsPenanggung, style: { width: 'auto' }, onChange: e => this.setState({ fOtsPenanggung: e.target.value }) },
+      ['Semua penanggung'].concat(penanggungOpts).map(o => React.createElement('option', { key: o, value: o }, o)));
+
+    // Detail satu item outstanding
+    const otsCur = s.screen === 'otsDetail' && s.otsId ? this.otsById(s.otsId) : null;
+    const otsDetailView = otsCur ? (() => {
+      const nextStatus = { 'Belum Dikerjakan': 'Dikerjakan', 'Dikerjakan': 'Selesai' }[otsCur.status] || null;
+      const nextLabel = nextStatus === 'Dikerjakan' ? 'Mulai dikerjakan' : nextStatus === 'Selesai' ? 'Tandai selesai' : '';
+      return {
+        id: this.dispId(otsCur), jenis: otsCur.jenis, jenisFg: this.otsJenisFg(otsCur.jenis),
+        deskripsi: otsCur.deskripsi, volTxt: this.num(otsCur.volume) + ' ' + otsCur.satuan,
+        nilai: rp(otsCur.nilai), showNilai: seesRupiah,
+        bqLabel: otsCur.sumberBq && otsCur.sumberBq.label ? otsCur.sumberBq.label : '-', showBq: seesRupiah,
+        target: this.tgl(otsCur.targetTgl), targetTxt: this.otsTargetTxt(otsCur.targetTgl), targetFg: this.otsTargetFg(otsCur.targetTgl, otsCur.status),
+        penanggung: otsCur.penanggung, status: otsCur.status, statusFg: this.otsColor(otsCur.status),
+        statusTagih: otsCur.jenis === 'Addwork' ? (otsCur.statusTagih || 'Belum diajukan') : '',
+        retensiTxt: otsCur.jenis === 'Retensi' && otsCur.retensiMulai ? 'Retensi ' + this.tgl(otsCur.retensiMulai) + ' – ' + this.tgl(otsCur.retensiAkhir) : '',
+        fotoSlotId: 'ots-foto-' + otsCur.id,
+        canNext: canProgress && !!nextStatus, nextLabel,
+        canVerify: canVerify && otsCur.status === 'Selesai',
+        canReq: otsCur.jenis === 'Addwork' && ['pm', 'qs', 'supervisi'].includes(role) && otsCur.status !== 'Diverifikasi',
+        onNext: () => this.otsAdvance(otsCur.id, nextStatus),
+        onVerify: () => this.otsAdvance(otsCur.id, 'Diverifikasi'),
+        onReq: () => this.otsBuatReq(otsCur.id),
+        onBack: () => this.setState({ screen: 'outs', otsId: null }),
+        reqTaut: (s.reqs || []).filter(r => r.otsId === otsCur.id).map(r => ({ id: this.dispId(r), status: r.status, onOpen: () => this.open('req', r.id) })),
+        hasReqTaut: (s.reqs || []).some(r => r.otsId === otsCur.id),
+        trail: (otsCur.trail || []).map((e, i, arr) => ({
+          ts: e.ts, actor: e.actor, peran: e.peran, aksi: e.aksi, note: this.renderNote(e), hasLine: i < arr.length - 1,
+          dot: /Ditolak|Selisih|Dibatalkan/.test(e.aksi) ? this.RED : /Disetujui|Diverifikasi|Selesai/.test(e.aksi) ? 'var(--color-accent)' : 'var(--color-neutral-500)',
+          titleColor: /Ditolak/.test(e.aksi) ? this.RED : 'var(--color-text)'
+        }))
+      };
+    })() : null;
+
     const onExportStok = () => {
       if (stokTab === 'masuk') {
         this.downloadCsv('barang-masuk.csv',
@@ -2926,6 +3208,13 @@ class Component extends DCLogic {
       showMeja: s.screen === 'meja', showBudget: s.screen === 'budget', showForm: role === 'supervisi' && s.screen === 'form',
       showWork: s.screen === 'work', showDetail: s.screen === 'detail' && !!cur, showRiwayat: s.screen === 'riwayat',
       showStok: s.screen === 'stok',
+      showOuts: s.screen === 'outs',
+      showOtsDetail: s.screen === 'otsDetail' && !!otsDetailView,
+      outsTitle: role === 'supervisi' ? 'Pekerjaan Sisa — tanggung jawab Anda' : 'Pekerjaan Sisa Proyek',
+      outsSub: role === 'supervisi' ? 'Retensi · Maintenance · Addwork yang dibebankan ke Anda.' : 'Retensi · Maintenance · Addwork · nilai rupiah dan sumber BQ hanya untuk QS/PM/Direktur.',
+      outsGroups, outsEmpty, outsShowPenanggung: role !== 'supervisi',
+      otsJenisSel, otsStatusSel, otsPenanggungSel,
+      otsDetailView,
       stokGroups, stokEmpty: !stokGroups.length,
       stokTabKartu: stokTab === 'kartu', stokTabMasuk: stokTab === 'masuk', stokTabKeluar: stokTab === 'keluar',
       stokTabKartuFg: stokTab === 'kartu' ? 'var(--color-accent-900)' : 'var(--color-neutral-700)',
